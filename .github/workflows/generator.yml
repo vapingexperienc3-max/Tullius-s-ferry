@@ -18,6 +18,27 @@ jobs:
           python <<EOF
           import os
 
+          # 1. 아카라이브 저장본(SingleFile) 너비 제한 자동 해제 함수
+          def inject_width_style(filepath):
+              style_code = """
+              <style>
+                body, .fr-view, #content, .main-container, div[class*="content"] { 
+                  max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
+                }
+                img { max-width: 100% !important; height: auto !important; }
+              </style>
+              """
+              try:
+                  with open(filepath, 'r', encoding='utf-8') as f:
+                      content = f.read()
+                  if 'max-width: 100% !important' not in content:
+                      new_content = content.replace('<head>', '<head>' + style_code)
+                      with open(filepath, 'w', encoding='utf-8') as f:
+                          f.write(new_content)
+                      print(f"Injected style into: {filepath}")
+              except:
+                  pass
+
           def generate_html_list(startpath):
               html_content = ""
               for root, dirs, files in sorted(os.walk(startpath)):
@@ -38,31 +59,31 @@ jobs:
                       html_content += "<ul style='margin: 0; padding: 15px 40px; list-style-type: square;'>"
                       
                       for f in sorted(html_files):
-                          raw_path = os.path.join(rel_path, f)
-                          clean_path = raw_path.replace(os.sep, '/')
-                          if clean_path.startswith('./'): clean_path = clean_path[2:]
+                          raw_path = os.path.join(root, f)
+                          inject_width_style(raw_path) # 파일마다 너비해제 코드 주입
+                          
+                          rel_file_path = os.path.relpath(raw_path, startpath).replace(os.sep, '/')
                           display_f = f.replace('.html', '')
-                          html_content += f'<li style="margin: 10px 0;"><a href="{clean_path}" target="_blank" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
+                          # 링크 색상을 금색(#ffce54)으로 변경
+                          html_content += f'<li style="margin: 10px 0;"><a href="{rel_file_path}" target="_blank" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
                       
                       html_content += "</ul></details>"
               return html_content
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
-              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tullius's Ferry</title><style>")
-              # 커서와 배경 설정 (강력 고정)
-              f.write("html, body, a, summary, * { cursor: url('https://img.icons8.com/ios-filled/30/ffffff/navigation.png'), auto !important; }")
+              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tulius's Ferry</title><style>")
+              f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
-              f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255,255,255,0.2); letter-spacing: 2px; text-transform: uppercase; }")
-              f.write("summary::-webkit-details-marker { display: none; }")
-              f.write("a:hover { color: #55efc4 !important; text-decoration: underline; }")
-              # 중요: 여기서 스타일과 헤더를 닫아줘야 합니다!
-              f.write("</style></head><body>")
+              f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; }")
+              # 호버 시에도 금색 유지 및 강조
+              f.write("summary::-webkit-details-marker { display: none; } a:hover { color: #fff !important; text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
-              f.write("<h1>Tullius's Ferry</h1>")
-              f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.' (I knew it would come to this one day. I knew. And no one believed.).</p>")
+              f.write("<h1>Tulius's Ferry</h1>")
+              f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
               f.write(generate_html_list('.'))
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
+              # 눈송이 개수 150개로 상향
               f.write("<script>particlesJS('particles-js', {'particles':{'number':{'value':150},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});</script>")
               f.write("</body></html>")
           EOF
@@ -71,10 +92,10 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
+          git add .
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "fix: restore site structure and lock cursor"
+            git commit -m "style: apply gold theme, increase snow density, and auto-inject width styles"
             git push
           fi
