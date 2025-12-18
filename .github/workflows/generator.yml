@@ -96,7 +96,7 @@ jobs:
           with open('index.html', 'w', encoding='utf-8') as f:
               # 1. 헤더 및 스타일 설정
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
-              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tulius's Ferry</title><style>")
+              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tulius's Ferry&Vault 404-Vault boy's Outpost</title><style>")
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
               f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }")
@@ -108,35 +108,44 @@ jobs:
               f.write("#search-bar:focus { background: rgba(255, 255, 255, 0.2); border-color: #ffce54; box-shadow: 0 0 10px rgba(255, 206, 84, 0.3); }")
               f.write("summary::-webkit-details-marker { display: none; } a:hover { color: #fff !important; text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
               
-              # 2. 본문 인터페이스
+              # 2. 본문 인터페이스 시작
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
-              f.write("<h1>Tulius's Ferry</h1>")
-              f.write("<div class='nav-tabs'><a href='#' class='nav-btn active'>SKYRIM</a><a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 폴아웃 보관소가 준비되지 않았습니다.\"); return false;'>FALLOUT (☢️)</a></div>")
+              
+             # 제목 영역 (두 이름을 나란히 배치)
+              f.write("<div style='display: flex; align-items: baseline; gap: 15px; border-bottom: 2px solid #586069; margin-bottom: 15px;'>")
+              f.write("<h1 style='border-bottom: none; margin-bottom: 0;'>Tulius's Ferry</h1>")
+              f.write("<span style='color: #ffce54; font-weight: bold; font-size: 1.2em; letter-spacing: 1px;'>& Vault 404-Vault boy's Outpost ☢️</span>")
+              f.write("</div>")
+              
+              # 버튼 영역 (버튼 이름은 짧고 간결하게 유지하는 것이 모바일에서 안 깨집니다)
+              f.write("<div class='nav-tabs'>")
+              f.write("<a href='#' class='nav-btn active'>🚣 나룻배 (스카이림)</a>")
+              f.write("<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ 볼트 404 (폴아웃)</a>")
+              f.write("</div>")
+              
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
+              
+              # (1순위) 검색창
               f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색 (예: 로어림, 에러픽스...)' onkeyup='filterList()'>")
-              
-              # 3. 파일 목록 생성
-              f.write(generate_html_list('.'))
 
-              # --- 이용 팁 & 후기 섹션 ---
-              f.write("<details style='background: rgba(255, 206, 84, 0.05); border: 1px solid rgba(255, 206, 84, 0.2); border-radius: 8px; padding: 15px; margin-bottom: 20px;'>")
-              f.write("<summary style='color: #ffce54; font-weight: bold; cursor: pointer; outline: none; list-style: none;'>[🚢 툴리우스의 나룻배 & Vault 404 가이드 및 후기]</summary>")
-              f.write("<div style='margin-top: 15px; font-size: 0.9em; color: #ccc; line-height: 1.7;'>")
+              # (2순위) 고정형 이용 가이드 및 제작 후기 (details 대신 div 사용)
+              f.write("<div style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px); text-align: left;'>")
+              f.write("<h3 style='color: #ffce54; margin-top: 0; margin-bottom: 15px; font-size: 1.1em; border: none;'>[🚣 툴리우스의 나룻배 & ☢️ Vault boy's Outpost 가이드 및 후기]</h3>")
+              f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8;'>")
               
-              # 1. 이용 팁 (테라박스 내용 포함)
-              f.write("<p><strong>💡 이용 팁:</strong><br>")
+              f.write("<p style='margin-bottom: 15px;'><strong>💡 이용 팁:</strong><br>")
               f.write("- 대부분의 파일은 <strong>HTML 양식</strong>으로 백업되어 있습니다. (기술적 한계로 영상은 출력되지 않습니다.)<br>")
               f.write("- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, 외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.<br>")
               f.write("- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 <strong>테라박스 원본</strong>으로 백업되어 있습니다. (파일 암호 필수 확인)<br>")
-              # 테라박스 피드백 문구를 위로 올림
-              f.write("<span style='color: #ffce54;'>* 테라박스 링크가 깨졌을 경우 툴챈이나 코네에 피드백 부탁드립니다.</span></p>")
+              f.write("<span style='color: #ffce54; font-weight: bold;'>* 테라박스 링크가 깨졌을 경우 툴챈이나 코네에 피드백 부탁드립니다.</span></p>")
               
-              # 2. 제작 후기 (구분선 뒤로 배치)
-              f.write("<p style='border-top: 1px solid rgba(255,206,84,0.1); padding-top: 10px;'><strong>✍️ 후기:</strong><br>")
+              f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px; margin-top: 15px;'><strong>✍️ 후기:</strong><br>")
               f.write("공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>")
               f.write("툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p>")
-              
-              f.write("</div></details>")
+              f.write("</div></div>")
+
+              # (3순위) 파일 목록 생성
+              f.write(generate_html_list('.'))
 
               # 4. 스크립트 (눈송이 + 검색기능)
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
