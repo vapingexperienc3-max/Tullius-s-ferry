@@ -125,8 +125,8 @@ jobs:
               
               # 버튼 영역 (버튼 이름은 짧고 간결하게 유지하는 것이 모바일에서 안 깨집니다)
               f.write("<div class='nav-tabs'>")
-              f.write("<a href='#' class='nav-btn active'>🚣 나룻배 (스카이림)</a>")
-              f.write("<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ 볼트 404 (폴아웃)</a>")
+              f.write("<a href='#' class='nav-btn active'>🚣 Ferry (Skyrim)</a>")
+              f.write("<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ Vault 404 (Fallout)</a>")
               f.write("</div>")
               
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
@@ -136,7 +136,7 @@ jobs:
 
               # (2순위) 고정형 이용 가이드 및 제작 후기 (details 대신 div 사용)
               f.write("<div style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px); text-align: left;'>")
-              f.write("<h3 style='color: #ffce54; margin-top: 0; margin-bottom: 15px; font-size: 1.1em; border: none;'>[🚣 툴리우스의 나룻배 & ☢️ Vault boy's Outpost 가이드 및 후기]</h3>")
+              f.write("<h3 style='color: #ffce54; margin-top: 0; margin-bottom: 15px; font-size: 1.1em; border: none;'>[🚣 Tullius's Ferry & ☢️ Vault 404-Vault boy's Outpost 가이드 및 후기]</h3>")
               f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8;'>")
               
               f.write("<p style='margin-bottom: 15px;'><strong>💡 이용 팁:</strong><br>")
