@@ -111,10 +111,16 @@ jobs:
               # 2. 본문 인터페이스 시작
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               
-             # 제목 영역 (두 이름을 나란히 배치)
-              f.write("<div style='display: flex; align-items: baseline; gap: 15px; border-bottom: 2px solid #586069; margin-bottom: 15px;'>")
-              f.write("<h1 style='border-bottom: none; margin-bottom: 0;'>Tulius's Ferry</h1>")
-              f.write("<span style='color: #ffce54; font-weight: bold; font-size: 1.2em; letter-spacing: 1px;'>& Vault 404-Vault boy's Outpost ☢️</span>")
+              # --- 제목 영역 (디자인 3번: 풀네임 및 대비 강조) ---
+              f.write("<div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;'>")
+              
+              # 툴리우스: 두껍고 묵직한 화이트
+              f.write("<span style='font-size: 2.2em; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: -1px;'>TULIUS'S FERRY</span>")
+              
+              # 볼트 404 풀네임: 얇고 세련된 골드 (Vault 404 부분만 살짝 더 강조)
+              f.write("<span style='font-size: 1.7em; font-weight: 200; color: #ffce54; letter-spacing: 0.5px; opacity: 0.9;'>")
+              f.write("& <strong style='font-weight: 600;'>Vault 404</strong> - Vault boy's Outpost ☢️</span>")
+              
               f.write("</div>")
               
               # 버튼 영역 (버튼 이름은 짧고 간결하게 유지하는 것이 모바일에서 안 깨집니다)
