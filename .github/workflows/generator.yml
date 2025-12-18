@@ -1,4 +1,19 @@
-- name: Generate nested index.html
+name: Generate Index
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate nested index.html
         run: |
           python <<EOF
           import os
@@ -35,7 +50,6 @@
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
               f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tulius's Ferry</title><style>")
-              # 아래 background 관련 코드를 절대 중간에 엔터 치지 말고 한 줄로 쭉 이어야 합니다.
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; cursor: url('https://cur.cursors-4u.net/games/gam-13/gam1251.cur'), auto; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
               f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255,255,255,0.2); letter-spacing: 2px; text-transform: uppercase; }")
               f.write("summary::-webkit-details-marker { display: none; } a:hover { color: #55efc4 !important; text-decoration: underline; }</style></head><body>")
@@ -46,16 +60,16 @@
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
               f.write("<script>particlesJS('particles-js', {'particles':{'number':{'value':80},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});</script>")
               f.write("</body></html>")
-              EOF
+          EOF
 
-        - name: Commit and Push
-          run: |  
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add index.html
-            if git diff --cached --quiet; then
-              echo "No changes"
-            else
-              git commit -m "style: apply skyrim theme with particles and cursor"
-              git push
-            fi
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "style: apply skyrim theme with particles and cursor"
+            git push
+          fi
