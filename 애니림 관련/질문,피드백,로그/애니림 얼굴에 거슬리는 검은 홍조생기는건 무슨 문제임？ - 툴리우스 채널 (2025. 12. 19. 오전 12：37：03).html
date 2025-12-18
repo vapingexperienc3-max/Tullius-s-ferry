@@ -1,4 +1,15 @@
-<!DOCTYPE html> <html lang=ko class="width-1300 navbar-scroll" style=font-size:15px><!--
+
+    <style>
+      /* 아카라이브 컨테이너 강제 확장 */
+      body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
+        max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
+      }
+      img { max-width: 100% !important; height: auto !important; }
+      
+      /* 상단 닉네임 및 아이콘 영역 숨기기 (추가 보안) */
+      .navbar-wrapper .user-info, .navbar-wrapper .nav-item.member { display: none !important; }
+    </style>
+    <!DOCTYPE html> <html lang=ko class="width-1300 navbar-scroll" style=font-size:15px><!--
  Page saved with SingleFile 
  url: https://arca.live/b/tullius/155361532?target=all&keyword=%EC%95%A0%EB%8B%88%EB%A6%BC+%ED%99%8D%EC%A1%B0&p=1 
  saved date: Fri Dec 19 2025 00:37:03 GMT+0900 (한국 표준시)
@@ -310,7 +321,7 @@
  
  <li class="nav-item dropdown user-menu-parent">
  <a aria-expanded=true class="nav-link dropdown-toggle user-menu-link loggedin" href=# title="Member Menu" data-toggle=dropdown aria-haspopup=true>
- <span class="username d-none d-sm-inline">Ryl3</span>
+ <span class="username d-none d-sm-inline"></span>
  <span class=ion-person></span>
  </a>
  <div class="dropdown-menu user-dropdown-menu right sf-hidden">
@@ -794,7 +805,7 @@
  
  </div>
  
- <input class=reply-form-user-input type=text disabled value=Ryl3>
+ <input class=reply-form-user-input type=text disabled value=>
  
  </div>
  <div class=reply-form-button-container>
