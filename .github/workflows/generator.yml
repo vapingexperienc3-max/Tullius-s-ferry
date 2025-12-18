@@ -29,49 +29,52 @@ jobs:
 
           def generate_html_list(startpath):
               html_content = ""
-              # 정렬된 순서로 폴더 탐색
+              # os.walk를 돌며 폴더별로 처리
               for root, dirs, files in sorted(os.walk(startpath)):
-                  # 숨김 폴더(.git, .github 등) 제외
                   dirs[:] = [d for d in dirs if not d.startswith('.')]
                   
-                  # 현재 폴더 내 html 파일들 (index.html 제외)
                   html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
                   
                   if html_files:
                       rel_path = os.path.relpath(root, startpath)
-                      # 폴더명을 요약 제목으로 사용 (Root 폴더는 별도 표시)
-                      display_name = "📂 전체 목록 (루트)" if rel_path == "." else f"📂 {rel_path}"
+                      display_name = "📂 Root Directory" if rel_path == "." else f"📂 {rel_path}"
                       
-                      # <details> 태그로 감싸서 접기/펴기 기능 추가
-                      html_content += f"<details style='margin-bottom: 10px; border: 1px solid #aaa; padding: 5px; border-radius: 5px;'>"
-                      html_content += f"<summary style='font-weight: bold; cursor: pointer; padding: 5px;'>{display_name} ({len(html_files)}개)</summary>"
-                      html_content += "<ul style='margin-top: 10px;'>"
+                      # 접기/펴기 디자인 적용
+                      html_content += f"<details style='margin-bottom: 12px; border: 1px solid #e1e4e8; border-radius: 6px; overflow: hidden;'>"
+                      html_content += f"<summary style='background-color: #f6f8fa; padding: 12px; font-weight: bold; cursor: pointer; list-style: none; border-bottom: 1px solid #e1e4e8;'>{display_name} ({len(html_files)}개)</summary>"
+                      html_content += "<ul style='margin: 0; padding: 10px 40px; list-style-type: disc;'>"
                       
                       for f in sorted(html_files):
-                          file_path = os.path.join(rel_path, f).replace('\\', '/')
-                          if file_path.startswith('./'): file_path = file_path[2:]
-                          html_content += f'<li><a href="{file_path}" target="_blank">{f}</a></li>'
+                          # 에러 원인이었던 백슬래시 처리 수정
+                          raw_path = os.path.join(rel_path, f)
+                          clean_path = raw_path.replace(os.sep, '/')
+                          if clean_path.startswith('./'): clean_path = clean_path[2:]
+                          
+                          html_content += f'<li style="margin: 8px 0;"><a href="{clean_path}" target="_blank" style="color: #0366d6; text-decoration: none;">{f}</a></li>'
                           
                       html_content += "</ul></details>"
               return html_content
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
+              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'>")
               f.write("<title>Tulius's Ferry Index</title>")
-              f.write("<style>body{font-family:sans-serif; padding:20px; max-width: 800px; margin: auto;}")
-              f.write("summary:hover{background-color: #f0f0f0;} li{margin-bottom: 5px;}</style></head><body>")
-              f.write("<h1>파일 목록 자동 생성 (카테고리별)</h1>")
+              f.write("<style>body{font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Helvetica, Arial, sans-serif; line-height: 1.5; padding: 30px; max-width: 900px; margin: auto; color: #24292e;}")
+              f.write("h1{border-bottom: 1px solid #eaecef; padding-bottom: .3em;} summary::-webkit-details-marker { display: none; }</style></head><body>")
+              f.write("<h1>Tulius's Ferry Index</h1>")
+              f.write("<p style='color: #586069;'>파일 목록이 자동으로 업데이트됩니다. 폴더를 클릭하여 내용을 확인하세요.</p>")
               f.write(generate_html_list('.'))
               f.write("</body></html>")
           EOF
+
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
           if git diff --cached --quiet; then
-            echo "No changes to commit"
+            echo "No changes"
           else
-            git commit -m "Auto-generate index.html"
+            git commit -m "style: add collapsible folder structure to index"
             git push
           fi
