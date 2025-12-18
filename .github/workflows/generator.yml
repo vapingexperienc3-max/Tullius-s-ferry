@@ -99,13 +99,47 @@ jobs:
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
               f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; }")
+              # 검색창 스타일 추가
+              f.write("#search-bar { width: 100%; padding: 12px 20px; margin: 20px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; font-size: 1em; backdrop-filter: blur(5px); outline: none; transition: 0.3s; }")
+              f.write("#search-bar:focus { background: rgba(255, 255, 255, 0.2); border-color: #ffce54; box-shadow: 0 0 10px rgba(255, 206, 84, 0.3); }")
               f.write("summary::-webkit-details-marker { display: none; } a:hover { color: #fff !important; text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               f.write("<h1>Tulius's Ferry</h1>")
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
+              # 검색창 입력 필드
+              f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색 (예: 로어림, 에러픽스...)' onkeyup='filterList()'>")
               f.write(generate_html_list('.'))
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
               f.write("<script>particlesJS('particles-js', {'particles':{'number':{'value':150},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});</script>")
+              # 검색 스크립트 추가
+              f.write("""<script>
+              function filterList() {
+                  let input = document.getElementById('search-bar').value.toLowerCase();
+                  let details = document.querySelectorAll('details');
+                  
+                  details.forEach(detail => {
+                      let items = detail.querySelectorAll('li');
+                      let folderVisible = false;
+                      
+                      items.forEach(item => {
+                          let text = item.textContent.toLowerCase();
+                          if (text.includes(input)) {
+                              item.style.display = "";
+                              folderVisible = true;
+                          } else {
+                              item.style.display = "none";
+                          }
+                      });
+                      
+                      if (folderVisible) {
+                          detail.style.display = "";
+                          if (input.length > 0) detail.open = true; // 검색 중일 때 자동으로 폴더 열기
+                      } else {
+                          detail.style.display = "none";
+                      }
+                  });
+              }
+              </script>""")
               f.write("</body></html>")
           EOF
 
