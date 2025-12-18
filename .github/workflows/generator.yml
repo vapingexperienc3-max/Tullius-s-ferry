@@ -55,7 +55,7 @@ jobs:
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
               f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'>")
-              f.write("<title>Tulius's Ferry Index</title>")
+              f.write("<title>Tulius's Ferry</title>")
               # --- 스카이림 쌈뽕 배경 스타일 시작 ---
               f.write("<style>")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg');")
@@ -67,7 +67,7 @@ jobs:
               f.write("</style></head><body>")
               # --- 스타일 끝 ---
               f.write("<h1>Tulius's Ferry Index</h1>")
-              f.write("<p style='color: #bdc3c7;'>파일 목록이 자동으로 업데이트됩니다. 폴더를 클릭하여 내용을 확인하세요.</p>")
+              f.write("<p style='color: #bdc3c7;'>"언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지." (I knew it would come to this one day. I knew. And no one believed.).</p>")
               f.write(generate_html_list('.'))
               f.write("</body></html>")
           EOF
