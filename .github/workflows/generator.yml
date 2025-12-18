@@ -24,12 +24,8 @@ jobs:
               # 아카라이브 글 영역을 강제로 넓히는 스타일
               style_code = """
               <style>
-                /* 아카라이브 컨테이너 강제 확장 */
                 body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
-                  max-width: 100% !important; 
-                  width: 100% !important; 
-                  margin: 0 !important; 
-                  padding: 10px !important; 
+                  max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
                 }
                 img { max-width: 100% !important; height: auto !important; }
               </style>
@@ -38,18 +34,23 @@ jobs:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
                   
-                  # 주입 여부 확인 (중복 주입 방지)
+                  # 1. 닉네임(ryl3) 삭제 로직
+                  target_nick = "ryl3"
+                  if target_nick in content:
+                      content = content.replace(target_nick, "")
+                      print(f"🧹 Cleaned nickname 'ryl3' from: {filepath}")
+
+                  # 2. 너비 제한 스타일 주입
                   if 'max-width: 100% !important' not in content:
                       if '<head>' in content:
-                          new_content = content.replace('<head>', '<head>' + style_code)
-                          with open(filepath, 'w', encoding='utf-8') as f:
-                              f.write(new_content)
-                          print(f"✅ Success: Style injected into {filepath}")
+                          content = content.replace('<head>', '<head>' + style_code)
                       else:
-                          # head 태그가 없으면 맨 위에 추가
-                          with open(filepath, 'w', encoding='utf-8') as f:
-                              f.write(style_code + content)
-                          print(f"⚠️ Warning: No <head> found, prepended to {filepath}")
+                          content = style_code + content
+                      print(f"✅ Success: Style injected into {filepath}")
+
+                  # 변경된 내용을 파일에 저장
+                  with open(filepath, 'w', encoding='utf-8') as f:
+                      f.write(content)
               except Exception as e:
                   print(f"❌ Error processing {filepath}: {e}")
 
