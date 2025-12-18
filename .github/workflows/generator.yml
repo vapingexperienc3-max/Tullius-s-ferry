@@ -1,28 +1,4 @@
-name: Generate File List Index
-
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - '**.html'
-      - '!index.html'
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Generate nested index.html
+- name: Generate nested index.html
         run: |
           python <<EOF
           import os
@@ -35,19 +11,30 @@ jobs:
                   
                   if html_files:
                       rel_path = os.path.relpath(root, startpath)
-                      display_name = "📂 Root Directory" if rel_path == "." else f"📂 {rel_path}"
+                      # 1. 아이콘 및 이름 설정 (드래곤 문양 이미지 사용)
+                      icon_url = "https://img.icons8.com/ios-filled/50/ffffff/skyrim.png"
+                      icon_html = f"<img src='{icon_url}' style='width:18px; margin-right:10px; opacity:0.9; vertical-align:text-bottom;'>"
+                      display_name = "MAIN ARCHIVE" if rel_path == "." else rel_path.upper()
                       
-                      # 쌈뽕한 디자인 적용된 details 태그
-                      html_content += f"<details style='margin-bottom: 15px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; overflow: hidden;'>"
-                      html_content += f"<summary style='background-color: rgba(255, 255, 255, 0.15); padding: 15px; font-weight: bold; cursor: pointer; list-style: none; color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.1);'>{display_name} ({len(html_files)}개)</summary>"
-                      html_content += "<ul style='margin: 0; padding: 15px 40px; list-style-type: disc;'>"
+                      # 2. 카테고리 박스 디자인 (스카이림 UI 스타일)
+                      html_content += f"<details style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
+                      
+                      # 3. 요약 줄 (아이콘 + 폴더명 + 파일수)
+                      html_content += f"<summary style='padding: 15px; font-weight: bold; cursor: pointer; list-style: none; color: #fff; letter-spacing: 1.5px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05);'>"
+                      html_content += f"<span>{icon_html}{display_name}</span>"
+                      html_content += f"<span style='font-size: 0.8em; color: #888; font-family: monospace;'>[{len(html_files)} FILES]</span>"
+                      html_content += "</summary>"
+                      
+                      # 4. 파일 리스트
+                      html_content += "<ul style='margin: 0; padding: 15px 40px; list-style-type: square;'>"
                       
                       for f in sorted(html_files):
                           raw_path = os.path.join(rel_path, f)
                           clean_path = raw_path.replace(os.sep, '/')
                           if clean_path.startswith('./'): clean_path = clean_path[2:]
-                          
-                          html_content += f'<li style="margin: 10px 0;"><a href="{clean_path}" target="_blank" style="color: #81ecec; text-decoration: none; font-weight: 500;">{f}</a></li>'
+                          # 파일명에서 .html 확장자 제거하여 더 깔끔하게 표시
+                          display_f = f.replace('.html', '')
+                          html_content += f'<li style="margin: 10px 0;"><a href="{clean_path}" target="_blank" style="color: #81ecec; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
                       
                       html_content += "</ul></details>"
               return html_content
@@ -56,19 +43,26 @@ jobs:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
               f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'>")
               f.write("<title>Tulius's Ferry</title>")
-              # --- 스카이림 쌈뽕 배경 스타일 시작 ---
+              
               f.write("<style>")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg');")
               f.write("background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000;")
+              f.write("cursor: url('https://cur.cursors-4u.net/games/gam-13/gam1251.cur'), auto;")
               f.write("font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
-              f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; }")
+              f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255,255,255,0.2); letter-spacing: 2px; text-transform: uppercase; }")
               f.write("summary::-webkit-details-marker { display: none; }")
               f.write("a:hover { color: #55efc4 !important; text-decoration: underline; }")
               f.write("</style></head><body>")
-              # --- 스타일 끝 ---
+              
+              f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               f.write("<h1>Tulius's Ferry</h1>")
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.' (I knew it would come to this one day. I knew. And no one believed.).</p>")
               f.write(generate_html_list('.'))
+              
+              f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
+              f.write("<script>")
+              f.write("particlesJS('particles-js', {'particles':{'number':{'value':80},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});")
+              f.write("</script>")
               f.write("</body></html>")
           EOF
 
@@ -80,6 +74,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "style: apply skyrim theme via auto-generator"
+            git commit -m "style: apply skyrim theme with particles and cursor"
             git push
           fi
