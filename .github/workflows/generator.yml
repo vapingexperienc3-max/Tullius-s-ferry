@@ -6,7 +6,7 @@ on:
     branches:
       - main  # HTML 파일이 있는 브랜치 이름
     paths:
-      - '**.html' # HTML 파일 변경 시에만 실행 (오류 수정됨)
+      - '**.html' **# HTML 파일 변경 시에만 실행 (공백 추가됨)**
 
 jobs:
   build:
