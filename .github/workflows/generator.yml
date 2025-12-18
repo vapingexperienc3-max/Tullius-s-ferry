@@ -94,64 +94,36 @@ jobs:
               return html_content
 
           with open('index.html', 'w', encoding='utf-8') as f:
+              # 1. 헤더 및 스타일 설정
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
               f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tulius's Ferry</title><style>")
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
-              f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }")
-              
-              # 버튼 스타일 (스카이림-폴아웃 전환)
-              f.write(".nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; }")
-              f.write(".nav-btn { padding: 8px 15px; border: 1px solid rgba(255,206,84,0.5); border-radius: 4px; color: #ffce54; text-decoration: none; font-size: 0.8em; font-weight: bold; background: rgba(0,0,0,0.4); transition: 0.3s; }")
-              f.write(".nav-btn:hover { background: #ffce54; color: #000; box-shadow: 0 0 10px #ffce54; }")
-              f.write(".nav-btn.active { background: rgba(255,206,84,0.2); border-color: #ffce54; }")
-
+              f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }")
+              f.write(".nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; }")
+              f.write(".nav-btn { padding: 8px 18px; border: 1px solid rgba(255,206,84,0.4); border-radius: 4px; color: #ffce54; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; letter-spacing: 1px; }")
+              f.write(".nav-btn:hover { background: #ffce54; color: #000; box-shadow: 0 0 12px rgba(255,206,84,0.5); }")
+              f.write(".nav-btn.active { background: rgba(255,206,84,0.15); border-color: #ffce54; cursor: default !important; }")
               f.write("#search-bar { width: 100%; padding: 12px 20px; margin: 20px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; font-size: 1em; backdrop-filter: blur(5px); outline: none; transition: 0.3s; }")
               f.write("#search-bar:focus { background: rgba(255, 255, 255, 0.2); border-color: #ffce54; box-shadow: 0 0 10px rgba(255, 206, 84, 0.3); }")
               f.write("summary::-webkit-details-marker { display: none; } a:hover { color: #fff !important; text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
+              
+              # 2. 본문 인터페이스
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
-              
-              # 제목 및 네비게이션 버튼
               f.write("<h1>Tulius's Ferry</h1>")
-              f.write("<div class='nav-tabs'>")
-              f.write("<a href='#' class='nav-btn active'>SKYRIM</a>")
-              # 나중에 폴아웃 저장소 만들면 아래 href 주소를 '/fallout-archive' 식으로 바꾸면 됩니다
-              f.write("<a href='#' class='nav-btn' onclick='alert(\"아직 폴아웃 보관소가 준비되지 않았습니다.\"); return false;'>FALLOUT (☢️)</a>")
-              f.write("</div>")
-              
+              f.write("<div class='nav-tabs'><a href='#' class='nav-btn active'>SKYRIM</a><a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 폴아웃 보관소가 준비되지 않았습니다.\"); return false;'>FALLOUT (☢️)</a></div>")
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
               f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색 (예: 로어림, 에러픽스...)' onkeyup='filterList()'>")
+              
+              # 3. 파일 목록 생성
               f.write(generate_html_list('.'))
-              # 검색 스크립트 추가
-              f.write("""<script>
-              function filterList() {
-                  let input = document.getElementById('search-bar').value.toLowerCase();
-                  let details = document.querySelectorAll('details');
-                  
-                  details.forEach(detail => {
-                      let items = detail.querySelectorAll('li');
-                      let folderVisible = false;
-                      
-                      items.forEach(item => {
-                          let text = item.textContent.toLowerCase();
-                          if (text.includes(input)) {
-                              item.style.display = "";
-                              folderVisible = true;
-                          } else {
-                              item.style.display = "none";
-                          }
-                      });
-                      
-                      if (folderVisible) {
-                          detail.style.display = "";
-                          if (input.length > 0) detail.open = true; // 검색 중일 때 자동으로 폴더 열기
-                      } else {
-                          detail.style.display = "none";
-                      }
-                  });
-              }
-              </script>""")
-              f.write("</body></html>")
+              
+              # 4. 스크립트 (눈송이 + 검색기능)
+              f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
+              f.write("<script>")
+              f.write("particlesJS('particles-js', {'particles':{'number':{'value':150,'density':{'enable':true,'value_area':800}},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5,'random':true},'size':{'value':3,'random':true},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});")
+              f.write("function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('details').forEach(d=>{let v=false;d.querySelectorAll('li').forEach(i=>{let t=i.textContent.toLowerCase();if(t.includes(q)){i.style.display='';v=true;}else{i.style.display='none';}});if(v){d.style.display='';if(q.length>0)d.open=true;}else{d.style.display='none';}})}")
+              f.write("</script></body></html>")
           EOF
 
       - name: Commit and Push
