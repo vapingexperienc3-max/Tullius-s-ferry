@@ -96,7 +96,7 @@ jobs:
           with open('index.html', 'w', encoding='utf-8') as f:
               # 1. 헤더 및 스타일 설정
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
-              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tulius's Ferry&Vault 404-Vault boy's Outpost</title><style>")
+              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tullius's Ferry&Vault 404-Vault boy's Outpost</title><style>")
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
               f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }")
@@ -115,7 +115,7 @@ jobs:
               f.write("<div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;'>")
               
               # 툴리우스: 두껍고 묵직한 화이트
-              f.write("<span style='font-size: 2.2em; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: -1px;'>TULIUS'S FERRY</span>")
+              f.write("<span style='font-size: 2.2em; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: -1px;'>TULLIUS'S FERRY</span>")
               
               # 볼트 404 풀네임: 얇고 세련된 골드 (Vault 404 부분만 살짝 더 강조)
               f.write("<span style='font-size: 1.7em; font-weight: 200; color: #ffce54; letter-spacing: 0.5px; opacity: 0.9;'>")
