@@ -1,21 +1,25 @@
-yaml
+YAML
+
 name: Generate File List Index
 
 on:
   push:
     branches:
-      - main  # HTML 파일이 있는 브랜치 이름
+      - main
     paths:
-      - '**.html' # HTML 파일 변경 시에만 실행
+      - '**.html'
+      - '!index.html' # index.html 자체 변경으로는 워크플로우가 실행되지 않게 방지
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # 푸시 권한 명시
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 전체 히스토리를 가져와 안정적인 커밋 지원
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,32 +32,41 @@ jobs:
           import os
 
           def generate_html_list(startpath):
-              html = '<ul>'
-              for root, dirs, files in os.walk(startpath):
-                  # 숨김 폴더(.github, .git 등) 무시
-                  dirs[:] = [d for d in dirs if not d.startswith('.')]
+              html_content = ""
+              # 정렬된 순서로 탐색
+              for root, dirs, files in sorted(os.walk(startpath)):
+                  # 숨김 폴더 및 특정 폴더 제외
+                  dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'venv']
                   
-                  level = root.replace(startpath, '').count(os.sep)
-                  # 현재 폴더에 파일이 있다면 목록 생성
-                  if files:
-                      if root != startpath:
-                          # 폴더 이름으로 제목 추가
-                          html += f'<h3>**{os.path.basename(root)}**</h3>' 
-
-                      for f in sorted(files):
-                          if f.endswith('.html') and f != 'index.html':
-                              path = os.path.join(root, f).replace('\\', '/')
-                              html += f'<li><a href="{path}">{f}</a></li>'
+                  # 현재 폴더 내의 html 파일들 필터링
+                  html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
                   
-              html += '</ul>'
-              return html
+                  if html_files:
+                      # 상대 경로 계산 (웹 링크용)
+                      rel_root = os.path.relpath(root, startpath)
+                      display_name = "Root" if rel_root == "." else rel_root
+                      
+                      html_content += f"<h3>📂 {display_name}</h3><ul>"
+                      
+                      for f in sorted(html_files):
+                          # 웹 표준에 맞게 경로 구분자를 /로 통일하고 ./ 제거
+                          file_path = os.path.join(rel_root, f).replace('\\', '/')
+                          if file_path.startswith('./'):
+                              file_path = file_path[2:]
+                          
+                          html_content += f'<li><a href="{file_path}">{f}</a></li>'
+                      html_content += "</ul>"
+              return html_content
 
           with open('index.html', 'w', encoding='utf-8') as f:
-              f.write("<!DOCTYPE html><html><head><title>Tulius's Ferry Index</title><meta charset='UTF-8'></head><body>")
-              f.write("<h1>파일 목록 자동 생성 (카테고리별)</h1>")
-              # 현재 디렉토리부터 시작하여 목록 생성
-              f.write(generate_html_list('.')) 
-              f.write("</body></html>")
+              f.write("<!DOCTYPE html>\n<html lang='ko'>\n<head>\n")
+              f.write("<title>Tulius's Ferry Index</title>\n")
+              f.write("<meta charset='UTF-8'>\n")
+              f.write("<style>body{font-family:sans-serif; line-height:1.6; padding:20px;} a{text-decoration:none; color:#0366d6;} a:hover{text-decoration:underline;}</style>\n")
+              f.write("</head>\n<body>\n")
+              f.write("<h1>파일 목록 자동 생성 (카테고리별)</h1>\n")
+              f.write(generate_html_list('.'))
+              f.write("\n</body>\n</html>")
           EOF
 
       - name: Commit and Push changes
@@ -61,5 +74,10 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Auto-generate index.html with folder structure" || exit 0
-          git push
+          # 변경사항이 있는 경우에만 커밋
+          if ! git diff --cached --exit-code; then
+            git commit -m "chore: update index.html structure"
+            git push
+          else
+            echo "No changes to index.html"
+          fi
