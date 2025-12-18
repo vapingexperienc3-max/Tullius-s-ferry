@@ -1,0 +1,35 @@
+name: Generate File List Index
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate index.html
+        run: |
+          echo "<html><head><title>Tulius's Ferry Index</title><meta charset='UTF-8'></head><body>" > index.html
+          echo "<h1>파일 목록 자동 생성</h1><ul>" >> index.html
+          
+          # 하위 폴더의 모든 .html 파일을 찾아 리스트로 만듭니다.
+          # -not -path '*/.*' 는 숨김 폴더(.github 등)를 제외하는 옵션입니다.
+          find . -name "*.html" ! -name "index.html" -not -path '*/.*' | sed 's|^\./||' | sort | while read line; do
+            echo "<li><a href=\"$line\">$line</a></li>" >> index.html
+          done
+          
+          echo "</ul></body></html>" >> index.html
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Auto-generate index.html" || exit 0
+          git push
