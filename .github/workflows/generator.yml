@@ -42,7 +42,7 @@ jobs:
                           clean_path = raw_path.replace(os.sep, '/')
                           if clean_path.startswith('./'): clean_path = clean_path[2:]
                           display_f = f.replace('.html', '')
-                          html_content += f'<li style="margin: 10px 0;"><a href="{clean_path}" target="_blank" style="color: #81ecec; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
+                          html_content += f'<li style="margin: 10px 0;"><a href="{clean_path}" target="_blank" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
                       
                       html_content += "</ul></details>"
               return html_content
@@ -63,7 +63,7 @@ jobs:
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.' (I knew it would come to this one day. I knew. And no one believed.).</p>")
               f.write(generate_html_list('.'))
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
-              f.write("<script>particlesJS('particles-js', {'particles':{'number':{'value':80},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});</script>")
+              f.write("<script>particlesJS('particles-js', {'particles':{'number':{'value':150},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});</script>")
               f.write("</body></html>")
           EOF
 
