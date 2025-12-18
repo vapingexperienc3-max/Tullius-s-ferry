@@ -4,9 +4,9 @@ name: Generate File List Index
 on:
   push:
     branches:
-      - main
+      - main  # HTML 파일이 있는 브랜치 이름
     paths:
-      - '**.html' # HTML 파일 변경 시에만 실행
+      - '**.html' # HTML 파일 변경 시에만 실행 (오류 수정됨)
 
 jobs:
   build:
@@ -17,51 +17,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Generate nested index.html
+      - name: Generate index.html
         run: |
-          python <<EOF
-          import os
-
-          def generate_html_list(startpath):
-              html = '<ul>'
-              for root, dirs, files in os.walk(startpath):
-                  # 숨김 폴더(.github, .git 등) 무시
-                  dirs[:] = [d for d in dirs if not d.startswith('.')]
-                  
-                  level = root.replace(startpath, '').count(os.sep)
-                  indent = '    ' * level
-
-                  # 현재 폴더에 파일이 있다면 목록 생성
-                  if files:
-                      if root != startpath:
-                          # 폴더 이름으로 제목 추가
-                          html += f'<{len(indent)+3}>**{os.path.basename(root)}**</{len(indent)+3}>' 
-
-                      for f in sorted(files):
-                          if f.endswith('.html') and f != 'index.html':
-                              path = os.path.join(root, f).replace('\\', '/')
-                              html += f'<li><a href="{path}">{f}</a></li>'
-                  
-              html += '</ul>'
-              return html
-
-          with open('index.html', 'w', encoding='utf-8') as f:
-              f.write("<!DOCTYPE html><html><head><title>Tulius's Ferry Index</title><meta charset='UTF-8'></head><body>")
-              f.write("<h1>파일 목록 자동 생성 (카테고리별)</h1>")
-              # 현재 디렉토리부터 시작하여 목록 생성
-              f.write(generate_html_list('.')) 
-              f.write("</body></html>")
-          EOF
+          echo "<!DOCTYPE html><html><head><title>File List</title><meta charset='UTF-8'></head><body>" > index.html
+          echo "<h1>파일 목록 자동 생성</h1><ul>" >> index.html
+          # .html 파일들을 찾아 링크로 변환 (index.html은 제외)
+          find . -maxdepth 2 -name "*.html" ! -name "index.html" | sed 's|^\./||' | while read line; do
+            echo "<li><a href=\"$line\">$line</a></li>" >> index.html
+          done
+          echo "</ul></body></html>" >> index.html
 
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Auto-generate index.html with folder structure" || exit 0
+          git commit -m "Auto-generate index.html" || exit 0
           git push
