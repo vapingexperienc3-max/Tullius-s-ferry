@@ -66,7 +66,7 @@ jobs:
               f.write("a:hover { color: #55efc4 !important; text-decoration: underline; }")
               f.write("</style></head><body>")
               # --- 스타일 끝 ---
-              f.write("<h1>Tulius's Ferry Index</h1>")
+              f.write("<h1>Tulius's Ferry</h1>")
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.' (I knew it would come to this one day. I knew. And no one believed.).</p>")
               f.write(generate_html_list('.'))
               f.write("</body></html>")
