@@ -28,31 +28,34 @@ jobs:
           import os
 
           def generate_html_list(startpath):
-              html = ""
-              for root, dirs, files in sorted(os.walk(startpath)):
-                  # 숨김 폴더 및 .github 제외
+              html = '<ul>'
+              for root, dirs, files in os.walk(startpath):
+                  # 숨김 폴더(.github, .git 등) 무시
                   dirs[:] = [d for d in dirs if not d.startswith('.')]
                   
-                  html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
-                  if html_files:
-                      rel_path = os.path.relpath(root, startpath)
-                      display_dir = "Root" if rel_path == "." else rel_path
-                      html += f"<h3>📂 {display_dir}</h3><ul>"
-                      for f in sorted(html_files):
-                          full_path = os.path.join(rel_path, f).replace('\\', '/')
-                          if full_path.startswith('./'): full_path = full_path[2:]
-                          html += f'<li><a href="{full_path}">{f}</a></li>'
-                      html += "</ul>"
+                  level = root.replace(startpath, '').count(os.sep)
+                  # 현재 폴더에 파일이 있다면 목록 생성
+                  if files:
+                      if root != startpath:
+                          # 폴더 이름으로 제목 추가
+                          html += f'<h3>**{os.path.basename(root)}**</h3>' 
+
+                      for f in sorted(files):
+                          if f.endswith('.html') and f != 'index.html':
+                              # **수정된 부분: 백슬래시를 두 개로 변경 (Windows 경로 처리)**
+                              path = os.path.join(root, f).replace('\\\\', '/')
+                              html += f'<li><a href="{path}">{f}</a></li>'
+                  
+              html += '</ul>'
               return html
 
           with open('index.html', 'w', encoding='utf-8') as f:
-              f.write("<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Index</title>")
-              f.write("<style>body{font-family:sans-serif;padding:40px;} li{margin:5px 0;}</style></head><body>")
-              f.write("<h1>Tulius's Ferry Index</h1>")
-              f.write(generate_html_list('.'))
+              f.write("<!DOCTYPE html><html><head><title>Tulius's Ferry Index</title><meta charset='UTF-8'></head><body>")
+              f.write("<h1>파일 목록 자동 생성 (카테고리별)</h1>")
+              # 현재 디렉토리부터 시작하여 목록 생성
+              f.write(generate_html_list('.')) 
               f.write("</body></html>")
           EOF
-
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
