@@ -28,32 +28,40 @@ jobs:
           import os
 
           def generate_html_list(startpath):
-              html = '<ul>'
-              for root, dirs, files in os.walk(startpath):
-                  # 숨김 폴더(.github, .git 등) 무시
+              html_content = ""
+              # 정렬된 순서로 폴더 탐색
+              for root, dirs, files in sorted(os.walk(startpath)):
+                  # 숨김 폴더(.git, .github 등) 제외
                   dirs[:] = [d for d in dirs if not d.startswith('.')]
                   
-                  level = root.replace(startpath, '').count(os.sep)
-                  # 현재 폴더에 파일이 있다면 목록 생성
-                  if files:
-                      if root != startpath:
-                          # 폴더 이름으로 제목 추가
-                          html += f'<h3>**{os.path.basename(root)}**</h3>' 
-
-                      for f in sorted(files):
-                          if f.endswith('.html') and f != 'index.html':
-                              # **수정된 부분: 백슬래시를 두 개로 변경 (Windows 경로 처리)**
-                              path = os.path.join(root, f).replace('\\\\', '/')
-                              html += f'<li><a href="{path}">{f}</a></li>'
+                  # 현재 폴더 내 html 파일들 (index.html 제외)
+                  html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
                   
-              html += '</ul>'
-              return html
+                  if html_files:
+                      rel_path = os.path.relpath(root, startpath)
+                      # 폴더명을 요약 제목으로 사용 (Root 폴더는 별도 표시)
+                      display_name = "📂 전체 목록 (루트)" if rel_path == "." else f"📂 {rel_path}"
+                      
+                      # <details> 태그로 감싸서 접기/펴기 기능 추가
+                      html_content += f"<details style='margin-bottom: 10px; border: 1px solid #aaa; padding: 5px; border-radius: 5px;'>"
+                      html_content += f"<summary style='font-weight: bold; cursor: pointer; padding: 5px;'>{display_name} ({len(html_files)}개)</summary>"
+                      html_content += "<ul style='margin-top: 10px;'>"
+                      
+                      for f in sorted(html_files):
+                          file_path = os.path.join(rel_path, f).replace('\\', '/')
+                          if file_path.startswith('./'): file_path = file_path[2:]
+                          html_content += f'<li><a href="{file_path}" target="_blank">{f}</a></li>'
+                          
+                      html_content += "</ul></details>"
+              return html_content
 
           with open('index.html', 'w', encoding='utf-8') as f:
-              f.write("<!DOCTYPE html><html><head><title>Tulius's Ferry Index</title><meta charset='UTF-8'></head><body>")
+              f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
+              f.write("<title>Tulius's Ferry Index</title>")
+              f.write("<style>body{font-family:sans-serif; padding:20px; max-width: 800px; margin: auto;}")
+              f.write("summary:hover{background-color: #f0f0f0;} li{margin-bottom: 5px;}</style></head><body>")
               f.write("<h1>파일 목록 자동 생성 (카테고리별)</h1>")
-              # 현재 디렉토리부터 시작하여 목록 생성
-              f.write(generate_html_list('.')) 
+              f.write(generate_html_list('.'))
               f.write("</body></html>")
           EOF
       - name: Commit and Push
