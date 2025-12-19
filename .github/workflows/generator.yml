@@ -1,4 +1,23 @@
-- name: Generate nested index.html
+name: Generate Index
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate nested index.html
         run: |
           python <<'EOF'
           import os
@@ -50,7 +69,6 @@
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius's Ferry & Vault 404</title><style>")
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
-              # background-position: center 20% 등으로 인물 위치 조정
               f.write("body { margin: 0; display: flex; justify-content: center; background-size: cover !important; background-attachment: fixed !important; transition: background 0.8s ease; font-family: sans-serif; color: #eee; overflow-x: hidden; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; }")
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); }")
@@ -71,8 +89,8 @@
               f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;' id='guide-box'><p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>- 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p></div></details>")
               f.write(f"<div id='a-ferry'>{main_ferry}</div><div id='a-vault' style='display:none;'>{main_vault}</div></div></div>")
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
-              # Skyrim: 상단 30%를 어둡게 하여 로고 제거 효과 / Fallout: 파워아머가 잘 보이도록 center 40% 조정
-              f.write(f"const bgF = \"linear-gradient(rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 30%, rgba(0,0,0,0.8) 100%), url('{bg_skyrim}')\";")
+              # Skyrim: 상단 35%를 진한 검은색으로 덮어 로고 제거 / Fallout: 파워아머가 잘 보이도록 center 40% 조정
+              f.write(f"const bgF = \"linear-gradient(rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,0.8) 100%), url('{bg_skyrim}')\";")
               f.write(f"const bgV = \"linear-gradient(to bottom, rgba(0,40,0,0.7), rgba(40,20,0,0.8)), url('{bg_vault}')\";")
               f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':120},'color':{'value':'#fff'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}}); }")
               f.write("else { window.particlesJS('particles-js',{'particles':{'number':{'value':150},'color':{'value':['#00ff42','#ffce54']},'opacity':{'value':0.6},'size':{'value':2},'line_linked':{'enable':false},'move':{'enable':true,'speed':2.5,'direction':'none','random':true,'out_mode':'out'}}}); } }")
@@ -81,3 +99,11 @@
               f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); let contents=document.querySelectorAll('.cat-content'); contents.forEach(c=>{ let items=c.querySelectorAll('li'); let foundCount=0; items.forEach(li=>{ if(li.textContent.toLowerCase().includes(q)){ li.style.display=''; foundCount++; } else { li.style.display='none'; } }); if(q.length>0){ if(foundCount>0){ c.style.display='block'; c.querySelector('details').open=true; } else { c.style.display='none'; } } else { let m=document.body.className.includes('ferry')?'ferry':'vault'; switchTheme(m); } }); }")
               f.write("window.onload=()=>{ switchTheme('ferry'); };</script></body></html>")
           EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Fix Indentation & Detail Refinement (Remove Skyrim Logo, Reposition Vault Boy)" || exit 0
+          git push origin main
