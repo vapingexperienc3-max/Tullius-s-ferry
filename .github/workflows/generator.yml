@@ -1,23 +1,4 @@
-name: Generate Index
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Generate nested index.html
+- name: Generate nested index.html
         run: |
           python <<'EOF'
           import os
@@ -34,61 +15,73 @@ jobs:
 
           sidebar, main = "", ""
           folders = []
+          # 폴더 탐색 및 데이터 수집
           for r, ds, fs in sorted(os.walk('.')):
               ds[:] = [d for d in ds if not d.startswith('.')]
               hfs = [f for f in fs if f.endswith('.html') and f != 'index.html']
               if hfs:
                   rel = os.path.relpath(r, '.')
-                  name = "MAIN ARCHIVE" if rel == "." else rel.upper()
+                  # [수정] '테스트' 대신 실제 폴더명을 대문자로 표시
+                  display_name = "MAIN ARCHIVE" if rel == "." else rel.replace(os.sep, ' > ').upper()
                   fid = "f-" + rel.replace(os.sep, '-')
-                  folders.append((name, fid, r, hfs))
+                  folders.append((display_name, fid, r, hfs))
 
-          sidebar += "<div class='sidebar-nav'><h3>📜 NAVIGATION</h3>"
+          # 1. 사이드바 (실제 폴더명 반영)
+          sidebar += "<div class='sidebar-nav'><h3 style='color: #ffce54; font-size: 0.95em; margin-bottom: 15px; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px;'>📜 보관소 인덱스</h3>"
           for n, fid, _, _ in folders:
-              sidebar += f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {name}</a>"
+              sidebar += f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {n}</a>"
           sidebar += "</div>"
 
           for n, fid, r, hfs in folders:
-              main += f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='margin-bottom:15px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.15); border-radius:4px; overflow:hidden;'>"
-              main += f"<summary style='padding:15px; font-weight:bold; color:#fff; display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.05);'><span>{n}</span><span style='font-size:0.8em; color:#888;'>[{len(hfs)} FILES]</span></summary><ul style='padding:15px 40px; list-style:square;'>"
+              main += f"<div id='{fid}' class='cat-content' style='display:none;'>"
+              main += f"<details open style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
+              main += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05);'><span><img src='https://img.icons8.com/ios-filled/50/ffffff/skyrim.png' style='width:18px; margin-right:10px; opacity:0.9; vertical-align:text-bottom;'>{n}</span><span style='font-size: 0.8em; color: #888; font-family: monospace;'>[{len(hfs)} FILES]</span></summary>"
+              main += "<ul style='margin: 0; padding: 15px 40px; list-style-type: square;'>"
               for f in sorted(hfs):
                   path = os.path.join(r, f)
                   inject_style(path)
                   url = os.path.relpath(path, '.').replace(os.sep, '/')
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                  main += f"<li style='margin:10px 0;'><a href='{url}' target='_blank' style='color:#ffce54; text-decoration:none;'>{disp}</a></li>"
+                  main += f'<li style="margin: 10px 0;"><a href="{url}" target="_blank" style="color: #ffce54; text-decoration: none; font-weight: 500;">{disp}</a></li>'
               main += "</ul></details></div>"
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius's Ferry&Vault 404</title><style>")
-              f.write("body { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: cover; background-attachment: fixed; background-color: #000; color: #eee; font-family: sans-serif; margin: 0; display: flex; justify-content: center; }")
-              f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; } .sidebar-nav { width: 250px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,206,84,0.3); border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); }")
-              f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; font-size: 0.9em; } .sidebar-link:hover, .sidebar-link.active { color: #ffce54; text-shadow: 0 0 8px #ffce54; padding-left: 5px; }")
-              f.write(".main-area { flex: 1; min-width: 0; } summary::-webkit-details-marker { display: none; } a:hover { text-decoration: underline; }</style></head><body>")
-              f.write("<div id='particles-js' style='position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; pointer-events:none;'></div>")
+              f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
+              f.write("body { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: cover; background-attachment: fixed; background-color: #000; font-family: sans-serif; margin: 0; display: flex; justify-content: center; }")
+              f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; }")
+              f.write(".sidebar-nav { width: 250px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,206,84,0.3); border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); }")
+              f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; transition: 0.3s; font-size: 0.9em; }")
+              f.write(".sidebar-link:hover, .sidebar-link.active { color: #ffce54; text-shadow: 0 0 8px #ffce54; padding-left: 5px; }")
+              f.write(".main-area { flex: 1; min-width: 0; }")
+              f.write("#search-bar { width: 100%; padding: 12px 20px; margin: 20px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; box-sizing: border-box; backdrop-filter: blur(5px); }")
+              f.write("summary::-webkit-details-marker { display: none; } a:hover { text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
+              f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
+              
               f.write(f"<div class='wrapper'>{sidebar}<div class='main-area'>")
               
-              # 백업본 가이드/후기 원문 100% 그대로 삽입
-              f.write("<div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px;'><span style='font-size: 2.2em; font-weight: 900; color: #ffffff;'>TULLIUS'S FERRY</span><span style='font-size: 1.7em; font-weight: 200; color: #ffce54;'> & Vault 404</span></div>")
+              # 2. 대문 제목 수정 (전부 볼드체 반영)
+              f.write("<div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;'>")
+              f.write("<span style='font-size: 2.2em; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: -1px;'>TULLIUS'S FERRY</span>")
+              f.write("<span style='font-size: 1.7em; font-weight: 800; color: #ffce54;'> & VAULT 404-VAULT BOY'S OUTPOST ☢️</span>")
+              f.write("</div>")
+              
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
+
+              # 3. 검색창 복구
+              f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
+
+              # 가이드 및 후기 (백업본 텍스트 100% 동일)
               f.write("<div style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'>")
               f.write("<h3 style='color: #ffce54; margin-top: 0;'>[🚣 Tullius's Ferry & ☢️ Vault 404-Vault boy's Outpost 가이드 및 후기]</h3>")
               f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8;'>")
-              f.write("<p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다 <strong>들어가 있는 글들 중에 해결된 문제가 있으면 피드백 부탁드립니다.</strong><br>- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, <strong>외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.</strong><br>- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
-              f.write("<span style='color: #ffce54; font-weight: bold;'>* 테라박스 링크가 깨졌을 경우 툴챈이나 코네에 피드백 부탁드립니다.</span></p>")
+              f.write("<p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다.<br>- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
               f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div>")
 
               f.write(main + "</div></div>")
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               f.write("function showCat(id){document.querySelectorAll('.cat-content').forEach(e=>e.style.display='none');document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active'));document.getElementById(id).style.display='block';document.getElementById('l-'+id).classList.add('active');}")
-              f.write("window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':100},'color':{'value':'#fff'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}});")
+              f.write("function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('.cat-content li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(q)?'':'none';});if(q.length>0){document.querySelectorAll('.cat-content').forEach(c=>c.style.display='block');}else{let act=document.querySelector('.sidebar-link.active');if(act)showCat(act.id.replace('l-',''));}}")
+              f.write("window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':150},'color':{'value':'#fff'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}});")
               f.write("let f=document.querySelector('.cat-content');if(f)showCat(f.id);};</script></body></html>")
           EOF
-
-      - name: Commit and Push
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Fix syntax and restore original content" || exit 0
-          git push origin main
