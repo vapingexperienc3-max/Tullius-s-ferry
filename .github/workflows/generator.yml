@@ -63,6 +63,9 @@ jobs:
               # os.walk로 모든 하위 폴더의 html 파일을 찾음
               for root, dirs, files in sorted(os.walk(startpath)):
                   dirs[:] = [d for d in dirs if not d.startswith('.')]
+                  
+                  # [수정] 확장자가 .html인 파일뿐만 아니라, 확장자가 없는 파일도 처리하도록 변경 고려
+                  # 일단 안전하게 .html 파일 위주로 가져오되, 리스트 출력 시 이름을 다듬습니다.
                   html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
                   
                   if html_files:
@@ -79,15 +82,21 @@ jobs:
                       html_content += "<ul style='margin: 0; padding: 15px 40px; list-style-type: square;'>"
                       
                       for f in sorted(html_files):
-                          # 1. 파일의 실제 전체 경로 획득
                           full_path = os.path.join(root, f)
-                          
-                          # 2. 너비 해제 스타일 주입 실행
                           inject_width_style(full_path)
                           
-                          # 3. 인덱스 파일용 상대 경로 생성
                           rel_file_path = os.path.relpath(full_path, startpath).replace(os.sep, '/')
-                          display_f = f.replace('.html', '')
+                          
+                          # --- [핵심 수정 구간: 제목 다듬기] ---
+                          # 1. 확장자 .html 제거
+                          display_f = f.rsplit('.html', 1)[0]
+                          
+                          # 2. 마지막 괄호와 그 안의 날짜/시간 정보 제거 (예: " (2025. 12. 18...)")
+                          # rsplit을 사용하여 가장 마지막에 나오는 " ("를 기준으로 앞부분만 가져옵니다.
+                          if ' (' in display_f:
+                              display_f = display_f.rsplit(' (', 1)[0]
+                          # ---------------------------------------
+
                           html_content += f'<li style="margin: 10px 0;"><a href="{rel_file_path}" target="_blank" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
                       
                       html_content += "</ul></details>"
