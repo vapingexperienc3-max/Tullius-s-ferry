@@ -69,16 +69,20 @@ jobs:
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
-              f.write("body { margin: 0; min-height: 100vh; display: flex; justify-content: center; background-color: #000; background-attachment: fixed !important; background-size: cover !important; background-repeat: no-repeat !important; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; }")
+              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed; background-size: cover; background-repeat: no-repeat; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); }")
-              f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.6); transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
-              f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none !important; padding: 8px 0; font-size: 0.9em; transition: 0.2s; }")
-              f.write(".sidebar-link:hover, .sidebar-link.active { color: #fff !important; font-weight: bold; }")
+              f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
+              
+              # 호버 효과 스타일
+              f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none !important; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
+              f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active, .theme-ferry .file-link:hover { color: #ffce54 !important; text-shadow: 0 0 8px rgba(255,206,84,0.6); }")
+              f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active, .theme-vault .file-link:hover { color: #00ff42 !important; text-shadow: 0 0 8px rgba(0,255,66,0.6); }")
+              
               f.write(".main-area { flex: 1; min-width: 0; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
               f.write(".guide-details { background: rgba(0, 0, 0, 0.75); border: 1px solid; border-radius: 8px; padding: 25px; margin-bottom: 30px; backdrop-filter: blur(10px); }")
-              f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.4); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; border-color: #ffce54; }")
-              f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; border-color: #00ff42; }")
+              f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.4); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; }")
+              f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; }")
               f.write("summary { cursor: pointer; outline: none; }</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
@@ -87,14 +91,14 @@ jobs:
               f.write(f"<div id='l-ferry'>{sidebar_ferry}</div><div id='l-vault' style='display:none;'>{sidebar_vault}</div></div>")
               
               f.write("<div class='main-area'><div style='border-bottom: 2px solid rgba(255,255,255,0.2); margin-bottom: 20px; padding-bottom: 15px; min-height: 80px; display: flex; align-items: center;'>")
-              f.write("<span id='title-ferry' style='font-weight: 900; color: #ffffff; font-size: 3em; display: none; text-shadow: 2px 2px 10px #000;'>TULLIUS'S FERRY</span>")
+              f.write("<span id='title-ferry' style='font-weight: 900; color: #ffffff; font-size: 3em; display: none; text-shadow: 2px 2px 10px #000;'>Tullius's Ferry</span>")
               f.write("<span id='title-vault' style='font-weight: 900; color: #00ff42; font-size: 2.6em; display: none; text-shadow: 2px 2px 10px #000;'>Vault 404-Vault boy's Outpost</span></div>")
               
               f.write("<p id='theme-quote' style='color: #bdc3c7; font-style: italic; margin-bottom: 15px;'></p><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'>")
               
-              # 가이드 및 후기 전체 문구 복구
+              # 가이드 문구 완벽 복구
               f.write("<details open class='guide-details'><summary><h3 id='guide-title' style='margin: 0; display: inline-block;'>[📜 가이드 및 후기 확인]</h3></summary>")
-              f.write("<div id='guide-body' style='font-size: 0.95em; color: #ddd; line-height: 1.8; margin-top: 15px;'>")
+              f.write("<div style='font-size: 0.95em; color: #ddd; line-height: 1.8; margin-top: 15px;'>")
               f.write("<p><strong>💡 이용 팁:</strong><br>")
               f.write("- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>")
               f.write("- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.<br>")
@@ -107,16 +111,19 @@ jobs:
               f.write("툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></details>")
               
               f.write(f"<div id='a-ferry'>{main_ferry}</div><div id='a-vault' style='display:none;'>{main_vault}</div></div></div>")
+              
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
-              f.write(f"const bgF = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%), url('{bg_skyrim}')\";")
-              f.write(f"const bgV = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%), url('{bg_vault}')\";")
+              f.write(f"const bgImgF = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('{bg_skyrim}')\";")
+              f.write(f"const bgImgV = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('{bg_vault}')\";")
+              
               f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
-              f.write("b.style.backgroundSize='cover'; b.style.backgroundPosition='right center'; ")
-              f.write("if(m==='ferry'){ b.className='theme-ferry'; b.style.backgroundImage = bgF; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54'; }")
-              f.write("else{ b.className='theme-vault'; b.style.backgroundImage = bgV; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42'; } updateParticles(m); }")
-              f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':60},'color':{'value':'#fff'},'shape':{'type':'circle'},'opacity':{'value':0.3},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}}); }")
-              f.write("else { window.particlesJS('particles-js',{'particles':{'number':{'value':80},'color':{'value':'#00ff42'},'shape':{'type':'circle'},'opacity':{'value':0.4},'size':{'value':2},'line_linked':{'enable':false},'move':{'enable':true,'speed':2,'random':true,'out_mode':'out'}}}); } }")
-              f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(c=>{ let items=c.querySelectorAll('li'); let count=0; items.forEach(li=>{ if(li.textContent.toLowerCase().includes(q)){ li.style.display=''; count++; } else li.style.display='none'; }); c.style.display=(q && count>0)?'block':'none'; }); }")
+              f.write("b.style.backgroundPosition='right center'; b.style.backgroundSize='cover'; ")
+              f.write("if(m==='ferry'){ b.className='theme-ferry'; b.style.backgroundImage = bgImgF; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54'; }")
+              f.write("else{ b.className='theme-vault'; b.style.backgroundImage = bgImgV; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42'; } updateParticles(m); }")
+              
+              f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':50},'color':{'value':'#fff'},'shape':{'type':'circle'},'opacity':{'value':0.3},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom'}}}); }")
+              f.write("else { window.particlesJS('particles-js',{'particles':{'number':{'value':80},'color':{'value':'#00ff42'},'shape':{'type':'circle'},'opacity':{'value':0.4},'size':{'value':2},'line_linked':{'enable':false},'move':{'enable':true,'speed':2,'random':true}}}); } }")
+              f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(c=>{ let items=c.querySelectorAll('li'); let cnt=0; items.forEach(li=>{ if(li.textContent.toLowerCase().includes(q)){ li.style.display=''; cnt++; } else li.style.display='none'; }); c.style.display=(q && cnt>0)?'block':'none'; }); }")
               f.write("function showCat(id){document.querySelectorAll('.cat-content').forEach(e=>e.style.display='none');document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active'));document.getElementById(id).style.display='block';document.getElementById('l-'+id).classList.add('active');} ")
               f.write("window.onload=()=>{ switchTheme('ferry'); };</script></body></html>")
           EOF
@@ -126,5 +133,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Final Fix: Restore Guide Text & Layout Polish" || exit 0
+          git commit -m "Final Fix: Restore Full Guide Text & Layout Polish" || exit 0
           git push origin main
