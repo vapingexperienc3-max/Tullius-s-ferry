@@ -35,35 +35,33 @@ jobs:
           sidebar_ferry, sidebar_vault = "", ""
           main_ferry, main_vault = "", ""
           
-          # 이미지 설정 (백업 2번 소스 및 파워아머)
           bg_skyrim = "https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg"
-          bg_fallout = "https://images2.alphacoders.com/893/893453.png"
-          icon_skyrim = "https://img.icons8.com/ios-filled/50/ffffff/skyrim.png"
-          icon_fallout = "https://img.icons8.com/color/48/vault-boy.png"
-
+          bg_vault = "https://images2.alphacoders.com/893/893453.png"
+          
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
               if html_files:
                   rel_path = os.path.relpath(root, '.')
-                  display_name = rel_path.upper()
+                  display_name = "MAIN ARCHIVE" if rel_path == "." else rel_path.upper()
                   fid = "f-" + rel_path.replace(os.sep, '-')
                   
                   is_vault = any(kw in display_name for kw in ["VAULT", "FALLOUT", "폴아웃"])
-                  current_icon = icon_fallout if is_vault else icon_skyrim
+                  icon = "https://img.icons8.com/color/48/vault-boy.png" if is_vault else "https://img.icons8.com/ios-filled/50/ffffff/skyrim.png"
                   
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
                   content_html = f"<div id='{fid}' class='cat-content' style='display:none;'>"
                   content_html += f"<details open style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
-                  content_html += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor:pointer;'><span><img src='{current_icon}' style='width:18px; margin-right:10px; vertical-align:middle;'>{display_name}</span><span style='font-size: 0.8em; color: #888;'>[{len(html_files)} FILES]</span></summary>"
+                  content_html += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor:pointer;'><span><img src='{icon}' style='width:18px; margin-right:10px;'>{display_name}</span><span style='font-size: 0.8em; color: #888;'>[{len(html_files)} FILES]</span></summary>"
                   content_html += "<ul style='margin: 0; padding: 15px 40px; list-style-type: square;'>"
                   for f in sorted(html_files):
                       path = os.path.join(root, f)
                       inject_width_style(path)
                       url = os.path.relpath(path, '.').replace(os.sep, '/')
                       disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                      content_html += f'<li style="margin: 10px 0;"><a href="{url}" target="_blank" class="file-link">{disp}</a></li>'
+                      link_color = "#00ff42" if is_vault else "#ffce54"
+                      content_html += f'<li style="margin: 10px 0;"><a href="{url}" target="_blank" style="color: {link_color}; text-decoration: none; font-weight: 500;">{disp}</a></li>'
                   content_html += "</ul></details></div>"
 
                   if is_vault:
@@ -75,39 +73,33 @@ jobs:
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius's Ferry & Vault 404</title><style>")
-              # 백업 2번 기반 디자인 CSS
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
               f.write("body { margin: 0; display: flex; justify-content: center; background-size: cover !important; background-attachment: fixed !important; transition: background 0.8s ease; font-family: sans-serif; color: #eee; overflow-x: hidden; }")
-              f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; transition: opacity 0.5s; }")
+              f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; }")
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
-              f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
+              f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; font-size: 0.9em; }")
               f.write(".main-area { flex: 1; min-width: 0; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; box-sizing: border-box; }")
-              
-              # 스카이림 테마 (노란색)
-              f.write(".theme-ferry .sidebar-nav { border: 1px solid rgba(255,206,84,0.3); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; border-color: #ffce54; } .theme-ferry .nav-btn.vault-btn { color: #ffce54; border-color: #ffce54; } .theme-ferry .sidebar-link.active, .theme-ferry .file-link { color: #ffce54; text-decoration: none; font-weight: 500; }")
-              
-              # 폴아웃 테마 (초록색)
-              f.write(".theme-vault .sidebar-nav { border: 1px solid rgba(0,255,66,0.3); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; border-color: #00ff42; box-shadow: 0 0 15px rgba(0,255,66,0.4); } .theme-vault .nav-btn.ferry-btn { color: #00ff42; border-color: #00ff42; } .theme-vault .sidebar-link.active, .theme-vault .file-link { color: #00ff42; text-decoration: none; font-weight: 500; }")
-              
+              f.write(".theme-ferry .sidebar-nav { border: 1px solid rgba(255,206,84,0.3); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; border-color: #ffce54; box-shadow: 0 0 12px rgba(255,206,84,0.5); } .theme-ferry .nav-btn.vault-btn { color: #ffce54; border-color: #ffce54; } .theme-ferry .sidebar-link.active { color: #ffce54; text-shadow: 0 0 8px #ffce54; padding-left: 5px; }")
+              f.write(".theme-vault .sidebar-nav { border: 1px solid rgba(0,255,66,0.3); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; border-color: #00ff42; box-shadow: 0 0 15px rgba(0,255,66,0.4); } .theme-vault .nav-btn.ferry-btn { color: #00ff42; border-color: #00ff42; } .theme-vault .sidebar-link.active { color: #00ff42; text-shadow: 0 0 8px #00ff42; padding-left: 5px; }")
               f.write("summary::-webkit-details-marker { display: none; } .guide-details summary { cursor: pointer; list-style: none; outline: none; } .guide-details summary::after { content: ' [접기/펼치기]'; font-size: 0.7em; color: #888; }</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
-              f.write(f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn feedback-btn' style='border-color:#58a6ff; color:#58a6ff; margin-bottom:20px;'>📢 건의 및 에러 제보</a>")
-              f.write("<h3 id='index-title' style='color: #ffce54; font-size: 0.9em; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3><div id='list-ferry'>{sidebar_ferry}</div><div id='list-vault' style='display:none;'>{sidebar_vault}</div></div>")
-              f.write("<div class='main-area'><div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px;'><span id='main-title' style='font-size: 2.2em; font-weight: 900; color: #ffffff;'>TULLIUS'S FERRY</span><span id='sub-title' style='font-size: 1.7em; font-weight: 800; color: #ffce54;'> & VAULT Boy's OUTPOST</span></div><input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
-              
-              # 가이드 (백업 2번 문구 100% 유지)
-              f.write("<details open class='guide-details' style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'><summary><h3 id='guide-head' style='color: #ffce54; margin: 0; display: inline-block;'>[📜 가이드 및 후기 확인]</h3></summary>")
+              f.write(f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn' style='border-color:#58a6ff; color:#58a6ff; margin-bottom:20px;'>📢 건의 및 에러 제보</a>")
+              f.write("<h3 id='idx-t' style='font-size: 0.9em; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3>")
+              f.write(f"<div id='l-ferry'>{sidebar_ferry}</div><div id='l-vault' style='display:none;'>{sidebar_vault}</div></div>")
+              f.write("<div class='main-area'><div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px;'><span id='mt' style='font-size: 2.2em; font-weight: 900; color: #ffffff;'>TULLIUS'S FERRY</span><span id='st' style='font-size: 1.7em; font-weight: 800; color: #ffce54;'> & VAULT Boy's OUTPOST</span></div>")
+              f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p><input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
+              f.write("<details open class='guide-details' style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'><summary><h3 style='color: #ffce54; margin: 0; display: inline-block;'>[📜 가이드 및 후기 확인]</h3></summary>")
               f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;'><p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다 <strong>해결된 문제가 있으면 피드백 부탁드립니다.</strong><br>- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, <strong>외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.</strong><br>- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
               f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></details>")
-              
-              f.write(f"<div id='area-ferry'>{main_ferry}</div><div id='area-vault' style='display:none;'>{main_vault}</div></div></div>")
+              f.write(f"<div id='a-ferry'>{main_ferry}</div><div id='a-vault' style='display:none;'>{main_vault}</div></div></div>")
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               f.write(f"const bgF = \"linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url('{bg_skyrim}')\";")
-              f.write(f"const bgV = \"linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('{bg_fallout}')\";")
-              f.write("function switchTheme(mode){const b=document.body; const wrap=document.querySelector('.wrapper'); wrap.style.opacity='0'; setTimeout(()=>{if(mode==='ferry'){b.className='theme-ferry'; b.style.background=bgF; document.getElementById('list-ferry').style.display='block'; document.getElementById('list-vault').style.display='none'; document.getElementById('area-ferry').style.display='block'; document.getElementById('area-vault').style.display='none'; document.getElementById('main-title').innerText='TULLIUS\\'S FERRY'; document.getElementById('index-title').style.color='#ffce54';}else{b.className='theme-vault'; b.style.background=bgV; document.getElementById('list-ferry').style.display='none'; document.getElementById('list-vault').style.display='block'; document.getElementById('area-ferry').style.display='none'; document.getElementById('area-vault').style.display='block'; document.getElementById('main-title').innerText='VAULT 404 OUTPOST'; document.getElementById('index-title').style.color='#00ff42';} wrap.style.opacity='1'; let first=document.querySelector('#area-'+mode+' .cat-content'); if(first) showCat(first.id);}, 400);}")
-              f.write("function showCat(id){document.querySelectorAll('.cat-content').forEach(e=>e.style.display='none');document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active'));document.getElementById(id).style.display='block';document.getElementById('l-'+id).classList.add('active');} function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('.cat-content li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(q)?'':'none';});} window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':80},'color':{'value':'#fff'},'opacity':{'value':0.3},'move':{'speed':1}}}); switchTheme('ferry');};</script></body></html>")
+              f.write(f"const bgV = \"linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('{bg_vault}')\";")
+              f.write("function switchTheme(m){const b=document.body; if(m==='ferry'){b.className='theme-ferry'; b.style.background=bgF; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54';}else{b.className='theme-vault'; b.style.background=bgV; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42';} let first=document.querySelector('#a-'+m+' .cat-content'); if(first) showCat(first.id);}")
+              f.write("function showCat(id){document.querySelectorAll('.cat-content').forEach(e=>e.style.display='none');document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active'));document.getElementById(id).style.display='block';document.getElementById('l-'+id).classList.add('active');} function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('.cat-content li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(q)?'':'none';});} ")
+              f.write("window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':120},'color':{'value':'#fff'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}}); switchTheme('ferry');};</script></body></html>")
           EOF
 
       - name: Commit and Push
@@ -115,5 +107,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Fix Layout and Merge Vault Theme with Backup 2 Design" || exit 0
+          git commit -m "Restore original text, snow particles, and fix sidebar rendering" || exit 0
           git push origin main
