@@ -1,4 +1,23 @@
-- name: Generate nested index.html
+name: Generate Index
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate nested index.html
         run: |
           python <<'EOF'
           import os
@@ -16,9 +35,9 @@
           sidebar_ferry, sidebar_vault = "", ""
           main_ferry, main_vault = "", ""
           
-          # 이미지 링크 정의
+          # 이미지 및 아이콘 설정
           bg_skyrim = "https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg"
-          bg_fallout = "https://images2.alphacoders.com/893/893453.png" # 가져오신 파워 아머 이미지
+          bg_fallout = "https://images2.alphacoders.com/893/893453.png"
           icon_skyrim = "https://img.icons8.com/ios-filled/50/ffffff/skyrim.png"
           icon_fallout = "https://img.icons8.com/color/48/vault-boy.png"
 
@@ -29,12 +48,10 @@
                   rel_path = os.path.relpath(root, '.')
                   display_name = rel_path.upper()
                   fid = "f-" + rel_path.replace(os.sep, '-')
-                  
                   is_vault = any(kw in display_name for kw in ["VAULT", "FALLOUT", "폴아웃"])
                   current_icon = icon_fallout if is_vault else icon_skyrim
                   
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
-                  
                   content_html = f"<div id='{fid}' class='cat-content' style='display:none;'>"
                   content_html += f"<details open style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
                   content_html += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor:pointer;'><span><img src='{current_icon}' style='width:22px; margin-right:10px; vertical-align:middle;'>{display_name}</span><span style='font-size: 0.8em; color: #888;'>[{len(html_files)} FILES]</span></summary>"
@@ -62,54 +79,28 @@
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
               f.write(".main-area { flex: 1; min-width: 0; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; box-sizing: border-box; }")
-              
-              # 테마 컬러 정의
               f.write(".theme-ferry .sidebar-nav { border: 1px solid rgba(255,206,84,0.3); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; border-color: #ffce54; } .theme-ferry .nav-btn.vault-btn { color: #ffce54; border-color: #ffce54; } .theme-ferry .sidebar-link.active, .theme-ferry .file-link { color: #ffce54; text-shadow: 0 0 8px #ffce54; }")
               f.write(".theme-vault .sidebar-nav { border: 1px solid rgba(0,255,66,0.3); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; border-color: #00ff42; box-shadow: 0 0 15px rgba(0,255,66,0.4); } .theme-vault .nav-btn.ferry-btn { color: #00ff42; border-color: #00ff42; } .theme-vault .sidebar-link.active, .theme-vault .file-link { color: #00ff42; text-shadow: 0 0 8px #00ff42; }")
               f.write("summary::-webkit-details-marker { display: none; } .guide-details summary { cursor: pointer; list-style: none; outline: none; } .guide-details summary::after { content: ' [접기/펼치기]'; font-size: 0.7em; color: #888; }</style></head><body>")
-              
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
               f.write(f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn feedback-btn' style='border-color:#58a6ff; color:#58a6ff; margin-bottom:20px;'>📢 건의 및 에러 제보</a>")
               f.write("<h3 id='index-title' style='color: #ffce54; font-size: 0.9em; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3><div id='list-ferry'>{sidebar_ferry}</div><div id='list-vault' style='display:none;'>{sidebar_vault}</div></div>")
               f.write("<div class='main-area'><div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px;'><span id='main-title' style='font-size: 2.2em; font-weight: 900; color: #ffffff;'>TULLIUS'S FERRY</span><span id='sub-title' style='font-size: 1.7em; font-weight: 800; color: #ffce54;'> & VAULT 404 ☢️</span></div><input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
-
-              # 가이드 (아이콘 동적 변경을 위해 id 부여)
               f.write("<details open class='guide-details' style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'><summary><h3 id='guide-head' style='color: #ffce54; margin: 0; display: inline-block;'>[🚣 가이드 및 후기 확인]</h3></summary>")
-              f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;' id='guide-box'>")
-              f.write("<p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다.<br>- <strong>질문,피드백,로그</strong>는 폴더 하나에 구분없이 넣었습니다.<br>- <strong>미해결 탭</strong>의 해결된 문제가 있으면 피드백 부탁드립니다.<br>- 주요 자료는 테라박스에 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
-              f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? <br>툴붕이들은 아프지 말고. 너네 없어지면 토드 새끼 누가 욕해주냐?</p></div></details>")
-              
+              f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;' id='guide-box'><p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다.<br>- <strong>질문,피드백,로그</strong>는 폴더 하나에 구분없이 넣었습니다.<br>- 주요 자료는 테라박스에 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p></div></details>")
               f.write(f"<div id='area-ferry'>{main_ferry}</div><div id='area-vault' style='display:none;'>{main_vault}</div></div></div>")
-              f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
-              f.write("<script>")
-              # 배경 이미지 링크 변수화
+              f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               f.write(f"const bgFerry = \"linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.8)), url('{bg_skyrim}')\";")
               f.write(f"const bgVault = \"linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('{bg_fallout}')\";")
-              
-              f.write("function switchTheme(mode){")
-              f.write("  const b=document.body; const wrap=document.querySelector('.wrapper'); wrap.style.opacity='0';")
-              f.write("  setTimeout(()=>{")
-              f.write("    if(mode==='ferry'){")
-              f.write("      b.className='theme-ferry'; b.style.background=bgFerry;")
-              f.write("      document.getElementById('list-ferry').style.display='block'; document.getElementById('list-vault').style.display='none';")
-              f.write("      document.getElementById('area-ferry').style.display='block'; document.getElementById('area-vault').style.display='none';")
-              f.write("      document.getElementById('main-title').innerText='TULLIUS\\'S FERRY';")
-              f.write("      document.getElementById('guide-head').innerText='[🚣 가이드 및 후기 확인]';")
-              f.write("      document.getElementById('index-title').style.color='#ffce54';")
-              f.write("    } else {")
-              f.write("      b.className='theme-vault'; b.style.background=bgVault;")
-              f.write("      document.getElementById('list-ferry').style.display='none'; document.getElementById('list-vault').style.display='block';")
-              f.write("      document.getElementById('area-ferry').style.display='none'; document.getElementById('area-vault').style.display='block';")
-              f.write("      document.getElementById('main-title').innerText='VAULT 404 OUTPOST';")
-              f.write("      document.getElementById('guide-head').innerText='[☢️ Vault 404 가이드 확인]';")
-              f.write("      document.getElementById('index-title').style.color='#00ff42';")
-              f.write("    }")
-              f.write("    wrap.style.opacity='1';")
-              f.write("    let first=document.querySelector('#area-'+mode+' .cat-content'); if(first) showCat(first.id);")
-              f.write("  }, 400);")
-              f.write("}")
-              f.write("function showCat(id){document.querySelectorAll('.cat-content').forEach(e=>e.style.display='none');document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active'));document.getElementById(id).style.display='block';document.getElementById('l-'+id).classList.add('active');}")
-              f.write("function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('.cat-content li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(q)?'':'none';});}")
-              f.write("window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':80},'color':{'value':'#fff'},'opacity':{'value':0.3},'move':{'speed':1}}}); switchTheme('ferry');};</script></body></html>")
+              f.write("function switchTheme(mode){const b=document.body; const wrap=document.querySelector('.wrapper'); wrap.style.opacity='0'; setTimeout(()=>{if(mode==='ferry'){b.className='theme-ferry'; b.style.background=bgFerry; document.getElementById('list-ferry').style.display='block'; document.getElementById('list-vault').style.display='none'; document.getElementById('area-ferry').style.display='block'; document.getElementById('area-vault').style.display='none'; document.getElementById('main-title').innerText='TULLIUS\\'S FERRY'; document.getElementById('guide-head').innerText='[🚣 가이드 및 후기 확인]'; document.getElementById('index-title').style.color='#ffce54';}else{b.className='theme-vault'; b.style.background=bgVault; document.getElementById('list-ferry').style.display='none'; document.getElementById('list-vault').style.display='block'; document.getElementById('area-ferry').style.display='none'; document.getElementById('area-vault').style.display='block'; document.getElementById('main-title').innerText='VAULT 404 OUTPOST'; document.getElementById('guide-head').innerText='[☢️ Vault 404 가이드 확인]'; document.getElementById('index-title').style.color='#00ff42';} wrap.style.opacity='1'; let first=document.querySelector('#area-'+mode+' .cat-content'); if(first) showCat(first.id);}, 400);}")
+              f.write("function showCat(id){document.querySelectorAll('.cat-content').forEach(e=>e.style.display='none');document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active'));document.getElementById(id).style.display='block';document.getElementById('l-'+id).classList.add('active');} function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('.cat-content li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(q)?'':'none';});} window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':80},'color':{'value':'#fff'},'opacity':{'value':0.3},'move':{'speed':1}}}); switchTheme('ferry');};</script></body></html>")
           EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Fix Line 2 Error & Apply Power Armor Background" || exit 0
+          git push origin main
