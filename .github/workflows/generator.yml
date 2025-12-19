@@ -57,12 +57,18 @@ jobs:
                   fid = "f-" + rel_path.replace(os.sep, '-')
                   folders.append((display_name, fid, root, html_files))
 
-          # 1. 사이드바 (버튼 + 목차)
+          # 1. 사이드바 (버튼 + 피드백 버튼 + 목차)
           sidebar += "<div class='sidebar-nav'>"
-          sidebar += "<div style='display:flex; flex-direction:column; gap:8px; margin-bottom:20px;'>"
+          sidebar += "<div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'>"
           sidebar += "<a href='#' class='nav-btn active'>🚣 Ferry (Skyrim)</a>"
           sidebar += "<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ Vault 404 (Fallout)</a>"
           sidebar += "</div>"
+          
+          # [추가] 피드백 버튼 섹션 (파란색 계열로 구분)
+          sidebar += "<div style='margin-bottom:20px;'>"
+          sidebar += f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn feedback-btn'>📢 건의 및 에러 제보</a>"
+          sidebar += "</div>"
+          
           sidebar += "<h3 style='color: #ffce54; font-size: 0.9em; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3>"
           for n, fid, _, _ in folders:
               sidebar += f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {n}</a>"
@@ -91,13 +97,17 @@ jobs:
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,206,84,0.3); border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid rgba(255,206,84,0.4); border-radius: 4px; color: #ffce54; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; }")
               f.write(".nav-btn:hover, .nav-btn.active { background: #ffce54; color: #000; box-shadow: 0 0 12px rgba(255,206,84,0.5); }")
+              
+              # 피드백 버튼 전용 스타일
+              f.write(".feedback-btn { border-color: #58a6ff; color: #58a6ff; }")
+              f.write(".feedback-btn:hover { background: #58a6ff; color: #fff; box-shadow: 0 0 12px rgba(88,166,255,0.5); }")
+              
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; font-size: 0.9em; } .sidebar-link.active { color: #ffce54; text-shadow: 0 0 8px #ffce54; padding-left: 5px; }")
               f.write(".main-area { flex: 1; min-width: 0; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; box-sizing: border-box; }")
               f.write("summary::-webkit-details-marker { display: none; } a:hover { text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               f.write(f"<div class='wrapper'>{sidebar}<div class='main-area'>")
               
-              # 대문 제목 (백업본 기준 전체 복구 및 볼드 적용)
               f.write("<div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px;'>")
               f.write("<span style='font-size: 2.2em; font-weight: 900; color: #ffffff;'>TULLIUS'S FERRY</span>")
               f.write("<span style='font-size: 1.7em; font-weight: 800; color: #ffce54;'> & VAULT 404-VAULT BOY'S OUTPOST ☢️</span>")
@@ -106,7 +116,6 @@ jobs:
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
               f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
 
-              # [중요] 가이드 및 후기: 백업본 원문 100% 동일 복구
               f.write("<div style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'>")
               f.write("<h3 style='color: #ffce54; margin-top: 0;'>[🚣 Tullius's Ferry & ☢️ Vault 404-Vault boy's Outpost 가이드 및 후기]</h3>")
               f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8;'>")
