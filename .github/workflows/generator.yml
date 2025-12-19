@@ -1,23 +1,4 @@
-name: Generate Index
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Generate nested index.html
+- name: Generate nested index.html
         run: |
           python <<'EOF'
           import os
@@ -57,14 +38,12 @@ jobs:
                   fid = "f-" + rel_path.replace(os.sep, '-')
                   folders.append((display_name, fid, root, html_files))
 
-          # 1. 사이드바 (버튼 + 피드백 버튼 + 목차)
           sidebar += "<div class='sidebar-nav'>"
           sidebar += "<div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'>"
           sidebar += "<a href='#' class='nav-btn active'>🚣 Ferry (Skyrim)</a>"
           sidebar += "<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ Vault 404 (Fallout)</a>"
           sidebar += "</div>"
           
-          # [추가] 피드백 버튼 섹션 (파란색 계열로 구분)
           sidebar += "<div style='margin-bottom:20px;'>"
           sidebar += f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn feedback-btn'>📢 건의 및 에러 제보</a>"
           sidebar += "</div>"
@@ -77,7 +56,7 @@ jobs:
           for n, fid, root, hfs in folders:
               main += f"<div id='{fid}' class='cat-content' style='display:none;'>"
               main += f"<details open style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
-              main += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05);'><span><img src='https://img.icons8.com/ios-filled/50/ffffff/skyrim.png' style='width:18px; margin-right:10px;'>{n}</span><span style='font-size: 0.8em; color: #888;'>[{len(hfs)} FILES]</span></summary>"
+              main += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor:pointer;'><span><img src='https://img.icons8.com/ios-filled/50/ffffff/skyrim.png' style='width:18px; margin-right:10px;'>{n}</span><span style='font-size: 0.8em; color: #888;'>[{len(hfs)} FILES]</span></summary>"
               main += "<ul style='margin: 0; padding: 15px 40px; list-style-type: square;'>"
               for f in sorted(hfs):
                   path = os.path.join(root, f)
@@ -97,14 +76,13 @@ jobs:
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,206,84,0.3); border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid rgba(255,206,84,0.4); border-radius: 4px; color: #ffce54; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; }")
               f.write(".nav-btn:hover, .nav-btn.active { background: #ffce54; color: #000; box-shadow: 0 0 12px rgba(255,206,84,0.5); }")
-              
-              # 피드백 버튼 전용 스타일
-              f.write(".feedback-btn { border-color: #58a6ff; color: #58a6ff; }")
-              f.write(".feedback-btn:hover { background: #58a6ff; color: #fff; box-shadow: 0 0 12px rgba(88,166,255,0.5); }")
-              
+              f.write(".feedback-btn { border-color: #58a6ff; color: #58a6ff; } .feedback-btn:hover { background: #58a6ff; color: #fff; box-shadow: 0 0 12px rgba(88,166,255,0.5); }")
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; font-size: 0.9em; } .sidebar-link.active { color: #ffce54; text-shadow: 0 0 8px #ffce54; padding-left: 5px; }")
               f.write(".main-area { flex: 1; min-width: 0; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; box-sizing: border-box; }")
-              f.write("summary::-webkit-details-marker { display: none; } a:hover { text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
+              f.write("summary::-webkit-details-marker { display: none; } a:hover { text-decoration: underline; text-shadow: 0 0 8px #ffce54; }")
+              f.write(".guide-details summary { cursor: pointer; list-style: none; outline: none; }")
+              f.write(".guide-details summary::after { content: ' [접기/펼치기]'; font-size: 0.7em; color: #888; vertical-align: middle; }")
+              f.write("</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               f.write(f"<div class='wrapper'>{sidebar}<div class='main-area'>")
               
@@ -116,12 +94,13 @@ jobs:
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
               f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
 
-              f.write("<div style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'>")
-              f.write("<h3 style='color: #ffce54; margin-top: 0;'>[🚣 Tullius's Ferry & ☢️ Vault 404-Vault boy's Outpost 가이드 및 후기]</h3>")
-              f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8;'>")
+              # [변경점] 가이드 박스를 접을 수 있게 수정
+              f.write("<details open class='guide-details' style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'>")
+              f.write("<summary><h3 style='color: #ffce54; margin: 0; display: inline-block;'>[🚣 가이드 및 후기 확인]</h3></summary>")
+              f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;'>")
               f.write("<p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다 <strong>해결된 문제가 있으면 피드백 부탁드립니다.</strong><br>- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, <strong>외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.</strong><br>- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
               f.write("<span style='color: #ffce54; font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
-              f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div>")
+              f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></details>")
 
               f.write(main + "</div></div>")
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
@@ -130,11 +109,3 @@ jobs:
               f.write("window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':120},'color':{'value':'#fff'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}});")
               f.write("let f=document.querySelector('.cat-content');if(f)showCat(f.id);};</script></body></html>")
           EOF
-
-      - name: Commit and Push
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "Final fix for YAML syntax and content restoration" || exit 0
-          git push origin main
