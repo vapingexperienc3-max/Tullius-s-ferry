@@ -13,7 +13,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -33,11 +33,11 @@ jobs:
               </style>
               """
               try:
-                  if not filepath.endswith('.html'): return
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
-                      content = content.replace(nick, "")
+                      if nick in content:
+                          content = content.replace(nick, "")
                   if 'max-width: 100% !important' not in content:
                       if '<head>' in content:
                           content = content.replace('<head>', '<head>' + style_code)
@@ -45,8 +45,8 @@ jobs:
                           content = style_code + content
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
-              except:
-                  pass
+              except Exception as e:
+                  print(f"❌ Error: {e}")
 
           def generate_html_list(startpath):
               html_content = ""
@@ -72,42 +72,82 @@ jobs:
                           inject_width_style(full_path)
                           rel_file_path = os.path.relpath(full_path, startpath).replace(os.sep, '/')
                           
-                          display_f = f.rsplit('.html', 1)[0]
-                          if ' (' in display_f: display_f = display_f.rsplit(' (', 1)[0]
-                          if ' - 툴리우스 채널' in display_f: display_f = display_f.replace(' - 툴리우스 채널', '')
+                          # --- [제목 다듬기 로직 추가] ---
+                          display_f = f.replace('.html', '')
+                          if ' (' in display_f: # 날짜 괄호 제거
+                              display_f = display_f.rsplit(' (', 1)[0]
+                          if ' - 툴리우스 채널' in display_f: # 채널명 제거
+                              display_f = display_f.replace(' - 툴리우스 채널', '')
                           
-                          html_content += f'<li style="margin: 10px 0; transition: transform 0.2s;"><a href="{rel_file_path}" target="_blank" class="file-link" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
+                          html_content += f'<li style="margin: 10px 0;"><a href="{rel_file_path}" target="_blank" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
+                      
                       html_content += "</ul></details>"
               return html_content
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
-              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tullius's Ferry&Vault 404</title><style>")
+              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tullius's Ferry&Vault 404-Vault boy's Outpost</title><style>")
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
               f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
-              f.write(".sticky-header { position: sticky; top: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 15px 0; margin-bottom: 20px; border-bottom: 2px solid rgba(255,206,84,0.4); }")
-              f.write(".nav-tabs { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }")
-              f.write(".nav-btn { padding: 8px 18px; border: 1px solid rgba(255,206,84,0.4); border-radius: 4px; color: #ffce54; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; }")
-              f.write(".nav-btn:hover { background: #ffce54; color: #000; }")
-              f.write("#search-bar { width: 90%; max-width: 800px; display: block; margin: 10px auto; padding: 12px 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
-              f.write(".file-link:hover { padding-left: 8px; transition: 0.2s; }")
-              f.write("summary::-webkit-details-marker { display: none; }</style></head><body>")
+              f.write("h1 { border-bottom: 2px solid #586069; padding-bottom: .3em; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; }")
+              f.write(".nav-tabs { display: flex; gap: 10px; margin-bottom: 25px; }")
+              f.write(".nav-btn { padding: 8px 18px; border: 1px solid rgba(255,206,84,0.4); border-radius: 4px; color: #ffce54; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; letter-spacing: 1px; }")
+              f.write(".nav-btn:hover { background: #ffce54; color: #000; box-shadow: 0 0 12px rgba(255,206,84,0.5); }")
+              f.write(".nav-btn.active { background: rgba(255,206,84,0.15); border-color: #ffce54; cursor: default !important; }")
+              f.write("#search-bar { width: 100%; padding: 12px 20px; margin: 20px 0; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; font-size: 1em; backdrop-filter: blur(5px); outline: none; transition: 0.3s; }")
+              f.write("#search-bar:focus { background: rgba(255, 255, 255, 0.2); border-color: #ffce54; box-shadow: 0 0 10px rgba(255, 206, 84, 0.3); }")
+              f.write("summary::-webkit-details-marker { display: none; } a:hover { color: #fff !important; text-decoration: underline; text-shadow: 0 0 8px #ffce54; }</style></head><body>")
+              
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
-              f.write("<div style='text-align: center; margin-bottom: 30px;'><span style='font-size: 2.2em; font-weight: 900; color: #ffffff; letter-spacing: -1px;'>TULLIUS'S FERRY</span><br><span style='font-size: 1.5em; font-weight: 200; color: #ffce54;'>& Vault 404 - Outpost ☢️</span></div>")
-              f.write("<div class='sticky-header'><div class='nav-tabs'><a href='index.html' class='nav-btn active'>🚣 Ferry (Skyrim)</a><a href='#' class='nav-btn' onclick='alert(\"준비 중\"); return false;'>☢️ Vault 404</a></div><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='filterList()'></div>")
+              
+              # 제목 영역 (사용자님의 원본 디자인)
+              f.write("<div style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 10px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px;'>")
+              f.write("<span style='font-size: 2.2em; font-weight: 900; color: #ffffff; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); letter-spacing: -1px;'>TULLIUS'S FERRY</span>")
+              f.write("<span style='font-size: 1.7em; font-weight: 200; color: #ffce54; letter-spacing: 0.5px; opacity: 0.9;'>& <strong style='font-weight: 600;'>Vault 404</strong> - Vault boy's Outpost ☢️</span>")
+              f.write("</div>")
+              
+              f.write("<div class='nav-tabs'>")
+              f.write("<a href='#' class='nav-btn active'>🚣 Ferry (Skyrim)</a>")
+              f.write("<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ Vault 404 (Fallout)</a>")
+              f.write("</div>")
+              
+              # 이스란 명언 복구
+              f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
+              
+              f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
+
+              # 가이드 및 후기 영역 복구
+              f.write("<div style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px); text-align: left;'>")
+              f.write("<h3 style='color: #ffce54; margin-top: 0; margin-bottom: 15px; font-size: 1.1em; border: none;'>[🚣 Tullius's Ferry & ☢️ Vault 404-Vault boy's Outpost 가이드 및 후기]</h3>")
+              f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8;'>")
+              f.write("<p style='margin-bottom: 15px;'><strong>💡 이용 팁:</strong><br>")
+              f.write("- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>")
+              f.write("- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>")
+              f.write("- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다 <strong>들어가 있는 글들 중에 해결된 문제가 있으면 피드백 부탁드립니다.</strong><br>")
+              f.write("- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, <strong>외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.</strong><br>")
+              f.write("- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
+              f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px; margin-top: 15px;'><strong>✍️ 후기:</strong><br>")
+              f.write("공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>")
+              f.write("툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p>")
+              f.write("</div></div>")
+
               f.write(generate_html_list('.'))
+
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
-              f.write("<script>particlesJS('particles-js', {'particles':{'number':{'value':80},'color':{'value':'#ffffff'},'move':{'enable':true,'speed':1,'direction':'bottom'}}});")
-              f.write("function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('details').forEach(d=>{let v=false;d.querySelectorAll('li').forEach(i=>{let t=i.textContent.toLowerCase();if(t.includes(q)){i.style.display='';v=true;}else{i.style.display='none';}});if(v){d.style.display='';if(q.length>0)d.open=true;}else{d.style.display='none';}})}</script></body></html>")
+              f.write("<script>")
+              f.write("particlesJS('particles-js', {'particles':{'number':{'value':150,'density':{'enable':true,'value_area':800}},'color':{'value':'#ffffff'},'shape':{'type':'circle'},'opacity':{'value':0.5,'random':true},'size':{'value':3,'random':true},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','random':true,'straight':false,'out_mode':'out'}}});")
+              f.write("function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('details').forEach(d=>{let v=false;d.querySelectorAll('li').forEach(i=>{let t=i.textContent.toLowerCase();if(t.includes(q)){i.style.display='';v=true;}else{i.style.display='none';}});if(v){d.style.display='';if(q.length>0)d.open=true;}else{d.style.display='none';}})}")
+              f.write("</script></body></html>")
           EOF
 
       - name: Commit and Push
         run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 모든 파일을 추가하고, 변경 사항이 있든 없든 강제로 커밋 프로세스를 진행합니다.
-          git add .
-          git commit -m "Update index and styles" || echo "No changes to commit"
-          git push origin main
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "style: auto-inject width styles and update index"
+            git push
+          fi
