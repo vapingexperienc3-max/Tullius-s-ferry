@@ -35,6 +35,7 @@ jobs:
           sidebar_ferry, sidebar_vault = "", ""
           main_ferry, main_vault = "", ""
           
+          # 배경 이미지 (폴아웃 파워아머 이미지 경로 재설정)
           bg_skyrim = "https://multiplayer.net-cdn.it/thumbs/images/2025/02/12/skyrim-3_lkz8srZ_cropped_0_9_1600_905_jpeg_1600x900_crop_q85.jpg"
           bg_vault = "https://images7.alphacoders.com/668/668471.jpg"
           
@@ -70,14 +71,15 @@ jobs:
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius's Ferry & Vault 404</title><style>")
               f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
-              f.write("body { margin: 0; display: flex; justify-content: center; background-attachment: fixed !important; transition: background 0.8s ease; font-family: sans-serif; color: #eee; overflow-x: hidden; }")
+              f.write("body { margin: 0; display: flex; justify-content: center; background-attachment: fixed !important; transition: background 0.5s ease; font-family: sans-serif; color: #eee; overflow-x: hidden; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; }")
-              f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,206,84,0.3); border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); z-index: 10; }")
+              f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.7); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(10px); z-index: 10; transition: border-color 0.4s; }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none; padding: 8px 0; font-size: 0.9em; }")
               f.write(".main-area { flex: 1; min-width: 0; z-index: 10; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; box-sizing: border-box; }")
-              f.write(".theme-ferry .sidebar-nav { border-color: rgba(255,206,84,0.3); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; border-color: #ffce54; } .theme-ferry .sidebar-link.active { color: #ffce54; text-shadow: 0 0 8px #ffce54; }")
-              f.write(".theme-vault .sidebar-nav { border-color: rgba(0,255,66,0.3); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; border-color: #00ff42; } .theme-vault .sidebar-link.active { color: #00ff42; text-shadow: 0 0 8px #00ff42; }")
+              f.write(".guide-details { background: rgba(0, 0, 0, 0.6); border: 1px solid; border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px); transition: border-color 0.4s; }")
+              f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.3); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; border-color: #ffce54; } .theme-ferry .sidebar-link.active { color: #ffce54; text-shadow: 0 0 8px #ffce54; }")
+              f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.3); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; border-color: #00ff42; } .theme-vault .sidebar-link.active { color: #00ff42; text-shadow: 0 0 8px #00ff42; }")
               f.write("summary::-webkit-details-marker { display: none; } .guide-details summary { cursor: pointer; list-style: none; outline: none; } .guide-details summary::after { content: ' [접기/펼치기]'; font-size: 0.7em; color: #888; }</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
@@ -85,43 +87,35 @@ jobs:
               f.write("<h3 id='idx-t' style='font-size: 0.9em; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3>")
               f.write(f"<div id='l-ferry'>{sidebar_ferry}</div><div id='l-vault' style='display:none;'>{sidebar_vault}</div></div>")
               
-              # 대문 제목 영역 (크기/색상 요청 반영)
-              f.write("<div class='main-area'><div id='main-title-container' style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 15px; line-height: 1.4;'>")
-              f.write("<span id='title-ferry' style='font-weight: 900; color: #ffffff; transition: 0.4s; display: inline-block;'>TULLIUS'S FERRY</span>")
-              f.write("<span id='title-sep' style='font-weight: 900; color: #daa520; margin: 0 15px; display: inline-block;'> & </span>")
-              f.write("<span id='title-vault' style='font-weight: 900; color: #00ff42; transition: 0.4s; display: inline-block;'>VAULT 404-Vault boy's OUTPOST</span></div>")
+              f.write("<div class='main-area'><div id='main-title-container' style='border-bottom: 2px solid rgba(88, 96, 105, 0.5); margin-bottom: 20px; padding-bottom: 15px; height: 60px; display: flex; align-items: center;'>")
+              f.write("<span id='title-ferry' style='font-weight: 900; color: #ffffff; font-size: 2.5em; display: none;'>TULLIUS'S FERRY</span>")
+              f.write("<span id='title-vault' style='font-weight: 900; color: #00ff42; font-size: 2.5em; display: none;'>Vault boy's OUTPOST</span></div>")
               
-              f.write("<p id='theme-quote' style='color: #bdc3c7;'></p><input type='text' id='search-bar' placeholder='보관소 내 전체 파일 검색...' onkeyup='globalSearch()'>")
-              
-              # 가이드 및 후기 (누락 없이 원문 복구)
-              f.write("<details open class='guide-details' style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'><summary><h3 style='color: #ffce54; margin: 0; display: inline-block;'>[📜 가이드 및 후기 확인]</h3></summary>")
-              f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;'>")
-              f.write("<p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다 <strong>해결된 문제가 있으면 피드백 부탁드립니다.</strong><br>- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, <strong>외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.</strong><br>- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color: #ffce54; font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
-              f.write("<p><span style='color: #ffce54; font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
+              f.write("<p id='theme-quote' style='color: #bdc3c7; height: 1.5em; margin-bottom: 10px;'></p><input type='text' id='search-bar' placeholder='보관소 내 전체 파일 검색...' onkeyup='globalSearch()'>")
+              f.write("<details open class='guide-details'><summary><h3 id='guide-title' style='margin: 0; display: inline-block;'>[📜 가이드 및 후기 확인]</h3></summary>")
+              f.write("<div id='guide-body' style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;'>")
+              f.write("<p><strong>💡 이용 팁:</strong><br>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>- <strong>질문,피드백,로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong>양해 바랍니다.<br>- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다 <strong>해결된 문제가 있으면 피드백 부탁드립니다.</strong><br>- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, <strong>외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.</strong><br>- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span class='highlight-text' style='font-weight: bold;'>(파일 암호 필수 확인)</span></p>")
+              f.write("<p><span class='highlight-text' style='font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
               f.write("<p style='border-top: 1px solid rgba(255,206,84,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></details>")
-              
               f.write(f"<div id='a-ferry'>{main_ferry}</div><div id='a-vault' style='display:none;'>{main_vault}</div></div></div>")
               
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
-              # 가독성 그라데이션 레이어
-              f.write(f"const bgF = \"linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.4) 100%), url('{bg_skyrim}')\";")
-              f.write(f"const bgV = \"linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.4) 100%), url('{bg_vault}')\";")
+              f.write(f"const bF = \"linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.4) 100%), url('{bg_skyrim}')\";")
+              f.write(f"const bV = \"linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.4) 100%), url('{bg_vault}')\";")
               
-              # 검색 알고리즘 (빼먹지 않고 포함)
-              f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); let contents=document.querySelectorAll('.cat-content'); contents.forEach(c=>{ let items=c.querySelectorAll('li'); let foundCount=0; items.forEach(li=>{ if(li.textContent.toLowerCase().includes(q)){ li.style.display=''; foundCount++; } else { li.style.display='none'; } }); if(q.length>0){ if(foundCount>0){ c.style.display='block'; c.querySelector('details').open=true; } else { c.style.display='none'; } } else { let m=document.body.className.includes('ferry')?'ferry':'vault'; switchTheme(m); } }); }")
+              # 테마 전환 로직 (이미지 미출력 현상 해결)
+              f.write("function switchTheme(m){ const b=document.body; const q=document.getElementById('theme-quote'); const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text'); ")
+              f.write("b.style.backgroundSize='cover'; b.style.backgroundRepeat='no-repeat'; b.style.backgroundAttachment='fixed'; ")
+              f.write("if(m==='ferry'){ b.className='theme-ferry'; b.style.backgroundImage=bF; b.style.backgroundPosition='right center'; ")
+              f.write("tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); ")
+              f.write("q.innerText=\"'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'\"; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54';}")
+              f.write("else{ b.className='theme-vault'; b.style.backgroundImage=bV; b.style.backgroundPosition='right center'; ")
+              f.write("tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42'); ")
+              f.write("q.innerText=\"'전쟁... 전쟁은 결코 변하지 않는다.'\"; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42';} updateParticles(m); let first=document.querySelector('#a-'+m+' .cat-content'); if(first) showCat(first.id);}")
               
               f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':120},'color':{'value':'#fff'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}}); }")
               f.write("else { window.particlesJS('particles-js',{'particles':{'number':{'value':150},'color':{'value':['#00ff42','#ffce54']},'opacity':{'value':0.6},'size':{'value':2},'line_linked':{'enable':false},'move':{'enable':true,'speed':2.5,'direction':'none','random':true,'out_mode':'out'}}}); } }")
-              
-              # 테마 전환 로직 (제목 크기 강조 포함)
-              f.write("function switchTheme(m){const b=document.body; const q=document.getElementById('theme-quote'); const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); b.style.backgroundSize='cover'; ")
-              f.write("if(m==='ferry'){b.className='theme-ferry'; b.style.background=bgF; b.style.backgroundSize='cover'; b.style.backgroundPosition='right center'; ")
-              f.write("tF.style.fontSize='2.3em'; tV.style.fontSize='1.7em'; tF.style.opacity='1'; tV.style.opacity='0.5'; ")
-              f.write("q.innerText=\"'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'\"; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54';}")
-              f.write("else{b.className='theme-vault'; b.style.background=bgV; b.style.backgroundSize='cover'; b.style.backgroundPosition='right center'; ")
-              f.write("tF.style.fontSize='1.7em'; tV.style.fontSize='2.3em'; tF.style.opacity='0.5'; tV.style.opacity='1'; ")
-              f.write("q.innerText=\"'전쟁... 전쟁은 결코 변하지 않는다.'\"; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42';} updateParticles(m); let first=document.querySelector('#a-'+m+' .cat-content'); if(first) showCat(first.id);}")
-              
+              f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); let contents=document.querySelectorAll('.cat-content'); contents.forEach(c=>{ let items=c.querySelectorAll('li'); let foundCount=0; items.forEach(li=>{ if(li.textContent.toLowerCase().includes(q)){ li.style.display=''; foundCount++; } else { li.style.display='none'; } }); if(q.length>0){ if(foundCount>0){ c.style.display='block'; c.querySelector('details').open=true; } else { c.style.display='none'; } } else { let m=document.body.className.includes('ferry')?'ferry':'vault'; switchTheme(m); } }); }")
               f.write("function showCat(id){document.querySelectorAll('.cat-content').forEach(e=>e.style.display='none');document.querySelectorAll('.sidebar-link').forEach(e=>e.classList.remove('active'));document.getElementById(id).style.display='block';document.getElementById('l-'+id).classList.add('active');} ")
               f.write("window.onload=()=>{ switchTheme('ferry'); };</script></body></html>")
           EOF
@@ -131,5 +125,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Complete Restore: All Guides, Search, and Adaptive Titles Applied" || exit 0
+          git commit -m "Fix: Vault boy background visibility and theme title sync" || exit 0
           git push origin main
