@@ -72,9 +72,12 @@ jobs:
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
               # 여기서부터 교체
-              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed !important; background-size: cover !important; background-repeat: no-repeat !important; ")
-              f.write("background-position: right center !important; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
+              # 1. body 설정 (중복 없이 한 번에)
+              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed !important; background-size: cover !important; background-repeat: no-repeat !important; background-position: right center !important; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
+              
+              # 2. wrapper 및 sidebar 설정
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
+              f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               
               # 호버 효과 스타일
@@ -84,8 +87,8 @@ jobs:
               
               f.write(".main-area { flex: 1; min-width: 0; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
               f.write(".guide-details { background: rgba(0, 0, 0, 0.75); border: 1px solid; border-radius: 8px; padding: 25px; margin-bottom: 30px; backdrop-filter: blur(10px); }")
-              f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.4); } .theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; }")
-              f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4); } .theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; }")
+              f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.4) !important; }")
+              f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4) !important; }")
               f.write("summary { cursor: pointer; outline: none; }</style></head><body>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
@@ -125,8 +128,8 @@ jobs:
               f.write("function switchTheme(m){ const b=document.body; ")
               f.write("const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
               # 배경 이미지를 그라데이션 없이 직접 주입 (이미지 확인용)
-              f.write("if(m==='ferry'){ b.style.backgroundImage = 'url(' + bgImgF + ')'; b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; }")
-              f.write("else { b.style.backgroundImage = 'url(' + bgImgV + ')'; b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; }")
+              f.write("if(m==='ferry'){ b.className='theme-ferry'; b.style.backgroundImage = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('\" + bgImgF + \"')\";")
+              f.write("} else { b.className='theme-vault'; b.style.backgroundImage = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('\" + bgImgV + \"')\";")
               # 나머지 색상 및 파티클 업데이트
               f.write("updateParticles(m); }")
               
