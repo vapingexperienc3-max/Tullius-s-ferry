@@ -87,16 +87,19 @@ jobs:
                           
                           rel_file_path = os.path.relpath(full_path, startpath).replace(os.sep, '/')
                           
-                          # --- [핵심 수정 구간: 제목 다듬기] ---
+                         # --- [핵심 수정 구간: 제목 다듬기] ---
                           # 1. 확장자 .html 제거
                           display_f = f.rsplit('.html', 1)[0]
                           
-                          # 2. 마지막 괄호와 그 안의 날짜/시간 정보 제거 (예: " (2025. 12. 18...)")
-                          # rsplit을 사용하여 가장 마지막에 나오는 " ("를 기준으로 앞부분만 가져옵니다.
+                          # 2. 마지막 괄호와 그 안의 날짜/시간 정보 제거
                           if ' (' in display_f:
                               display_f = display_f.rsplit(' (', 1)[0]
+                          
+                          # 3. " - 툴리우스 채널" 문구 제거
+                          if ' - 툴리우스 채널' in display_f:
+                              display_f = display_f.replace(' - 툴리우스 채널', '')
                           # ---------------------------------------
-
+                         
                           html_content += f'<li style="margin: 10px 0;"><a href="{rel_file_path}" target="_blank" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
                       
                       html_content += "</ul></details>"
