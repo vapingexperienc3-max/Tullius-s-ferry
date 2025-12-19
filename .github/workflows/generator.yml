@@ -9,12 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # 깃허브 액션이 저장소에 글을 쓸 수 있는 권한을 명시적으로 부여합니다.
     permissions:
       contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # 최신 버전으로 업데이트
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -53,7 +52,6 @@ jobs:
               html_content = ""
               for root, dirs, files in sorted(os.walk(startpath)):
                   dirs[:] = [d for d in dirs if not d.startswith('.')]
-                  # .html 파일 또는 확장자 없는 파일 포함
                   html_files = [f for f in files if (f.endswith('.html') or '.' not in f) and f != 'index.html']
                   
                   if html_files:
@@ -68,3 +66,48 @@ jobs:
                       html_content += f"<span style='font-size: 0.8em; color: #888; font-family: monospace;'>[{len(html_files)} FILES]</span>"
                       html_content += "</summary>"
                       html_content += "<ul style='margin: 0; padding: 15px 40px; list-style-type: square;'>"
+                      
+                      for f in sorted(html_files):
+                          full_path = os.path.join(root, f)
+                          inject_width_style(full_path)
+                          rel_file_path = os.path.relpath(full_path, startpath).replace(os.sep, '/')
+                          
+                          display_f = f.rsplit('.html', 1)[0]
+                          if ' (' in display_f: display_f = display_f.rsplit(' (', 1)[0]
+                          if ' - 툴리우스 채널' in display_f: display_f = display_f.replace(' - 툴리우스 채널', '')
+                          
+                          html_content += f'<li style="margin: 10px 0; transition: transform 0.2s;"><a href="{rel_file_path}" target="_blank" class="file-link" style="color: #ffce54; text-decoration: none; font-weight: 500; font-size: 0.95em;">{display_f}</a></li>'
+                      html_content += "</ul></details>"
+              return html_content
+
+          with open('index.html', 'w', encoding='utf-8') as f:
+              f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'>")
+              f.write("<meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Tullius's Ferry&Vault 404</title><style>")
+              f.write("* { cursor: url('https://img.icons8.com/ios-filled/25/ffffff/sent.png'), auto !important; }")
+              f.write("body { background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,1) 95%), linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://static.kinguin.net/media/catalog/category/cache/1/hi_image/9df78eab33525d08d6e5fb8d27136e95/The-Elder-Scrolls-V-Skyrim.jpg'); background-size: 100% auto; background-repeat: no-repeat; background-position: top center; background-attachment: scroll; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; padding: 30px; max-width: 1000px; margin: auto; color: #eee; }")
+              f.write(".sticky-header { position: sticky; top: 0; z-index: 1000; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); padding: 15px 0; margin-bottom: 20px; border-bottom: 2px solid rgba(255,206,84,0.4); }")
+              f.write(".nav-tabs { display: flex; gap: 10px; margin-bottom: 10px; justify-content: center; }")
+              f.write(".nav-btn { padding: 8px 18px; border: 1px solid rgba(255,206,84,0.4); border-radius: 4px; color: #ffce54; text-decoration: none; font-size: 0.85em; font-weight: bold; background: rgba(0,0,0,0.5); transition: 0.3s; }")
+              f.write(".nav-btn:hover { background: #ffce54; color: #000; }")
+              f.write("#search-bar { width: 90%; max-width: 800px; display: block; margin: 10px auto; padding: 12px 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
+              f.write(".file-link:hover { padding-left: 8px; transition: 0.2s; }")
+              f.write("summary::-webkit-details-marker { display: none; }</style></head><body>")
+              f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;'></div>")
+              f.write("<div style='text-align: center; margin-bottom: 30px;'><span style='font-size: 2.2em; font-weight: 900; color: #ffffff; letter-spacing: -1px;'>TULLIUS'S FERRY</span><br><span style='font-size: 1.5em; font-weight: 200; color: #ffce54;'>& Vault 404 - Outpost ☢️</span></div>")
+              f.write("<div class='sticky-header'><div class='nav-tabs'><a href='index.html' class='nav-btn active'>🚣 Ferry (Skyrim)</a><a href='#' class='nav-btn' onclick='alert(\"준비 중\"); return false;'>☢️ Vault 404</a></div><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='filterList()'></div>")
+              f.write(generate_html_list('.'))
+              f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>")
+              f.write("<script>particlesJS('particles-js', {'particles':{'number':{'value':80},'color':{'value':'#ffffff'},'move':{'enable':true,'speed':1,'direction':'bottom'}}});")
+              f.write("function filterList(){let q=document.getElementById('search-bar').value.toLowerCase();document.querySelectorAll('details').forEach(d=>{let v=false;d.querySelectorAll('li').forEach(i=>{let t=i.textContent.toLowerCase();if(t.includes(q)){i.style.display='';v=true;}else{i.style.display='none';}});if(v){d.style.display='';if(q.length>0)d.open=true;}else{d.style.display='none';}})}</script></body></html>")
+          EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 모든 파일을 추가하고, 변경 사항이 있든 없든 강제로 커밋 프로세스를 진행합니다.
+          git add .
+          git commit -m "Update index and styles" || echo "No changes to commit"
+          git push origin main
