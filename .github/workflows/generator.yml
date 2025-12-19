@@ -1,4 +1,23 @@
-- name: Generate nested index.html
+name: Generate Index
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate nested index.html
         run: |
           python <<'EOF'
           import os
@@ -38,12 +57,14 @@
                   fid = "f-" + rel_path.replace(os.sep, '-')
                   folders.append((display_name, fid, root, html_files))
 
+          # 사이드바 구성
           sidebar += "<div class='sidebar-nav'>"
           sidebar += "<div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'>"
           sidebar += "<a href='#' class='nav-btn active'>🚣 Ferry (Skyrim)</a>"
           sidebar += "<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ Vault 404 (Fallout)</a>"
           sidebar += "</div>"
           
+          # 피드백 버튼
           sidebar += "<div style='margin-bottom:20px;'>"
           sidebar += f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn feedback-btn'>📢 건의 및 에러 제보</a>"
           sidebar += "</div>"
@@ -94,7 +115,7 @@
               f.write("<p style='color: #bdc3c7;'>'언젠가 이런 날이 올 줄 알았지. 난 알았어. 하지만 아무도 믿지 않았지.'</p>")
               f.write("<input type='text' id='search-bar' placeholder='보관소 내 파일 검색...' onkeyup='filterList()'>")
 
-              # [변경점] 가이드 박스를 접을 수 있게 수정
+              # 가이드 박스 접기 기능 적용 (문구는 백업 2 버전 100% 유지)
               f.write("<details open class='guide-details' style='background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 206, 84, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(10px);'>")
               f.write("<summary><h3 style='color: #ffce54; margin: 0; display: inline-block;'>[🚣 가이드 및 후기 확인]</h3></summary>")
               f.write("<div style='font-size: 0.9em; color: #ccc; line-height: 1.8; margin-top: 15px;'>")
@@ -109,3 +130,11 @@
               f.write("window.onload=()=>{particlesJS('particles-js',{'particles':{'number':{'value':120},'color':{'value':'#fff'},'opacity':{'value':0.5},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom','out_mode':'out'}}});")
               f.write("let f=document.querySelector('.cat-content');if(f)showCat(f.id);};</script></body></html>")
           EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Apply Indentation Fix and Guide Collapse Feature" || exit 0
+          git push origin main
