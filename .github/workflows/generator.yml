@@ -35,8 +35,10 @@ jobs:
           sidebar_ferry, sidebar_vault = "", ""
           main_ferry, main_vault = "", ""
           
+          # 파이썬 코드 상단
           bg_skyrim = "https://multiplayer.net-cdn.it/thumbs/images/2025/02/12/skyrim-3_lkz8srZ_cropped_0_9_1600_905_jpeg_1600x900_crop_q85.jpg"
-          bg_vault = "https://images7.alphacoders.com/668/668471.jpg"
+          # 외부 링크가 더 안정적인 주소로 교체
+          bg_vault = "https://images.wallpapersden.com/image/download/fallout-4-vault-boy_a2dtZ2aUmZqaraWkpJRmbmdlrWZlbWU.jpg"
           
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -69,9 +71,10 @@ jobs:
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
-              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed; background-size: cover; background-repeat: no-repeat; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
+              # 여기서부터 교체
+              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed !important; background-size: cover !important; background-repeat: no-repeat !important; ")
+              f.write("background-position: right center !important; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
-              f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               
               # 호버 효과 스타일
@@ -119,10 +122,13 @@ jobs:
               f.write(f"const bgImgV = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('{bg_vault}')\";")
 
               # 2. switchTheme 함수
-              f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
-              f.write("b.style.backgroundRepeat='no-repeat'; b.style.backgroundAttachment='fixed'; b.style.backgroundSize='cover'; b.style.backgroundPosition='right center';")
-              f.write("if(m==='ferry'){ b.className='theme-ferry'; b.style.backgroundImage=bgImgF; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54'; }")
-              f.write("else{ b.className='theme-vault'; b.style.backgroundImage=bgImgV; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42'; } if(typeof updateParticles==='function') updateParticles(m); }")
+              f.write("function switchTheme(m){ const b=document.body; ")
+              f.write("const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
+              # 배경 이미지를 그라데이션 없이 직접 주입 (이미지 확인용)
+              f.write("if(m==='ferry'){ b.style.backgroundImage = 'url(' + bgImgF + ')'; b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; }")
+              f.write("else { b.style.backgroundImage = 'url(' + bgImgV + ')'; b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; }")
+              # 나머지 색상 및 파티클 업데이트
+              f.write("updateParticles(m); }")
               
               f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':50},'color':{'value':'#fff'},'shape':{'type':'circle'},'opacity':{'value':0.3},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom'}}}); }")
               f.write("else { window.particlesJS('particles-js',{'particles':{'number':{'value':80},'color':{'value':'#00ff42'},'shape':{'type':'circle'},'opacity':{'value':0.4},'size':{'value':2},'line_linked':{'enable':false},'move':{'enable':true,'speed':2,'random':true}}}); } }")
