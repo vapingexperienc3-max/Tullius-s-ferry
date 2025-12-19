@@ -63,7 +63,7 @@ jobs:
           sidebar += "<a href='#' class='nav-btn active'>🚣 Ferry (Skyrim)</a>"
           sidebar += "<a href='#' class='nav-btn' onclick='alert(\"Vault 404: 아직 전초기지가 준비되지 않았습니다.\"); return false;'>☢️ Vault 404 (Fallout)</a>"
           sidebar += "</div>"
-          sidebar += "<h3 style='color: #ffce54; font-size: 0.9em; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px; margin-bottom:10px;'>📜 보관소 인덱스</h3>"
+          sidebar += "<h3 style='color: #ffce54; font-size: 0.9em; border-bottom: 1px solid rgba(255,206,84,0.3); padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3>"
           for n, fid, _, _ in folders:
               sidebar += f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {n}</a>"
           sidebar += "</div>"
