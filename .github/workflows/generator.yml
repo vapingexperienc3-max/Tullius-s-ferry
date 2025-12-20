@@ -131,24 +131,24 @@ jobs:
               # 2. switchTheme 함수 (인물 위치 및 크기 정밀 조정 버전)
               f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
               
-              f.write("let targetImg = (m==='ferry') ? bgImgF : bgImgV;")
-              f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url(\"' + targetImg + '\")';")
+              # 배경 이미지 경로 설정 (순수하게 파일명만 연결)
+              f.write("let imgUrl = (m==='ferry') ? bgImgF : bgImgV;")
+              f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url(' + imgUrl + ')';")
               f.write("b.style.backgroundRepeat = 'no-repeat'; b.style.backgroundAttachment = 'fixed';")
 
               f.write("if(m==='ferry'){")
               f.write("  b.className='theme-ferry';")
-              # 도바킨: 사진이 매우 크므로 사이즈를 100% 미만(85%)으로 줄여서 우측에 배치
-              f.write("  b.style.setProperty('background-size', '85%', 'important');")
-              # 'right 150px top 20%' -> 오른쪽에서 150px 안으로 들여오고 위에서 20% 내려서 얼굴 강조
-              f.write("  b.style.setProperty('background-position', 'right -100px top 20%', 'important');")
+              # 도바킨: 이미지가 크므로 사이즈를 100%로 맞추고, 오른쪽 끝에서 안으로 50px 들여옴
+              f.write("  b.style.setProperty('background-size', '100%', 'important');")
+              f.write("  b.style.setProperty('background-position', 'right -50px top 20%', 'important');")
               f.write("  tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54');")
               f.write("  document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none';")
               f.write("  document.getElementById('idx-t').style.color='#ffce54';")
               f.write("} else {")
               f.write("  b.className='theme-vault';")
-              # 볼트보이: 전체를 채우되(cover), 오른쪽 끝에서 350px 더 밀어서 메뉴와 안 겹치게 함
+              # 볼트보이: 전체 채우기(cover) 및 오른쪽 밖으로 400px 밀어서 메뉴 가림 방지
               f.write("  b.style.setProperty('background-size', 'cover', 'important');")
-              f.write("  b.style.setProperty('background-position', 'calc(100% + 350px) center', 'important');")
+              f.write("  b.style.setProperty('background-position', 'calc(100% + 400px) center', 'important');")
               f.write("  tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42');")
               f.write("  document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block';")
               f.write("  document.getElementById('idx-t').style.color='#00ff42';")
