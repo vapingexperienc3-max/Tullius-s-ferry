@@ -74,7 +74,7 @@ jobs:
               f.write(".theme-ferry { background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('" + bg_skyrim + "'); background-size: 90% !important; background-position: right -150px top 20% !important; }")
               f.write(".theme-vault { background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('" + bg_vault + "'); background-size: cover !important; background-position: calc(100% + 280px) center !important; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
-              f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); transition: border-color 0.3s; }")
+              f.write(".sidebar-nav { width: 280px; position: sticky; top: 120px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); transition: border-color 0.3s; }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none !important; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
               f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active, .theme-ferry .file-link:hover { color: #ffce54 !important; text-shadow: 0 0 8px rgba(255,206,84,0.6); }")
@@ -116,50 +116,30 @@ jobs:
           
               f.write("<div id='a-ferry'>" + main_ferry + "</div><div id='a-vault' style='display:none;'>" + main_vault + "</div></div></div>")
           
-              # 자바스크립트 완성본 (함수 누락 수정)
+              # 자바스크립트 시작 (중복 태그 제거 및 함수 정리)
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               
-              # 1. 카테고리 전환 함수 (이게 없어서 먹통이었음)
-              f.write("function showCat(fid){")
-              f.write("  document.querySelectorAll('.cat-content').forEach(c => c.style.display = 'none');")
-              f.write("  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));")
-              f.write("  const target = document.getElementById(fid);")
-              f.write("  if(target) target.style.display = 'block';")
-              f.write("  const link = document.getElementById('l-' + fid);")
-              f.write("  if(link) link.classList.add('active');")
-              f.write("}")
-
-              # 자바스크립트 통합 제어 (입자 + 검색 + 인덱스)
-              f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
-              
-              # 1. 입자 컨테이너를 재생성하여 강제 초기화하는 함수
+              # 1. 입자 설정 함수 (이 줄에서 색상 배열만 수정됨)
               f.write("function updateParticles(m){")
-              f.write("  const oldCtx = document.getElementById('particles-js');")
-              f.write("  if (oldCtx) { oldCtx.remove(); }") # 기존 컨테이너 아예 삭제
-          
-              # 새 컨테이너 생성 및 삽입
-              f.write("  const newCtx = document.createElement('div');")
-              f.write("  newCtx.id = 'particles-js';")
+              f.write("  const oldCtx = document.getElementById('particles-js'); if (oldCtx) { oldCtx.remove(); }")
+              f.write("  const newCtx = document.createElement('div'); newCtx.id = 'particles-js';")
               f.write("  newCtx.style = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;';")
               f.write("  document.body.prepend(newCtx);")
-          
               f.write("  let conf;")
-              f.write("  if(m==='ferry'){") # 스카이림: 하얀 눈
+              f.write("  if(m==='ferry'){")
               f.write("    conf = {particles:{number:{value:80},color:{value:'#ffffff'},shape:{type:'circle'},opacity:{value:0.6},size:{value:3},line_linked:{enable:false},move:{enable:true,speed:1.2,direction:'bottom',random:true,out_mode:'out'}}};")
-              f.write("  } else {") # 폴아웃: 네온 그린 먼지 (확연히 보이게 설정)
-              f.write("    conf = {particles:{number:{value:110},color:{value:'#39FF14'},shape:{type:'circle'},opacity:{value:0.7},size:{value:2.5},line_linked:{enable:false},move:{enable:true,speed:0.8,direction:'top',random:true,out_mode:'out'}}};")
+              f.write("  } else {")
+              # 아래 줄이 말씀하신 '다중 색상' 적용 한 줄입니다.
+              f.write("    conf = {particles:{number:{value:120},color:{value:['#39FF14', '#4b3c2a', '#7b5c3d']},shape:{type:'circle'},opacity:{value:0.7,random:true},size:{value:2.5,random:true},line_linked:{enable:false},move:{enable:true,speed:1.0,direction:'top',random:true,out_mode:'out'}}};")
               f.write("  }")
-          
               f.write("  if(typeof particlesJS !== 'undefined') { particlesJS('particles-js', conf); }")
               f.write("}")
 
-              # 2. 테마 전환 함수 (안정적인 실행을 위해 입자 업데이트를 먼저 수행)
+              # 2. 테마 및 카테고리 제어 함수
               f.write("function switchTheme(m){")
-              f.write("  updateParticles(m);") # 입자 엔진을 먼저 새로 고침
-          
+              f.write("  updateParticles(m);")
               f.write("  const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
               f.write("  const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
-          
               f.write("  if(m==='ferry'){")
               f.write("    b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54';")
               f.write("    hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block';")
@@ -172,8 +152,15 @@ jobs:
               f.write("    document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42';")
               f.write("  }")
               f.write("}")
-              
-              # 4. 검색 함수 (공백 제거 및 빈 폴더 숨기기)
+
+              f.write("function showCat(fid){")
+              f.write("  document.querySelectorAll('.cat-content').forEach(c => c.style.display = 'none');")
+              f.write("  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));")
+              f.write("  const target = document.getElementById(fid); if(target) target.style.display = 'block';")
+              f.write("  const link = document.getElementById('l-' + fid); if(link) link.classList.add('active');")
+              f.write("}")
+
+              # 3. 검색 함수 (기존 로직 유지)
               f.write("function globalSearch(){")
               f.write("  let q = document.getElementById('search-bar').value.toLowerCase();")
               f.write("  let allCats = document.querySelectorAll('.cat-content');")
@@ -187,11 +174,11 @@ jobs:
               f.write("    if (q === '') { cat.style.display = 'none'; }")
               f.write("    else { cat.style.display = hasVisibleFile ? 'block' : 'none'; }")
               f.write("  });")
-              f.write("  if (q === '') { ")
-              f.write("    const activeLink = document.querySelector('.sidebar-link.active');")
-              f.write("    if(activeLink) { const fid = activeLink.id.replace('l-', ''); const target = document.getElementById(fid); if(target) target.style.display = 'block'; }")
-              f.write("  }")
+              f.write("  if (q === '') { const activeLink = document.querySelector('.sidebar-link.active'); if(activeLink) { const fid = activeLink.id.replace('l-', ''); const target = document.getElementById(fid); if(target) target.style.display = 'block'; } }")
               f.write("}")
+              
+              f.write("window.onload=()=>{ switchTheme('ferry'); };")
+              f.write("</script></body></html>")
               
               f.write("window.onload=()=>{ switchTheme('ferry'); };")
               f.write("</script></body></html>")
