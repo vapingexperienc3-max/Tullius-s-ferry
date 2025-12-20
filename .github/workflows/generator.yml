@@ -36,8 +36,8 @@ jobs:
           main_ferry, main_vault = "", ""
           
           # 파이썬 코드 상단
-          bg_skyrim = "skyrim.jpg"
-          bg_vault = "fallout.jpg"
+          bg_skyrim = "skyrim.png"
+          bg_vault = "fallout.png"
           
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -133,8 +133,8 @@ jobs:
               
               # 배경 이미지 설정: 우측 고정을 위해 backgroundPosition을 명시적으로 추가
               f.write("let targetImg = (m==='ferry') ? bgImgF : bgImgV;")
-              f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.3) 100%), url(' + targetImg + ')';")
-              f.write("b.style.backgroundPosition = 'right center';") # 도바킨/볼트보이 강제 우측 정렬
+              f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url(\"' + targetImg + '\")';")
+              f.write("b.style.backgroundPosition = 'right center';") # 우측 고정
               f.write("b.style.backgroundSize = 'cover';")
               f.write("b.style.backgroundRepeat = 'no-repeat';")
               
