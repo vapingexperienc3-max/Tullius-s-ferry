@@ -128,6 +128,7 @@ jobs:
               f.write("function switchTheme(m){ const b=document.body; ")
               f.write("const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
               # 배경 이미지를 그라데이션 없이 직접 주입 (이미지 확인용)
+              # switchTheme 함수 내부
               f.write("if(m==='ferry'){ b.className='theme-ferry'; b.style.backgroundImage = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('\" + bgImgF + \"')\";")
               f.write("} else { b.className='theme-vault'; b.style.backgroundImage = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('\" + bgImgV + \"')\";")
               # 나머지 색상 및 파티클 업데이트
