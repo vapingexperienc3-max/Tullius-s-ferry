@@ -22,6 +22,8 @@ jobs:
           python <<'EOF'
           import os
 
+          import os
+
           def inject_width_style(filepath):
               style_code = """<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>"""
               try:
@@ -32,17 +34,13 @@ jobs:
                   with open(filepath, 'w', encoding='utf-8') as f: f.write(content)
               except: pass
 
-          sidebar_ferry, sidebar_vault = "", ""
-          main_ferry, main_vault = "", ""
-          
-          # 파이썬 코드 상단
-          bg_skyrim = "skyrim.png"
-          bg_vault = "fallout.png"
-          
-          # 1. 변수 세분화 (분류용)
+          # 1. 변수 세분화 (분류용 초기화)
           sidebar_ferry_modpack, sidebar_ferry_normal = "", ""
           sidebar_vault_modpack, sidebar_vault_normal = "", ""
           main_ferry, main_vault = "", ""
+          
+          bg_skyrim = "skyrim.png"
+          bg_vault = "fallout.png"
           
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -56,7 +54,7 @@ jobs:
                   icon = "https://img.icons8.com/color/48/vault-boy.png" if is_vault else "https://img.icons8.com/ios-filled/50/ffffff/skyrim.png"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
-                  # 본문 리스트 (기존 로직 유지)
+                  # 본문 내용 생성
                   content_html = f"<div id='{fid}' class='cat-content' style='display:none;'>"
                   content_html += f"<details open class='folder-details' style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
                   content_html += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor:pointer;'><span><img src='{icon}' style='width:18px; margin-right:10px;'>{display_name}</span><span style='font-size: 0.8em; color: #888;'>[{len(html_files)} FILES]</span></summary>"
@@ -68,9 +66,9 @@ jobs:
                       disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
                       link_color = "#00ff42" if is_vault else "#ffce54"
                       content_html += f'<li style="margin: 10px 0;"><a href="{url}" target="_blank" class="file-link" style="color: {link_color}; text-decoration: none; font-weight: 500;">{disp}</a></li>'
-                      content_html += "</ul></details></div>"
+                  content_html += "</ul></details></div>"
 
-                  # [모드팩] 키워드 분류
+                  # [모드팩] 키워드에 따른 사이드바 분류
                   if "[모드팩]" in display_name:
                       if is_vault: sidebar_vault_modpack += link_html
                       else: sidebar_ferry_modpack += link_html
@@ -78,16 +76,16 @@ jobs:
                       if is_vault: sidebar_vault_normal += link_html
                       else: sidebar_ferry_normal += link_html
                   
-                      if is_vault: main_vault += content_html
-                      else: main_ferry += content_html
+                  if is_vault: main_vault += content_html
+                  else: main_ferry += content_html
 
-          # 2. 사이드바 조립 (접기 기능 추가)
+          # 2. 사이드바 최종 조립 함수
           def wrap_modpack(content, color):
               if not content: return ""
               return f"<details class='group-details' open style='margin-bottom:15px;'><summary style='color:{color}; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px dashed {color}66; margin-bottom:10px;'>[📦 모드팩 아카이브]</summary><div style='padding-left:10px;'>{content}</div></details>"
 
-              sidebar_ferry = wrap_modpack(sidebar_ferry_modpack, "#ffce54") + sidebar_ferry_normal
-              sidebar_vault = wrap_modpack(sidebar_vault_modpack, "#00ff42") + sidebar_vault_normal
+          sidebar_ferry = wrap_modpack(sidebar_ferry_modpack, "#ffce54") + sidebar_ferry_normal
+          sidebar_vault = wrap_modpack(sidebar_vault_modpack, "#00ff42") + sidebar_vault_normal
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
@@ -95,6 +93,7 @@ jobs:
               f.write(".theme-ferry { background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('" + bg_skyrim + "'); background-size: 90% !important; background-position: right -150px top 20% !important; }")
               f.write(".theme-vault { background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('" + bg_vault + "'); background-size: cover !important; background-position: calc(100% + 280px) center !important; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
+              # 인덱스 위치를 본문 높이에 맞춰 조정 (top: 120px)
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 120px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); transition: border-color 0.3s; }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none !important; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
@@ -107,7 +106,11 @@ jobs:
               f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4) !important; }")
               f.write(".theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; }")
               f.write(".theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; }")
-              f.write("summary { cursor: pointer; outline: none; }</style></head>")
+              f.write("summary { cursor: pointer; outline: none; }")
+              # 세퍼레이터용 스타일 추가
+              f.write(".group-details summary { list-style: none; font-size: 0.95em; }")
+              f.write(".group-details summary::-webkit-details-marker { display: none; }")
+              f.write("</style></head>")
           
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
@@ -137,10 +140,9 @@ jobs:
           
               f.write("<div id='a-ferry'>" + main_ferry + "</div><div id='a-vault' style='display:none;'>" + main_vault + "</div></div></div>")
           
-              # 자바스크립트 시작 (중복 태그 제거 및 함수 정리)
+              # 자바스크립트 통합 (입자 강제 재생성 포함)
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               
-              # 1. 입자 설정 함수 (이 줄에서 색상 배열만 수정됨)
               f.write("function updateParticles(m){")
               f.write("  const oldCtx = document.getElementById('particles-js'); if (oldCtx) { oldCtx.remove(); }")
               f.write("  const newCtx = document.createElement('div'); newCtx.id = 'particles-js';")
@@ -150,13 +152,12 @@ jobs:
               f.write("  if(m==='ferry'){")
               f.write("    conf = {particles:{number:{value:80},color:{value:'#ffffff'},shape:{type:'circle'},opacity:{value:0.6},size:{value:3},line_linked:{enable:false},move:{enable:true,speed:1.2,direction:'bottom',random:true,out_mode:'out'}}};")
               f.write("  } else {")
-              # 아래 줄이 말씀하신 '다중 색상' 적용 한 줄입니다.
-              f.write("    conf = {particles:{number:{value:120},color:{value:['#39FF14', '#4b3c2a', '#7b5c3d']},shape:{type:'circle'},opacity:{value:0.7,random:true},size:{value:2.5,random:true},line_linked:{enable:false},move:{enable:true,speed:1.0,direction:'top',random:true,out_mode:'out'}}};")
+              # 폴아웃 입자 색상 믹스 적용 (#39FF14: 녹색, #4b3c2a: 갈색)
+              f.write("    conf = {particles:{number:{value:120},color:{value:['#39FF14', '#4b3c2a']},shape:{type:'circle'},opacity:{value:0.7,random:true},size:{value:2.5,random:true},line_linked:{enable:false},move:{enable:true,speed:1.0,direction:'top',random:true,out_mode:'out'}}};")
               f.write("  }")
               f.write("  if(typeof particlesJS !== 'undefined') { particlesJS('particles-js', conf); }")
               f.write("}")
 
-              # 2. 테마 및 카테고리 제어 함수
               f.write("function switchTheme(m){")
               f.write("  updateParticles(m);")
               f.write("  const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
@@ -181,7 +182,6 @@ jobs:
               f.write("  const link = document.getElementById('l-' + fid); if(link) link.classList.add('active');")
               f.write("}")
 
-              # 3. 검색 함수 (기존 로직 유지)
               f.write("function globalSearch(){")
               f.write("  let q = document.getElementById('search-bar').value.toLowerCase();")
               f.write("  let allCats = document.querySelectorAll('.cat-content');")
@@ -193,13 +193,11 @@ jobs:
               f.write("      else { f.parentElement.style.display = 'none'; }")
               f.write("    });")
               f.write("    if (q === '') { cat.style.display = 'none'; }")
+              # 검색 시에는 접혀있는 그룹이 있어도 내용을 보여줘야 하므로 block 처리
               f.write("    else { cat.style.display = hasVisibleFile ? 'block' : 'none'; }")
               f.write("  });")
               f.write("  if (q === '') { const activeLink = document.querySelector('.sidebar-link.active'); if(activeLink) { const fid = activeLink.id.replace('l-', ''); const target = document.getElementById(fid); if(target) target.style.display = 'block'; } }")
               f.write("}")
-              
-              f.write("window.onload=()=>{ switchTheme('ferry'); };")
-              f.write("</script></body></html>")
               
               f.write("window.onload=()=>{ switchTheme('ferry'); };")
               f.write("</script></body></html>")
