@@ -37,8 +37,8 @@ jobs:
           
           # 파이썬 코드 상단
           bg_skyrim = "https://multiplayer.net-cdn.it/thumbs/images/2025/02/12/skyrim-3_lkz8srZ_cropped_0_9_1600_905_jpeg_1600x900_crop_q85.jpg"
-          # 외부 링크가 더 안정적인 주소로 교체
-          bg_vault = "https://images.wallpapersden.com/image/download/fallout-4-vault-boy_a2dtZ2aUmZqaraWkpJRmbmdlrWZlbWU.jpg"
+          # 사펑 대신 폴아웃 4 공식 배경화면으로 교체
+          bg_vault = "https://images.alphacoders.com/656/656111.jpg"
           
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -129,12 +129,15 @@ jobs:
               f.write(f"const bgImgF = '{bg_skyrim}';")
               f.write(f"const bgImgV = '{bg_vault}';")
 
-              # 2. switchTheme 함수 (따옴표 꼬임 방지 및 로직 단순화)
+              # 2. switchTheme 함수 (위치 강제 고정 버전)
               f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
               
-              # 배경 이미지 적용 (그라데이션과 URL 결합)
+              # 배경 이미지 및 위치 설정 (right center !important 효과를 JS로 구현)
               f.write("let bgUrl = (m==='ferry') ? bgImgF : bgImgV;")
               f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url(' + bgUrl + ')';")
+              f.write("b.style.backgroundPosition = 'right center';")
+              f.write("b.style.backgroundSize = 'cover';")
+              f.write("b.style.backgroundAttachment = 'fixed';")
               
               # 테마별 UI 제어
               f.write("if(m==='ferry'){ b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54'; }")
