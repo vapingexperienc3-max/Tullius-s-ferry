@@ -71,7 +71,7 @@ jobs:
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
               # 1. Body & Wrapper (도바킨 우측 고정 포함)
-              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed !important; background-size: cover !important; background-repeat: no-repeat !important; background-position: right center !important; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
+              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed; background-size: cover; background-repeat: no-repeat; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
               
               # 2. 사이드바 및 버튼
@@ -128,27 +128,24 @@ jobs:
               f.write(f"const bgImgF = '{bg_skyrim}';")
               f.write(f"const bgImgV = '{bg_vault}';")
 
-              # 2. switchTheme 함수 (위치 강제 고정 버전)
+              # 2. switchTheme 함수 (파이썬 if문을 자바스크립트 안으로 통합)
               f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
               
-              # 배경 이미지 설정: 우측 고정을 위해 backgroundPosition을 명시적으로 추가
               f.write("let targetImg = (m==='ferry') ? bgImgF : bgImgV;")
               f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url(\"' + targetImg + '\")';")
-              f.write("b.style.backgroundSize = 'cover';")
-              f.write("b.style.backgroundRepeat = 'no-repeat';")
-              f.write("b.style.backgroundAttachment = 'fixed';")
-              
-              # [핵심] 테마별로 이미지 위치를 다르게 설정
+              f.write("b.style.backgroundSize = 'cover'; b.style.backgroundRepeat = 'no-repeat'; b.style.backgroundAttachment = 'fixed';")
+
+              # [핵심] 위치 미세조정: JS에서 !important를 강제로 입히는 방식
               f.write("if(m==='ferry'){")
               f.write("  b.className='theme-ferry';")
-              f.write("  b.style.backgroundPosition = 'right 20%';") # 도바킨을 아래로 살짝 내림 (Top에서 20% 지점)
+              f.write("  b.style.setProperty('background-position', 'right 35%', 'important');") # 도바킨을 아래로 더 내림
               f.write("  tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54');")
               f.write("  document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none';")
               f.write("  document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none';")
               f.write("  document.getElementById('idx-t').style.color='#ffce54';")
               f.write("} else {")
               f.write("  b.className='theme-vault';")
-              f.write("  b.style.backgroundPosition = 'calc(100% + 150px) center';") # 볼트보이를 오른쪽 화면 밖으로 150px 더 밀어냄
+              f.write("  b.style.setProperty('background-position', '115% center', 'important');") # 볼트보이를 오른쪽 밖으로 확 밀어냄
               f.write("  tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42');")
               f.write("  document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block';")
               f.write("  document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block';")
