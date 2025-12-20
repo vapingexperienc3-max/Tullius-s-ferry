@@ -125,20 +125,23 @@ jobs:
               
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               
-              # 1. 배경 변수 선언 (중복되지 않게 딱 한 번만!)
-              f.write(f"const bgImgF = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('{bg_skyrim}')\";")
-              f.write(f"const bgImgV = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('{bg_vault}')\";")
+              # 1. 배경 변수 선언 (순수 URL만 담습니다)
+              f.write(f"const bgImgF = '{bg_skyrim}';")
+              f.write(f"const bgImgV = '{bg_vault}';")
 
-              # 2. switchTheme 함수
-              f.write("function switchTheme(m){ const b=document.body; ")
-              f.write("const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
-              # 배경 이미지를 그라데이션 없이 직접 주입 (이미지 확인용)
-              # switchTheme 함수 내부
-              f.write("if(m==='ferry'){ b.className='theme-ferry'; b.style.backgroundImage = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('\" + bgImgF + \"')\";")
-              f.write("} else { b.className='theme-vault'; b.style.backgroundImage = \"linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url('\" + bgImgV + \"')\";")
-              # 나머지 색상 및 파티클 업데이트
+              # 2. switchTheme 함수 (따옴표 꼬임 방지 및 로직 단순화)
+              f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
+              
+              # 배경 이미지 적용 (그라데이션과 URL 결합)
+              f.write("let bgUrl = (m==='ferry') ? bgImgF : bgImgV;")
+              f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url(' + bgUrl + ')';")
+              
+              # 테마별 UI 제어
+              f.write("if(m==='ferry'){ b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54'; }")
+              f.write("else{ b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42'; }")
               f.write("updateParticles(m); }")
               
+              # 3. 파티클 및 기타 함수 (기존과 동일하지만 중괄호 체크 완료)
               f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':50},'color':{'value':'#fff'},'shape':{'type':'circle'},'opacity':{'value':0.3},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom'}}}); }")
               f.write("else { window.particlesJS('particles-js',{'particles':{'number':{'value':80},'color':{'value':'#00ff42'},'shape':{'type':'circle'},'opacity':{'value':0.4},'size':{'value':2},'line_linked':{'enable':false},'move':{'enable':true,'speed':2,'random':true}}}); } }")
               f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(c=>{ let items=c.querySelectorAll('li'); let cnt=0; items.forEach(li=>{ if(li.textContent.toLowerCase().includes(q)){ li.style.display=''; cnt++; } else li.style.display='none'; }); c.style.display=(q && cnt>0)?'block':'none'; }); }")
