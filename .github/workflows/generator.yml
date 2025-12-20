@@ -1,5 +1,5 @@
 - name: Generate nested index.html
-        run: |
+         run: |
           python <<'EOF'
           import os
           import urllib.parse
