@@ -129,6 +129,21 @@ jobs:
               f.write("  if(link) link.classList.add('active');")
               f.write("}")
 
+              # 자바스크립트 통합 제어 (입자 + 검색 + 인덱스)
+              f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
+              
+              # 1. 입자 효과 설정 함수
+              f.write("function updateParticles(m){")
+              f.write("  let conf;")
+              f.write("  if(m==='ferry'){") # 스카이림: 하얀 눈
+              f.write("    conf = {particles:{number:{value:80},color:{value:'#fff'},shape:{type:'circle'},opacity:{value:0.5},size:{value:3},line_linked:{enable:false},move:{enable:true,speed:1,direction:'bottom',random:true,straight:false,out_mode:'out'}}};")
+              f.write("  } else {") # 폴아웃: 녹색 먼지
+              f.write("    conf = {particles:{number:{value:50},color:{value:'#00ff42'},shape:{type:'circle'},opacity:{value:0.3},size:{value:2},line_linked:{enable:false},move:{enable:true,speed:0.5,direction:'top',random:true,straight:false,out_mode:'out'}}};")
+              f.write("  }")
+              f.write("  if(window.pJSDom && window.pJSDom.length > 0) window.pJSDom[0].pJS.fn.vendors.destroypJS();")
+              f.write("  particlesJS('particles-js', conf);")
+              f.write("}")
+
               # 2. 테마 전환 함수
               f.write("function switchTheme(m){")
               f.write("  const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
@@ -144,48 +159,39 @@ jobs:
               f.write("    document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none';")
               f.write("    document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42';")
               f.write("  }")
-              f.write("  if(typeof updateParticles==='function'){ updateParticles(m); }")
+              f.write("  updateParticles(m);")
+              f.write("}")
+
+              # 3. 카테고리 전환 함수 (이게 있어야 인덱스가 클릭됨)
+              f.write("function showCat(fid){")
+              f.write("  document.querySelectorAll('.cat-content').forEach(c => c.style.display = 'none');")
+              f.write("  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));")
+              f.write("  const target = document.getElementById(fid);")
+              f.write("  if(target) target.style.display = 'block';")
+              f.write("  const link = document.getElementById('l-' + fid);")
+              f.write("  if(link) link.classList.add('active');")
               f.write("}")
               
-              # 검색 함수 보강 (빈 폴더 숨기기 및 파일 공백 제거)
+              # 4. 검색 함수 (공백 제거 및 빈 폴더 숨기기)
               f.write("function globalSearch(){")
               f.write("  let q = document.getElementById('search-bar').value.toLowerCase();")
               f.write("  let allCats = document.querySelectorAll('.cat-content');")
-              
               f.write("  allCats.forEach(cat => {")
-              f.write("    let files = cat.querySelectorAll('.file-link');")
-              f.write("    let hasVisibleFile = false;")
-              
+              f.write("    let files = cat.querySelectorAll('.file-link'); let hasVisibleFile = false;")
               f.write("    files.forEach(f => {")
               f.write("      let txt = f.innerText.toLowerCase();")
-              f.write("      if (q === '' || txt.includes(q)) {")
-              f.write("        f.parentElement.style.display = 'block';") # li 태그 표시
-              f.write("        hasVisibleFile = true;")
-              f.write("      } else {")
-              f.write("        f.parentElement.style.display = 'none';") # li 태그 숨김 (공백 제거)
-              f.write("      }")
+              f.write("      if (q === '' || txt.includes(q)) { f.parentElement.style.display = 'block'; hasVisibleFile = true; }")
+              f.write("      else { f.parentElement.style.display = 'none'; }")
               f.write("    });")
-              
-              # 검색 결과가 하나라도 있는 폴더만 표시, 없으면 폴더 전체를 숨김
-              f.write("    if (q === '') {")
-              f.write("      cat.style.display = 'none';") # 검색어 없을 땐 초기화 (전부 숨김)
-              f.write("    } else {")
-              f.write("      cat.style.display = hasVisibleFile ? 'block' : 'none';")
-              f.write("    }")
+              f.write("    if (q === '') { cat.style.display = 'none'; }")
+              f.write("    else { cat.style.display = hasVisibleFile ? 'block' : 'none'; }")
               f.write("  });")
-              
-              # 검색어 비웠을 때 현재 활성화된 테마의 첫 번째 카테고리를 보여줄지 결정 (선택사항)
               f.write("  if (q === '') { ")
               f.write("    const activeLink = document.querySelector('.sidebar-link.active');")
-              f.write("    if(activeLink) {")
-              f.write("      const fid = activeLink.id.replace('l-', '');")
-              f.write("      const target = document.getElementById(fid);")
-              f.write("      if(target) target.style.display = 'block';")
-              f.write("    }")
+              f.write("    if(activeLink) { const fid = activeLink.id.replace('l-', ''); const target = document.getElementById(fid); if(target) target.style.display = 'block'; }")
               f.write("  }")
               f.write("}")
               
-              f.write("function updateParticles(m){ console.log('Particles updated for:', m); }")
               f.write("window.onload=()=>{ switchTheme('ferry'); };")
               f.write("</script></body></html>")
           EOF
