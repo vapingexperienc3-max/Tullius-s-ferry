@@ -36,9 +36,8 @@ jobs:
           main_ferry, main_vault = "", ""
           
           # 파이썬 코드 상단
-          bg_skyrim = "https://multiplayer.net-cdn.it/thumbs/images/2025/02/12/skyrim-3_lkz8srZ_cropped_0_9_1600_905_jpeg_1600x900_crop_q85.jpg"
-          # 사펑 대신 폴아웃 4 공식 배경화면으로 교체
-          bg_vault = "https://images.alphacoders.com/656/656111.jpg"
+          bg_skyrim = "skyrim.jpg"
+          bg_vault = "fallout.jpg"
           
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -132,14 +131,14 @@ jobs:
               # 2. switchTheme 함수 (위치 강제 고정 버전)
               f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
               
-              # 배경 이미지 및 위치 설정 (right center !important 효과를 JS로 구현)
-              f.write("let bgUrl = (m==='ferry') ? bgImgF : bgImgV;")
-              f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%), url(' + bgUrl + ')';")
-              f.write("b.style.backgroundPosition = 'right center';")
+              # 배경 이미지 설정: 우측 고정을 위해 backgroundPosition을 명시적으로 추가
+              f.write("let targetImg = (m==='ferry') ? bgImgF : bgImgV;")
+              f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.3) 100%), url(' + targetImg + ')';")
+              f.write("b.style.backgroundPosition = 'right center';") # 도바킨/볼트보이 강제 우측 정렬
               f.write("b.style.backgroundSize = 'cover';")
-              f.write("b.style.backgroundAttachment = 'fixed';")
+              f.write("b.style.backgroundRepeat = 'no-repeat';")
               
-              # 테마별 UI 제어
+              # 테마별 UI 제어 (나머지 로직 동일)
               f.write("if(m==='ferry'){ b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54'; }")
               f.write("else{ b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42'; }")
               f.write("updateParticles(m); }")
