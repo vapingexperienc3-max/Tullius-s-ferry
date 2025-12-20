@@ -71,25 +71,30 @@ jobs:
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
-              # 여기서부터 교체
-              # 1. body 설정 (중복 없이 한 번에)
+              # 1. Body & Wrapper (도바킨 우측 고정 포함)
               f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed !important; background-size: cover !important; background-repeat: no-repeat !important; background-position: right center !important; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
-              
-              # 2. wrapper 및 sidebar 설정
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
-              f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); }")
+              
+              # 2. 사이드바 및 버튼
+              f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); transition: border-color 0.3s; }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               
-              # 호버 효과 스타일
+              # 3. 인덱스 링크 및 호버 효과 (황금빛/녹색)
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none !important; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
               f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active, .theme-ferry .file-link:hover { color: #ffce54 !important; text-shadow: 0 0 8px rgba(255,206,84,0.6); }")
               f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active, .theme-vault .file-link:hover { color: #00ff42 !important; text-shadow: 0 0 8px rgba(0,255,66,0.6); }")
               
-              f.write(".main-area { flex: 1; min-width: 0; } #search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
+              # 4. 메인 영역 및 검색창
+              f.write(".main-area { flex: 1; min-width: 0; }")
+              f.write("#search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
               f.write(".guide-details { background: rgba(0, 0, 0, 0.75); border: 1px solid; border-radius: 8px; padding: 25px; margin-bottom: 30px; backdrop-filter: blur(10px); }")
+              
+              # 5. 테마별 경계선 색상 강제 지정
               f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.4) !important; }")
               f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4) !important; }")
-              f.write("summary { cursor: pointer; outline: none; }</style></head><body>")
+              f.write(".theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; }")
+              f.write(".theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; }")
+              f.write("summary { cursor: pointer; outline: none; }</style></head>")
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
               f.write(f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn' style='border-color:#58a6ff; color:#58a6ff; margin-bottom:20px;'>📢 건의 및 에러 제보</a>")
