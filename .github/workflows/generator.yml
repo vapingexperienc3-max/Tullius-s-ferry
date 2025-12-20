@@ -116,8 +116,20 @@ jobs:
           
               f.write("<div id='a-ferry'>" + main_ferry + "</div><div id='a-vault' style='display:none;'>" + main_vault + "</div></div></div>")
           
-              # 자바스크립트 완성본 (함수 부재로 인한 먹통 방지)
+              # 자바스크립트 완성본 (함수 누락 수정)
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
+              
+              # 1. 카테고리 전환 함수 (이게 없어서 먹통이었음)
+              f.write("function showCat(fid){")
+              f.write("  document.querySelectorAll('.cat-content').forEach(c => c.style.display = 'none');")
+              f.write("  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));")
+              f.write("  const target = document.getElementById(fid);")
+              f.write("  if(target) target.style.display = 'block';")
+              f.write("  const link = document.getElementById('l-' + fid);")
+              f.write("  if(link) link.classList.add('active');")
+              f.write("}")
+
+              # 2. 테마 전환 함수
               f.write("function switchTheme(m){")
               f.write("  const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
               f.write("  const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
@@ -134,18 +146,24 @@ jobs:
               f.write("  }")
               f.write("  if(typeof updateParticles==='function'){ updateParticles(m); }")
               f.write("}")
-          
-              # 빈 함수들을 추가해 에러 방지
-              f.write("function updateParticles(m){ console.log('Particles updated for:', m); }")
+              
+              # 3. 검색 함수 (검색 시 해당 항목이 포함된 카테고리를 자동으로 열어줌)
               f.write("function globalSearch(){")
               f.write("  let q = document.getElementById('search-bar').value.toLowerCase();")
               f.write("  let links = document.querySelectorAll('.file-link, .sidebar-link');")
               f.write("  links.forEach(l => {")
               f.write("    let txt = l.innerText.toLowerCase();")
-              f.write("    l.style.display = txt.includes(q) ? 'block' : 'none';")
+              f.write("    if(q === '') { l.style.display = ''; }")
+              f.write("    else { l.style.display = txt.includes(q) ? 'block' : 'none'; }")
               f.write("  });")
+              f.write("  if(q !== '') {")
+              f.write("    document.querySelectorAll('.cat-content').forEach(c => {")
+              f.write("      if(c.innerText.toLowerCase().includes(q)) c.style.display = 'block';")
+              f.write("    });")
+              f.write("  }")
               f.write("}")
-          
+              
+              f.write("function updateParticles(m){ console.log('Particles updated for:', m); }")
               f.write("window.onload=()=>{ switchTheme('ferry'); };")
               f.write("</script></body></html>")
           EOF
