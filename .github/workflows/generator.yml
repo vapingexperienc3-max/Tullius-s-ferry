@@ -132,29 +132,32 @@ jobs:
               # 자바스크립트 통합 제어 (입자 + 검색 + 인덱스)
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               
-              # 1. 입자 효과 설정 함수 (방사능 입자 설정 보강)
+              # 1. 강력한 입자 초기화 및 설정 함수
               f.write("function updateParticles(m){")
-              f.write("  let conf;")
-              f.write("  if(m==='ferry'){") # 스카이림: 하얀 눈
-              f.write("    conf = {particles:{number:{value:80},color:{value:'#ffffff'},shape:{type:'circle'},opacity:{value:0.7},size:{value:3},line_linked:{enable:false},move:{enable:true,speed:1.5,direction:'bottom',random:true,straight:false,out_mode:'out'}}};")
-              f.write("  } else {") # 폴아웃: 녹색 방사능 먼지 (색상 및 불투명도 상향)
-              f.write("    conf = {particles:{number:{value:100},color:{value:'#00ff42'},shape:{type:'circle'},opacity:{value:0.8},size:{value:2.5},line_linked:{enable:false},move:{enable:true,speed:0.8,direction:'top',random:true,straight:false,out_mode:'out'}}};")
+              f.write("  const pJSContainer = document.getElementById('particles-js');")
+              f.write("  if(!pJSContainer) return;")
+              
+              # 기존 인스턴스 강제 파괴 및 DOM 초기화
+              f.write("  if(window.pJSDom && window.pJSDom.length > 0) {")
+              f.write("    for(let i=0; i<window.pJSDom.length; i++) { window.pJSDom[i].pJS.fn.vendors.destroypJS(); }")
+              f.write("    window.pJSDom = [];")
               f.write("  }")
               
-              # 입자 초기화 로직 보강
-              f.write("  try {")
-              f.write("    if(window.pJSDom && window.pJSDom.length > 0) {")
-              f.write("      for(let i=0; i<window.pJSDom.length; i++) { window.pJSDom[i].pJS.fn.vendors.destroypJS(); }")
-              f.write("      window.pJSDom = [];")
-              f.write("    }")
-              f.write("    particlesJS('particles-js', conf);")
-              f.write("  } catch(e) { console.error('Particles error:', e); }")
+              f.write("  let conf;")
+              f.write("  if(m==='ferry'){") # 스카이림: 하얀 눈 (불투명도 강화)
+              f.write("    conf = {particles:{number:{value:90,density:{enable:true,value_area:800}},color:{value:'#ffffff'},shape:{type:'circle'},opacity:{value:0.8,random:true},size:{value:3.5,random:true},line_linked:{enable:false},move:{enable:true,speed:1.5,direction:'bottom',random:true,straight:false,out_mode:'out'}}};")
+              f.write("  } else {") # 폴아웃: 녹색 방사능 먼지 (색상 명도 및 개수 강화)
+              f.write("    conf = {particles:{number:{value:120,density:{enable:true,value_area:800}},color:{value:'#39FF14'},shape:{type:'circle'},opacity:{value:0.9,random:true},size:{value:2.5,random:true},line_linked:{enable:false},move:{enable:true,speed:1.0,direction:'top',random:true,straight:false,out_mode:'out'}}};")
+              f.write("  }")
+              
+              f.write("  particlesJS('particles-js', conf);")
               f.write("}")
 
-              # 2. 테마 전환 함수 (입자 업데이트 보장)
+              # 2. 테마 전환 함수 (안정적인 실행을 위해 순서 조정)
               f.write("function switchTheme(m){")
               f.write("  const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
               f.write("  const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
+              
               f.write("  if(m==='ferry'){")
               f.write("    b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54';")
               f.write("    hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block';")
@@ -166,8 +169,9 @@ jobs:
               f.write("    document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none';")
               f.write("    document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42';")
               f.write("  }")
-              # 테마 전환 애니메이션이 끝날 때쯤 입자를 다시 뿌려주도록 약간의 딜레이 부여 (안정성)
-              f.write("  setTimeout(() => { updateParticles(m); }, 50);")
+              
+              # 입자가 사라지지 않도록 즉시 실행하되, 브라우저 렌더링 스택을 비우기 위해 0ms 지연 사용
+              f.write("  setTimeout(() => { updateParticles(m); }, 0);")
               f.write("}")
 
               # 3. 카테고리 전환 함수 (이게 있어야 인덱스가 클릭됨)
