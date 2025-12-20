@@ -21,8 +21,7 @@ jobs:
         run: |
           python <<'EOF'
           import os
-
-          import os
+          import urllib.parse
 
           def inject_width_style(filepath):
               style_code = """<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>"""
@@ -34,7 +33,6 @@ jobs:
                   with open(filepath, 'w', encoding='utf-8') as f: f.write(content)
               except: pass
 
-          # 1. 변수 세분화 (분류용 초기화)
           sidebar_ferry_modpack, sidebar_ferry_normal = "", ""
           sidebar_vault_modpack, sidebar_vault_normal = "", ""
           main_ferry, main_vault = "", ""
@@ -54,7 +52,6 @@ jobs:
                   icon = "https://img.icons8.com/color/48/vault-boy.png" if is_vault else "https://img.icons8.com/ios-filled/50/ffffff/skyrim.png"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
-                  # 본문 내용 생성
                   content_html = f"<div id='{fid}' class='cat-content' style='display:none;'>"
                   content_html += f"<details open class='folder-details' style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
                   content_html += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor:pointer;'><span><img src='{icon}' style='width:18px; margin-right:10px;'>{display_name}</span><span style='font-size: 0.8em; color: #888;'>[{len(html_files)} FILES]</span></summary>"
@@ -68,7 +65,6 @@ jobs:
                       content_html += f'<li style="margin: 10px 0;"><a href="{url}" target="_blank" class="file-link" style="color: {link_color}; text-decoration: none; font-weight: 500;">{disp}</a></li>'
                   content_html += "</ul></details></div>"
 
-                  # [모드팩] 키워드에 따른 사이드바 분류
                   if "[모드팩]" in display_name:
                       if is_vault: sidebar_vault_modpack += link_html
                       else: sidebar_ferry_modpack += link_html
@@ -79,7 +75,6 @@ jobs:
                   if is_vault: main_vault += content_html
                   else: main_ferry += content_html
 
-          # 2. 사이드바 최종 조립 함수
           def wrap_modpack(content, color):
               if not content: return ""
               return f"<details class='group-details' open style='margin-bottom:15px;'><summary style='color:{color}; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px dashed {color}66; margin-bottom:10px;'>[📦 모드팩 아카이브]</summary><div style='padding-left:10px;'>{content}</div></details>"
@@ -93,7 +88,6 @@ jobs:
               f.write(".theme-ferry { background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('" + bg_skyrim + "'); background-size: 90% !important; background-position: right -150px top 20% !important; }")
               f.write(".theme-vault { background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('" + bg_vault + "'); background-size: cover !important; background-position: calc(100% + 280px) center !important; }")
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
-              # 인덱스 위치를 본문 높이에 맞춰 조정 (top: 120px)
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 120px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); transition: border-color 0.3s; }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none !important; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
@@ -101,32 +95,25 @@ jobs:
               f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active, .theme-vault .file-link:hover { color: #00ff42 !important; text-shadow: 0 0 8px rgba(0,255,66,0.6); }")
               f.write(".main-area { flex: 1; min-width: 0; }")
               f.write("#search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
-              f.write(".guide-details { background: rgba(0, 0, 0, 0.75); border: 1px solid; border-radius: 8px; padding: 25px; margin-bottom: 30px; backdrop-filter: blur(10px); }")
-              f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.4) !important; }")
-              f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4) !important; }")
+              
+              # 팝업(모달) 스타일 추가
+              f.write(".modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }")
+              f.write(".modal-content { background: #111418; margin: 10% auto; padding: 30px; border: 1px solid; border-radius: 12px; width: 80%; max-width: 700px; position: relative; max-height: 70vh; overflow-y: auto; text-align: left; box-shadow: 0 0 30px rgba(0,0,0,0.5); }")
+              f.write(".close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #888; }")
+              
+              f.write(".theme-ferry .sidebar-nav, .theme-ferry .modal-content { border-color: rgba(255,206,84,0.4) !important; }")
+              f.write(".theme-vault .sidebar-nav, .theme-vault .modal-content { border-color: rgba(0,255,66,0.4) !important; }")
               f.write(".theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; }")
               f.write(".theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; }")
-              f.write("summary { cursor: pointer; outline: none; }")
-              # 세퍼레이터용 스타일 추가
               f.write(".group-details summary { list-style: none; font-size: 0.95em; }")
-              f.write(".group-details summary::-webkit-details-marker { display: none; }")
               f.write("</style></head>")
           
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;'></div>")
-              f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
-          
-              repo_path = os.environ.get('GITHUB_REPOSITORY', 'vapingexperienc3-max/Tullius-s-ferry')
-              f.write("<a href='https://github.com/" + repo_path + "/issues' target='_blank' class='nav-btn' style='border-color:#58a6ff; color:#58a6ff; margin-bottom:20px;'>📢 건의 및 에러 제보</a>")
-              f.write("<h3 id='idx-t' style='font-size: 0.9em; border-bottom: 1px solid; padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3>")
-              f.write("<div id='l-ferry'>" + sidebar_ferry + "</div><div id='l-vault' style='display:none;'>" + sidebar_vault + "</div></div>")
-          
-              f.write("<div class='main-area'><div style='border-bottom: 2px solid rgba(255,255,255,0.2); margin-bottom: 20px; padding-bottom: 15px; min-height: 80px; display: flex; align-items: center;'>")
-              f.write("<span id='title-ferry' style='font-weight: 900; color: #ffffff; font-size: 3em; display: none; text-shadow: 2px 2px 10px #000;'>Tullius's Ferry</span>")
-              f.write("<span id='title-vault' style='font-weight: 900; color: #00ff42; font-size: 2.6em; display: none; text-shadow: 2px 2px 10px #000;'>Vault 404-Vault boy's Outpost</span></div>")
-              f.write("<p id='theme-quote' style='color: #bdc3c7; font-style: italic; margin-bottom: 15px;'></p><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'>")
-
-              f.write("<details open class='guide-details'><summary><h3 id='guide-title' style='margin: 0; display: inline-block;'>[📜 가이드 및 후기 확인]</h3></summary>")
-              f.write("<div style='font-size: 0.95em; color: #ddd; line-height: 1.8; margin-top: 15px;'>")
+              
+              # 팝업 HTML 구조
+              f.write("<div id='guideModal' class='modal'><div class='modal-content'><span class='close-btn' onclick='closeModal()'>&times;</span>")
+              f.write("<h3 id='modal-t' style='margin-top:0;'>📜 가이드 및 후기 확인</h3>")
+              f.write("<div style='font-size: 0.95em; color: #ddd; line-height: 1.8;'>")
               f.write("<p><strong>💡 이용 팁:</strong><br>")
               f.write("- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong><br>")
               f.write("- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.<br>")
@@ -136,13 +123,32 @@ jobs:
               f.write("<p><span class='highlight-text' style='font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
               f.write("<p style='border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>")
               f.write("공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>")
-              f.write("툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></details>")
+              f.write("툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div></div>")
+
+              f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
           
+              repo_path = os.environ.get('GITHUB_REPOSITORY', 'vapingexperienc3-max/Tullius-s-ferry')
+              f.write("<a href='https://github.com/" + repo_path + "/issues' target='_blank' class='nav-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 건의 및 에러 제보</a>")
+              
+              # 가이드 버튼 추가
+              f.write("<div class='nav-btn' onclick='openModal()' id='g-btn' style='border-color:#ffce54; color:#ffce54; margin-top:5px;'>📖 가이드 및 후기</div>")
+              
+              f.write("<h3 id='idx-t' style='font-size: 0.9em; border-bottom: 1px solid; padding-bottom: 5px; margin-top:20px; margin-bottom:10px;'>📜 INDEX</h3>")
+              f.write("<div id='l-ferry'>" + sidebar_ferry + "</div><div id='l-vault' style='display:none;'>" + sidebar_vault + "</div></div>")
+          
+              f.write("<div class='main-area'><div style='border-bottom: 2px solid rgba(255,255,255,0.2); margin-bottom: 20px; padding-bottom: 15px; min-height: 80px; display: flex; align-items: center;'>")
+              f.write("<span id='title-ferry' style='font-weight: 900; color: #ffffff; font-size: 3em; display: none; text-shadow: 2px 2px 10px #000;'>Tullius's Ferry</span>")
+              f.write("<span id='title-vault' style='font-weight: 900; color: #00ff42; font-size: 2.6em; display: none; text-shadow: 2px 2px 10px #000;'>Vault 404-Vault boy's Outpost</span></div>")
+              f.write("<p id='theme-quote' style='color: #bdc3c7; font-style: italic; margin-bottom: 15px;'></p><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'>")
               f.write("<div id='a-ferry'>" + main_ferry + "</div><div id='a-vault' style='display:none;'>" + main_vault + "</div></div></div>")
           
-              # 자바스크립트 통합 (입자 강제 재생성 포함)
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
               
+              # 팝업 제어 함수
+              f.write("function openModal(){ document.getElementById('guideModal').style.display='block'; }")
+              f.write("function closeModal(){ document.getElementById('guideModal').style.display='none'; }")
+              f.write("window.onclick=(e)=>{ if(e.target==document.getElementById('guideModal')) closeModal(); };")
+
               f.write("function updateParticles(m){")
               f.write("  const oldCtx = document.getElementById('particles-js'); if (oldCtx) { oldCtx.remove(); }")
               f.write("  const newCtx = document.createElement('div'); newCtx.id = 'particles-js';")
@@ -152,7 +158,6 @@ jobs:
               f.write("  if(m==='ferry'){")
               f.write("    conf = {particles:{number:{value:80},color:{value:'#ffffff'},shape:{type:'circle'},opacity:{value:0.6},size:{value:3},line_linked:{enable:false},move:{enable:true,speed:1.2,direction:'bottom',random:true,out_mode:'out'}}};")
               f.write("  } else {")
-              # 폴아웃 입자 색상 믹스 적용 (#39FF14: 녹색, #4b3c2a: 갈색)
               f.write("    conf = {particles:{number:{value:120},color:{value:['#39FF14', '#4b3c2a']},shape:{type:'circle'},opacity:{value:0.7,random:true},size:{value:2.5,random:true},line_linked:{enable:false},move:{enable:true,speed:1.0,direction:'top',random:true,out_mode:'out'}}};")
               f.write("  }")
               f.write("  if(typeof particlesJS !== 'undefined') { particlesJS('particles-js', conf); }")
@@ -161,14 +166,14 @@ jobs:
               f.write("function switchTheme(m){")
               f.write("  updateParticles(m);")
               f.write("  const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
-              f.write("  const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
+              f.write("  const modalT=document.getElementById('modal-t'); const hl=document.querySelectorAll('.highlight-text'); const gBtn=document.getElementById('g-btn');")
               f.write("  if(m==='ferry'){")
-              f.write("    b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54';")
+              f.write("    b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; modalT.style.color='#ffce54'; gBtn.style.borderColor='#ffce54'; gBtn.style.color='#ffce54';")
               f.write("    hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block';")
               f.write("    document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block';")
               f.write("    document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54';")
               f.write("  } else {")
-              f.write("    b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42';")
+              f.write("    b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; modalT.style.color='#00ff42'; gBtn.style.borderColor='#00ff42'; gBtn.style.color='#00ff42';")
               f.write("    hl.forEach(e=>e.style.color='#00ff42'); document.getElementById('l-ferry').style.display='none';")
               f.write("    document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none';")
               f.write("    document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42';")
@@ -193,7 +198,6 @@ jobs:
               f.write("      else { f.parentElement.style.display = 'none'; }")
               f.write("    });")
               f.write("    if (q === '') { cat.style.display = 'none'; }")
-              # 검색 시에는 접혀있는 그룹이 있어도 내용을 보여줘야 하므로 block 처리
               f.write("    else { cat.style.display = hasVisibleFile ? 'block' : 'none'; }")
               f.write("  });")
               f.write("  if (q === '') { const activeLink = document.querySelector('.sidebar-link.active'); if(activeLink) { const fid = activeLink.id.replace('l-', ''); const target = document.getElementById(fid); if(target) target.style.display = 'block'; } }")
@@ -208,5 +212,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Final Fix: Restore Full Guide Text & Layout Polish" || exit 0
+          git commit -m "Apply Modal Popup for Guide & Review" || exit 0
           git push origin main
