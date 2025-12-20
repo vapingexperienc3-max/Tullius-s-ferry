@@ -128,24 +128,27 @@ jobs:
               f.write(f"const bgImgF = '{bg_skyrim}';")
               f.write(f"const bgImgV = '{bg_vault}';")
 
-              # 2. switchTheme 함수 (파이썬 if문을 자바스크립트 안으로 통합)
+              # 2. switchTheme 함수 (이 구간을 통째로 덮어쓰세요)
               f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
               
               f.write("let targetImg = (m==='ferry') ? bgImgF : bgImgV;")
               f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url(\"' + targetImg + '\")';")
-              f.write("b.style.backgroundSize = 'cover'; b.style.backgroundRepeat = 'no-repeat'; b.style.backgroundAttachment = 'fixed';")
+              f.write("b.style.backgroundRepeat = 'no-repeat'; b.style.backgroundAttachment = 'fixed';")
 
-              # [핵심] 위치 미세조정: JS에서 !important를 강제로 입히는 방식
               f.write("if(m==='ferry'){")
               f.write("  b.className='theme-ferry';")
-              f.write("  b.style.setProperty('background-position', 'right 35%', 'important');") # 도바킨을 아래로 더 내림
+              # 도바킨: 크기를 160%로 키워 얼굴 클로즈업 + 위치를 오른쪽 살짝 아래로 조정
+              f.write("  b.style.setProperty('background-size', '160%', 'important');")
+              f.write("  b.style.setProperty('background-position', 'right 25%', 'important');")
               f.write("  tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54');")
               f.write("  document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none';")
               f.write("  document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none';")
               f.write("  document.getElementById('idx-t').style.color='#ffce54';")
               f.write("} else {")
               f.write("  b.className='theme-vault';")
-              f.write("  b.style.setProperty('background-position', '115% center', 'important');") # 볼트보이를 오른쪽 밖으로 확 밀어냄
+              # 볼트보이: 크기는 적당히(cover) + 위치를 화면 오른쪽 밖으로 200px 밀어냄
+              f.write("  b.style.setProperty('background-size', 'cover', 'important');")
+              f.write("  b.style.setProperty('background-position', 'calc(100% + 200px) center', 'important');")
               f.write("  tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42');")
               f.write("  document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block';")
               f.write("  document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block';")
