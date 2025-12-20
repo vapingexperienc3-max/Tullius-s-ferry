@@ -134,14 +134,26 @@ jobs:
               # 배경 이미지 설정: 우측 고정을 위해 backgroundPosition을 명시적으로 추가
               f.write("let targetImg = (m==='ferry') ? bgImgF : bgImgV;")
               f.write("b.style.backgroundImage = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url(\"' + targetImg + '\")';")
-              f.write("b.style.backgroundPosition = 'right center';") # 우측 고정
               f.write("b.style.backgroundSize = 'cover';")
               f.write("b.style.backgroundRepeat = 'no-repeat';")
+              f.write("b.style.backgroundAttachment = 'fixed';")
               
-              # 테마별 UI 제어 (나머지 로직 동일)
-              f.write("if(m==='ferry'){ b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; document.getElementById('idx-t').style.color='#ffce54'; }")
-              f.write("else{ b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; document.getElementById('idx-t').style.color='#00ff42'; }")
-              f.write("updateParticles(m); }")
+              # [핵심] 테마별로 이미지 위치를 다르게 설정
+              f.write("if(m==='ferry'){")
+              f.write("  b.className='theme-ferry';")
+              f.write("  b.style.backgroundPosition = 'right 20%';") # 도바킨을 아래로 살짝 내림 (Top에서 20% 지점)
+              f.write("  tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54');")
+              f.write("  document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none';")
+              f.write("  document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none';")
+              f.write("  document.getElementById('idx-t').style.color='#ffce54';")
+              f.write("} else {")
+              f.write("  b.className='theme-vault';")
+              f.write("  b.style.backgroundPosition = 'calc(100% + 150px) center';") # 볼트보이를 오른쪽 화면 밖으로 150px 더 밀어냄
+              f.write("  tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42');")
+              f.write("  document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block';")
+              f.write("  document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block';")
+              f.write("  document.getElementById('idx-t').style.color='#00ff42';")
+              f.write("} updateParticles(m); }")
               
               # 3. 파티클 및 기타 함수 (기존과 동일하지만 중괄호 체크 완료)
               f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':50},'color':{'value':'#fff'},'shape':{'type':'circle'},'opacity':{'value':0.3},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom'}}}); }")
