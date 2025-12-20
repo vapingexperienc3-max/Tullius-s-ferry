@@ -69,44 +69,43 @@ jobs:
                       main_ferry += content_html
 
           with open('index.html', 'w', encoding='utf-8') as f:
+              # 1. HTML Header & CSS (테마별 배경 위치를 CSS로 이동하여 출렁거림 방지)
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
-              # 1. Body & Wrapper (도바킨 우측 고정 포함)
-              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed; background-size: cover; background-repeat: no-repeat; transition: 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
+              f.write("body { margin: 0; min-height: 100vh; background-color: #000; background-attachment: fixed; background-repeat: no-repeat; transition: background-color 0.5s; font-family: sans-serif; color: #eee; overflow-x: hidden; display: flex; justify-content: center; }")
+          
+              # 테마별 CSS 클래스 정의 (자바스크립트 부하 최소화)
+              f.write(f".theme-ferry {{ background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('{bg_skyrim}'); background-size: 90% !important; background-position: right -150px top 20% !important; }}")
+              f.write(f".theme-vault {{ background-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url('{bg_vault}'); background-size: cover !important; background-position: calc(100% + 280px) center !important; }}")
+          
               f.write(".wrapper { display: flex; width: 100%; max-width: 1200px; padding: 40px; gap: 40px; position: relative; z-index: 10; }")
-              
-              # 2. 사이드바 및 버튼
               f.write(".sidebar-nav { width: 280px; position: sticky; top: 40px; height: fit-content; background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 20px; backdrop-filter: blur(15px); transition: border-color 0.3s; }")
               f.write(".nav-btn { display: block; padding: 10px; text-align: center; border: 1px solid; border-radius: 4px; text-decoration: none !important; font-size: 0.85em; font-weight: bold; transition: 0.3s; margin-bottom: 8px; cursor: pointer; }")
-              
-              # 3. 인덱스 링크 및 호버 효과 (황금빛/녹색)
               f.write(".sidebar-link { display: block; color: #ccc; text-decoration: none !important; padding: 8px 0; font-size: 0.9em; transition: 0.3s; }")
               f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active, .theme-ferry .file-link:hover { color: #ffce54 !important; text-shadow: 0 0 8px rgba(255,206,84,0.6); }")
               f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active, .theme-vault .file-link:hover { color: #00ff42 !important; text-shadow: 0 0 8px rgba(0,255,66,0.6); }")
-              
-              # 4. 메인 영역 및 검색창
               f.write(".main-area { flex: 1; min-width: 0; }")
               f.write("#search-bar { width: 100%; padding: 12px 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; color: #fff; outline: none; }")
               f.write(".guide-details { background: rgba(0, 0, 0, 0.75); border: 1px solid; border-radius: 8px; padding: 25px; margin-bottom: 30px; backdrop-filter: blur(10px); }")
-              
-              # 5. 테마별 경계선 색상 강제 지정
               f.write(".theme-ferry .sidebar-nav, .theme-ferry .guide-details { border-color: rgba(255,206,84,0.4) !important; }")
               f.write(".theme-vault .sidebar-nav, .theme-vault .guide-details { border-color: rgba(0,255,66,0.4) !important; }")
               f.write(".theme-ferry .nav-btn.ferry-btn { background: #ffce54; color: #000; }")
               f.write(".theme-vault .nav-btn.vault-btn { background: #00ff42; color: #000; }")
               f.write("summary { cursor: pointer; outline: none; }</style></head>")
+
+              # 2. HTML Body (레이아웃 및 버튼)
               f.write("<div id='particles-js' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;'></div>")
               f.write("<div class='wrapper'><div class='sidebar-nav'><div style='display:flex; flex-direction:column; gap:8px; margin-bottom:12px;'><div class='nav-btn ferry-btn' onclick='switchTheme(\"ferry\")'>🚣 Ferry (Skyrim)</div><div class='nav-btn vault-btn' onclick='switchTheme(\"vault\")'>☢️ Vault 404 (Fallout)</div></div>")
               f.write(f"<a href='https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/issues' target='_blank' class='nav-btn' style='border-color:#58a6ff; color:#58a6ff; margin-bottom:20px;'>📢 건의 및 에러 제보</a>")
               f.write("<h3 id='idx-t' style='font-size: 0.9em; border-bottom: 1px solid; padding-bottom: 5px; margin-bottom:10px;'>📜 INDEX</h3>")
               f.write(f"<div id='l-ferry'>{sidebar_ferry}</div><div id='l-vault' style='display:none;'>{sidebar_vault}</div></div>")
-              
+          
+              # 3. 메인 컨텐츠 영역 (타이틀 & 검색바)
               f.write("<div class='main-area'><div style='border-bottom: 2px solid rgba(255,255,255,0.2); margin-bottom: 20px; padding-bottom: 15px; min-height: 80px; display: flex; align-items: center;'>")
               f.write("<span id='title-ferry' style='font-weight: 900; color: #ffffff; font-size: 3em; display: none; text-shadow: 2px 2px 10px #000;'>Tullius's Ferry</span>")
               f.write("<span id='title-vault' style='font-weight: 900; color: #00ff42; font-size: 2.6em; display: none; text-shadow: 2px 2px 10px #000;'>Vault 404-Vault boy's Outpost</span></div>")
-              
               f.write("<p id='theme-quote' style='color: #bdc3c7; font-style: italic; margin-bottom: 15px;'></p><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'>")
-              
-              # 가이드 문구 완벽 복구
+
+              # 4. 가이드 및 후기 문구 (요청하신 내용 100% 복구)
               f.write("<details open class='guide-details'><summary><h3 id='guide-title' style='margin: 0; display: inline-block;'>[📜 가이드 및 후기 확인]</h3></summary>")
               f.write("<div style='font-size: 0.95em; color: #ddd; line-height: 1.8; margin-top: 15px;'>")
               f.write("<p><strong>💡 이용 팁:</strong><br>")
@@ -119,44 +118,30 @@ jobs:
               f.write("<p style='border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px;'><strong>✍️ 후기:</strong><br>")
               f.write("공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>")
               f.write("툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></details>")
-              
+          
+              # 5. 테마별 섹션 및 푸터
               f.write(f"<div id='a-ferry'>{main_ferry}</div><div id='a-vault' style='display:none;'>{main_vault}</div></div></div>")
-              
+
+              # 6. 자바스크립트 (클래스 교체 방식 - 전환 깨짐 해결)
               f.write("<script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script><script>")
-              
-              # 1. 배경 변수 선언 (순수 파일명만)
-              f.write(f"const bgImgF = '{bg_skyrim}';")
-              f.write(f"const bgImgV = '{bg_vault}';")
-
-              # 2. switchTheme 함수 (출렁거림 방지 로직)
-              f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault');")
-              
-              # 배경 이미지 및 그라데이션 설정
-              f.write("let targetImg = (m==='ferry') ? bgImgF : bgImgV;")
-              f.write("const bgValue = 'linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.2) 100%), url(\"' + targetImg + '\")';")
-              
-              # 스타일 주입 (출렁거림 방지를 위해 backgroundImage를 먼저 설정)
-              f.write("b.style.backgroundImage = bgValue;")
-              f.write("b.style.backgroundRepeat = 'no-repeat';")
-              f.write("b.style.backgroundAttachment = 'fixed';")
-
+              f.write("function switchTheme(m){ const b=document.body; const tF=document.getElementById('title-ferry'); const tV=document.getElementById('title-vault'); const gT=document.getElementById('guide-title'); const hl=document.querySelectorAll('.highlight-text');")
+          
+              # 배경 전환 (직접 style을 건드리지 않고 클래스만 교체하여 깜빡임 방지)
               f.write("if(m==='ferry'){")
-              f.write("  b.className='theme-ferry';")
-              # 도바킨: 크기 90%, 우측 여백 -150px (영상 구도)
-              f.write("  b.style.setProperty('background-size', '90%', 'important');")
-              f.write("  b.style.setProperty('background-position', 'right -150px top 20%', 'important');")
-              f.write("  tF.style.display='block'; tV.style.display='none';")
+              f.write("  b.className='theme-ferry'; tF.style.display='block'; tV.style.display='none'; gT.style.color='#ffce54'; hl.forEach(e=>e.style.color='#ffce54');")
               f.write("  document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none';")
               f.write("  document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none';")
+              f.write("  document.getElementById('idx-t').style.color='#ffce54';")
               f.write("} else {")
-              f.write("  b.className='theme-vault';")
-              # 볼트보이: 32인치 모니터에 맞춰 +250px로 조정 (기존보다 왼쪽으로 당김)
-              f.write("  b.style.setProperty('background-size', 'cover', 'important');")
-              f.write("  b.style.setProperty('background-position', 'calc(100% + 250px) center', 'important');")
-              f.write("  tF.style.display='none'; tV.style.display='block';")
+              f.write("  b.className='theme-vault'; tF.style.display='none'; tV.style.display='block'; gT.style.color='#00ff42'; hl.forEach(e=>e.style.color='#00ff42');")
               f.write("  document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block';")
               f.write("  document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block';")
+              f.write("  document.getElementById('idx-t').style.color='#00ff42';")
               f.write("} updateParticles(m); }")
+
+              # 초기 실행 및 나머지 함수들 (particles, globalSearch 등 기존 로직 유지)
+              f.write("window.onload=()=>{ switchTheme('ferry'); };")
+              f.write("</script></body></html>")
               
               # 3. 파티클 및 기타 함수 (기존과 동일하지만 중괄호 체크 완료)
               f.write("function updateParticles(m){ if(m==='ferry'){ window.particlesJS('particles-js',{'particles':{'number':{'value':50},'color':{'value':'#fff'},'shape':{'type':'circle'},'opacity':{'value':0.3},'size':{'value':3},'line_linked':{'enable':false},'move':{'enable':true,'speed':1.5,'direction':'bottom'}}}); }")
