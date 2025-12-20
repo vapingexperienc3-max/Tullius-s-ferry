@@ -39,6 +39,11 @@ jobs:
           bg_skyrim = "skyrim.png"
           bg_vault = "fallout.png"
           
+          # 1. 변수 세분화 (분류용)
+          sidebar_ferry_modpack, sidebar_ferry_normal = "", ""
+          sidebar_vault_modpack, sidebar_vault_normal = "", ""
+          main_ferry, main_vault = "", ""
+          
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
@@ -47,8 +52,11 @@ jobs:
                   display_name = "MAIN ARCHIVE" if rel_path == "." else rel_path.upper()
                   fid = "f-" + rel_path.replace(os.sep, '-')
                   is_vault = any(kw in display_name for kw in ["VAULT", "FALLOUT", "폴아웃"])
+                  
                   icon = "https://img.icons8.com/color/48/vault-boy.png" if is_vault else "https://img.icons8.com/ios-filled/50/ffffff/skyrim.png"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
+                  
+                  # 본문 리스트 (기존 로직 유지)
                   content_html = f"<div id='{fid}' class='cat-content' style='display:none;'>"
                   content_html += f"<details open class='folder-details' style='margin-bottom: 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 4px; overflow: hidden;'>"
                   content_html += f"<summary style='padding: 15px; font-weight: bold; color: #fff; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor:pointer;'><span><img src='{icon}' style='width:18px; margin-right:10px;'>{display_name}</span><span style='font-size: 0.8em; color: #888;'>[{len(html_files)} FILES]</span></summary>"
@@ -60,13 +68,26 @@ jobs:
                       disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
                       link_color = "#00ff42" if is_vault else "#ffce54"
                       content_html += f'<li style="margin: 10px 0;"><a href="{url}" target="_blank" class="file-link" style="color: {link_color}; text-decoration: none; font-weight: 500;">{disp}</a></li>'
-                  content_html += "</ul></details></div>"
-                  if is_vault:
-                      sidebar_vault += link_html
-                      main_vault += content_html
+                      content_html += "</ul></details></div>"
+
+                  # [모드팩] 키워드 분류
+                  if "[모드팩]" in display_name:
+                      if is_vault: sidebar_vault_modpack += link_html
+                      else: sidebar_ferry_modpack += link_html
                   else:
-                      sidebar_ferry += link_html
-                      main_ferry += content_html
+                      if is_vault: sidebar_vault_normal += link_html
+                      else: sidebar_ferry_normal += link_html
+                  
+                      if is_vault: main_vault += content_html
+                      else: main_ferry += content_html
+
+          # 2. 사이드바 조립 (접기 기능 추가)
+          def wrap_modpack(content, color):
+              if not content: return ""
+              return f"<details class='group-details' open style='margin-bottom:15px;'><summary style='color:{color}; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px dashed {color}66; margin-bottom:10px;'>[📦 모드팩 아카이브]</summary><div style='padding-left:10px;'>{content}</div></details>"
+
+              sidebar_ferry = wrap_modpack(sidebar_ferry_modpack, "#ffce54") + sidebar_ferry_normal
+              sidebar_vault = wrap_modpack(sidebar_vault_modpack, "#00ff42") + sidebar_vault_normal
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
