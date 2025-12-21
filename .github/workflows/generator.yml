@@ -109,7 +109,7 @@ jobs:
 
               f.write("<header class='top-header'><div class='header-container'><div>")
               f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px; display:inline-flex; align-items:center; gap:8px;'>")
-f.write("<img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:brightness(0) invert(1);'> Ferry (Skyrim)</button>")
+              f.write("<img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:brightness(0) invert(1);'> Ferry (Skyrim)</button>")
               f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'>☢️ Railroad (Fallout)</button></div>")
               f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button>")
               f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
