@@ -84,7 +84,8 @@ jobs:
           for top_folder, data in tree.items():
               is_rr = any(k in top_folder.upper() for k in ["FALLOUT", "폴아웃"]) or any(k in top_folder for k in fallout_pack_names)
               theme_key = "railroad" if is_rr else "ferry"
-              fid = "f-" + top_folder.replace(os.sep, '-')
+              # ID에서 공백 및 특수문자 제거하여 JS 오류 방지
+              fid = "f-" + "".join(filter(str.isalnum, top_folder))
               main_contents[theme_key] += f"<div id='{fid}' class='cat-content' style='display:none; width:100%;'>" + render_tree(top_folder, data, 0, is_rr, top_folder) + "</div>"
               is_modpack = any(k in top_folder for k in skyrim_pack_names + fallout_pack_names) or "[모드팩]" in top_folder
               category = "modpack" if is_modpack else "normal"
@@ -95,14 +96,14 @@ jobs:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
               f.write("html { overflow-y: scroll; scroll-behavior: smooth; }")
               f.write("body { margin:0; min-height:100vh; background-color:#000; font-family:sans-serif; color:#eee; overflow-x:hidden; transition:0.4s; background-attachment: fixed !important; background-size: cover !important; }")
-              # [파란색 링크 방지] sidebar-link 전용 스타일
-              f.write("a { text-decoration: none !important; color: inherit; }")
-              f.write(".sidebar-link { display:block; padding:10px 0; font-size:0.95em; border-bottom:1px solid rgba(255,255,255,0.05); transition:0.3s; color: inherit !important; }")
+              # [파란색 링크 방지 핵심]
+              f.write("a, a:link, a:visited { text-decoration: none !important; color: inherit !important; }")
+              f.write(".sidebar-link { display:block; padding:10px 0; font-size:0.95em; border-bottom:1px solid rgba(255,255,255,0.05); transition:0.3s; }")
               f.write(".sidebar-link-f { color:#aaa !important; } .sidebar-link-f:hover, .sidebar-link-f.active { color:#fff !important; padding-left:5px; }")
               f.write(".sidebar-link-v { color:#b37d00 !important; } .sidebar-link-v:hover, .sidebar-link-v.active { color:#FFB000 !important; padding-left:5px; }")
               f.write(".top-header { position:fixed; top:0; left:0; width:100%; height:70px; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; z-index:1000; border-bottom:2px solid rgba(255,255,255,0.1); backdrop-filter:blur(5px); }")
               f.write(".header-container { width:100%; max-width:1400px; display:flex; justify-content:space-between; align-items:center; padding:0 40px; box-sizing:border-box; }")
-              f.write(".header-btn { background:rgba(255,255,255,0.03); border:1px solid; border-radius:6px; padding:0 18px; height:42px; font-weight:bold; font-size:0.95em; display:inline-flex; align-items:center; gap:8px; transition:0.3s; cursor:pointer; color:inherit; }")
+              f.write(".header-btn { background:rgba(255,255,255,0.03); border:1px solid; border-radius:6px; padding:0 18px; height:42px; font-weight:bold; font-size:0.95em; display:inline-flex; align-items:center; gap:8px; transition:0.3s; cursor:pointer; color:inherit !important; }")
               f.write("#btn-f:hover { background:rgba(255,255,255,0.15) !important; border-color:#fff !important; box-shadow: 0 0 15px #fff; transform:translateY(-2px); }")
               f.write("#btn-v:hover { background:rgba(255,176,0,0.15) !important; border-color:#FFB000 !important; box-shadow: 0 0 15px #FFB000; transform:translateY(-2px); }")
               f.write(".sidebar-nav { width:330px; position:fixed; top:110px; left:40px; height:calc(100vh - 150px); background:rgba(0,0,0,0.85); border:1px solid #444; border-radius:8px; padding:25px; overflow-y:auto; z-index:100; opacity:0; visibility:hidden; transition:0.3s; box-sizing:border-box; }")
@@ -115,7 +116,7 @@ jobs:
               f.write(".modal-content { background:#111; margin:5% auto; padding:50px; border:1px solid #333; border-radius:15px; width:90%; max-width:1000px; position:relative; max-height:85vh; overflow-y:auto; box-sizing:border-box; }")
               f.write("</style></head><body>")
 
-              # 가이드/후기 (내용 고정)
+              # 가이드/후기 (고정)
               f.write("<div id='guideModal' class='modal'><div class='modal-content'><span style='position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer; color:#666;' onclick='closeModal()'>&times;</span><h3 id='modal-t' style='margin-top:0; font-size:1.8em;'>📜 가이드 및 후기</h3><div style='color:#ddd; line-height:2; font-size:1.05em;'><p><strong>💡 이용 팁:</strong><br>")
               f.write("<span style='margin-bottom:12px; display:block;'>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong></span>")
               f.write("<span style='margin-bottom:12px; display:block;'>- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.</span>")
@@ -125,25 +126,31 @@ jobs:
               f.write("<p style='border-top:1px solid #333; padding-top:20px; margin-top:20px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div></div>")
 
               # 헤더
-              f.write("<header class='top-header'><div class='header-container'><div class='header-group'>")
+              f.write("<header class='top-header'><div class='header-container'><div>")
               f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff;'><img src='ship.PNG' style='width:22px; filter:invert(1) brightness(2); vertical-align:middle;'> Ferry (Skyrim)</button>")
               f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'><img src='railroad.png' style='width:18px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg); vertical-align:middle; margin-top:-2px;'> Railroad (Fallout)</button></div>")
-              f.write("<div class='header-group'><button class='header-btn' style='border-color:#ccc; color:#ccc;' onclick='openModal()'>📖 가이드 & 후기</button>")
+              f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc;' onclick='openModal()'>📖 가이드 & 후기</button>")
               f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
-              f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sidebar_data['ferry']['modpack'] + sidebar_data['ferry']['normal'] + "</div><div id='l-vault' style='display:none;'>" + sidebar_data['railroad']['modpack'] + sidebar_data['railroad']['normal'] + "</div></div>")
+              sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.2); display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:40px; margin-right:12px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['ferry']['modpack']}</div></details>{sidebar_data['ferry']['normal']}"
+              srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; padding:5px 0; border-bottom:1px solid rgba(255,176,0,0.3); display:flex; align-items:center;'><img src='railroad.png' style='width:32px; margin-right:12px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
+
+              f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + srr_final + "</div></div>")
               f.write("<div class='main-area'><h1 id='t-f' style='display:none; color:#fff; font-size:4.5em; margin:0;'>Tullius's Ferry</h1><h1 id='t-v' style='display:none; color:#FFB000; font-size:4.5em; margin:0;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
               
-              # [환영 문구 절대 복구]
-              f.write("<div id='welcome-screen' style='position:fixed; top:70px; left:0; width:100vw; height:100vh; background:#000; z-index:2000; overflow:hidden;'><img src='welcome page.png' style='width:100%; height:100%; object-fit:cover; filter:brightness(0.5);'><div style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; width:100%;'><h1 style='color:#fff; font-size:3.5em;'>환영합니다,드래곤본 그리고 생존자 여러분.</h1><p style='color:#ccc; font-size:1.6em;'>?</p>상단의 버튼을 눌러 아카이브로 이동하실 수 있습니다.<p style='color:#aaa;'>가이드 & 후기 버튼도 꼭 한번 눌러주세요!</p></div></div>")
+              # [환영 멘트 고정]
+              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분.상단의 버튼을 누르면 아카이브로 연결됩니다.</h1><p style='color:#ccc; font-size:1.6em;'>가이드 & 후기 버튼도 한번씩 눌러주세요!</p></div></div>")
               
               f.write("<script>")
               f.write("function openModal(){ document.getElementById('guideModal').style.display='block'; }")
               f.write("function closeModal(){ document.getElementById('guideModal').style.display='none'; }")
               f.write("function triggerTheme(m){ document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex'; switchTheme(m); document.getElementById('main-lnb').classList.add('active'); }")
-              # [배경 위치 핵심 보정] 스카이림은 center, 폴아웃은 주인공 머리가 나오게 center 25% (수치 조정)
-              f.write("function switchTheme(m){ const b=document.body; if(m==='ferry'){ b.style.setProperty('background-image', \"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('skyrim.png')\", 'important'); b.style.setProperty('background-position', 'center center', 'important'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; } else { b.style.setProperty('background-image', \"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('fallout.png')\", 'important'); b.style.setProperty('background-position', 'center 25%', 'important'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; } }")
-              # [검색 기능: 전체 탭 완전 탐색]
+              # [배경 위치 핵심 보정: 백업 설정 반영]
+              # 스카이림: center 10%, 폴아웃: center top 70px
+              f.write("function switchTheme(m){ const b=document.body; if(m==='ferry'){ b.style.setProperty('background-image', \"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('skyrim.png')\", 'important'); b.style.setProperty('background-position', 'center 10%', 'important'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; } else { b.style.setProperty('background-image', \"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('fallout.png')\", 'important'); b.style.setProperty('background-position', 'center top 70px', 'important'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; } }")
+              # [인덱스 클릭 시 파일 표시 기능 복구]
+              f.write("function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); const target = document.getElementById(fid); if(target) target.style.display='block'; const link = document.getElementById('l-'+fid); if(link) link.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }")
+              # [전체 검색 기능 복구]
               f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); let allLinks = document.querySelectorAll('.file-link-f, .file-link-v'); allLinks.forEach(a=>{ let li = a.parentElement; if(q==='' || a.innerText.toLowerCase().includes(q)){ li.style.setProperty('display', 'block', 'important'); } else { li.style.setProperty('display', 'none', 'important'); } }); document.querySelectorAll('.tree-node').forEach(node=>{ let hasMatch = Array.from(node.querySelectorAll('li')).some(li => li.style.display !== 'none'); if(q !== '' && !hasMatch) { node.style.setProperty('display', 'none', 'important'); } else { node.style.setProperty('display', 'block', 'important'); } }); }")
               f.write("</script></body></html>")
           EOF
@@ -153,5 +160,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "UI Overhaul: Fix Blue Links, Correct Bg Position, and Search" || exit 0
+          git commit -m "FIX: Restore Index, Fix Search, Apply Backup Background Positions" || exit 0
           git push origin main
