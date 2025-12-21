@@ -49,13 +49,15 @@ jobs:
                   icon = "https://img.icons8.com/color/48/vault-boy.png" if is_vault else "ElderScroll.webp"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
-                  content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:20px;'><summary style='padding:15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='width:{'18px' if is_vault else '65px'}; aspect-ratio: 1/1; object-fit: contain; margin-right:15px; vertical-align:middle;'>{display_name}</span></summary><ul style='margin:0; padding:15px 40px; list-style-type:square;'>"
+                  content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:10px;'><summary style='padding:10px 15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='width:{'18px' if is_vault else '55px'}; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle;'>{display_name}</span></summary><ul style='margin:0; padding:5px 40px 15px 40px; list-style-type:none;'>"
                   for f_name in sorted(html_files):
                       path = os.path.join(root, f_name)
                       inject_width_style(path)
                       url = os.path.relpath(path, '.').replace(os.sep, '/')
                       disp = f_name.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                      content_html += f'<li style="margin:10px 0;"><a href="{url}" target="_blank" class="file-link">{disp}</a></li>'
+                      # 파일명 앞에 드래곤 로고(ElderScroll.webp)를 직접 삽입하고 간격을 조절합니다.
+                      file_icon = f"<img src='ElderScroll.webp' style='width:16px; margin-right:8px; vertical-align:middle;'>" if not is_vault else "▪️ "
+                      content_html += f'<li style="margin:8px 0; display:flex; align-items:center;">{file_icon}<a href="{url}" target="_blank" class="file-link" style="font-size:0.95em;">{disp}</a></li>'
                   content_html += "</ul></details></div>"
 
                   if "[모드팩]" in display_name:
