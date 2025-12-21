@@ -56,12 +56,11 @@ jobs:
               bg_color = "rgba(0,0,0,0.6)"
               border_color = "rgba(255,176,0,0.3)" if is_rr else "rgba(255,255,255,0.1)"
               
-              # [스카이림 아이콘 크기 대폭 확대] 45px 적용
+              # 스카이림 아이콘 45px로 크게, 폴아웃 28px
               img_w = "28px" if is_rr else "45px"
+              # 폴아웃 아이콘이 처져 보이지 않도록 margin-top 보정
               img_style = f"width:{img_w}; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle;"
-              
               if is_rr: 
-                  # 폴아웃 아이콘의 경우 필터 적용 및 미세한 위치 보정 (살짝 위로)
                   img_style += " filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.1); margin-top:-2px;"
               
               margin = f"margin-left:{depth * 15}px;"
@@ -75,7 +74,7 @@ jobs:
                   inject_width_style(f_path)
                   url = f_path.replace(os.sep, '/')
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                  # 리스트 내 아이콘도 24px로 확대
+                  # 리스트 내 엘더스크롤 아이콘도 24px로 확대
                   f_icon = f"<span style='color:#FFB000; margin-right:10px; font-size:12px;'>●</span>" if is_rr else f"<img src='ElderScroll.webp' style='width:24px; margin-right:10px; vertical-align:middle;'>"
                   link_class = "file-link-v" if is_rr else "file-link-f"
                   html += f'<li style="margin:12px 0;"><a href="{url}" target="_blank" class="{link_class}">{f_icon}{disp}</a></li>'
@@ -109,7 +108,6 @@ jobs:
               f.write(".top-header { position:fixed; top:0; left:0; width:100%; height:70px; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; z-index:1000; border-bottom:2px solid rgba(255,255,255,0.1); backdrop-filter:blur(5px); }")
               f.write(".header-container { width:100%; max-width:1400px; display:flex; justify-content:space-between; align-items:center; padding:0 40px; box-sizing:border-box; }")
               f.write(".header-group { display:flex; align-items:center; gap:15px; }")
-              # [강조 효과 복구]
               f.write(".header-btn { background:rgba(255,255,255,0.03); border:1px solid; border-radius:6px; padding:0 18px; height:42px; font-weight:bold; font-size:0.95em; display:inline-flex; align-items:center; gap:8px; transition:0.3s; cursor:pointer; color:inherit; }")
               f.write("#btn-f:hover { background:rgba(255,255,255,0.15) !important; border-color:#fff !important; box-shadow: 0 0 15px #fff; transform:translateY(-2px); }")
               f.write("#btn-v:hover { background:rgba(255,176,0,0.15) !important; border-color:#FFB000 !important; box-shadow: 0 0 15px #FFB000; transform:translateY(-2px); }")
@@ -124,7 +122,6 @@ jobs:
               f.write(".modal-content { background:#111; margin:5% auto; padding:50px; border:1px solid #333; border-radius:15px; width:90%; max-width:1000px; position:relative; max-height:85vh; overflow-y:auto; box-sizing:border-box; }")
               f.write("</style></head><body>")
 
-              # 가이드/후기 (유지)
               f.write("<div id='guideModal' class='modal'><div class='modal-content'><span style='position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer; color:#666;' onclick='closeModal()'>&times;</span><h3 id='modal-t' style='margin-top:0; font-size:1.8em;'>📜 가이드 및 후기</h3><div style='color:#ddd; line-height:2; font-size:1.05em;'><p><strong>💡 이용 팁:</strong><br>")
               f.write("<span style='margin-bottom:12px; display:block;'>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong></span>")
               f.write("<span style='margin-bottom:12px; display:block;'>- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.</span>")
@@ -134,21 +131,21 @@ jobs:
               f.write("<p><span style='color:#58a6ff; font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
               f.write("<p style='border-top:1px solid #333; padding-top:20px; margin-top:20px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div></div>")
 
-              # 헤더
+              # 헤더 (정렬 보정 적용)
               f.write("<header class='top-header'><div class='header-container'><div class='header-group'>")
-              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff;'><img src='ship.PNG' style='width:22px; filter:invert(1) brightness(2);'> Ferry (Skyrim)</button>")
-              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'><img src='railroad.png' style='width:18px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg);'> Railroad (Fallout)</button></div>")
+              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff;'><img src='ship.PNG' style='width:22px; filter:invert(1) brightness(2); vertical-align:middle;'> Ferry (Skyrim)</button>")
+              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'><img src='railroad.png' style='width:18px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg); vertical-align:middle; margin-top:-2px;'> Railroad (Fallout)</button></div>")
               f.write("<div class='header-group'><button class='header-btn' style='border-color:#ccc; color:#ccc;' onclick='openModal()'>📖 가이드 & 후기</button>")
               f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
-              # 사이드바
               sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.2); display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:40px; margin-right:12px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['ferry']['modpack']}</div></details>{sidebar_data['ferry']['normal']}"
               srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; padding:5px 0; border-bottom:1px solid rgba(255,176,0,0.3); display:flex; align-items:center;'><img src='railroad.png' style='width:32px; margin-right:12px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
 
               f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + srr_final + "</div></div>")
               f.write("<div class='main-area'><h1 id='t-f' style='display:none; color:#fff; font-size:4.5em; margin:0;'>Tullius's Ferry</h1><h1 id='t-v' style='display:none; color:#FFB000; font-size:4.5em; margin:0;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
 
-              # [생존자 머리 위치 수정: background-position: center 20%]
+              f.write("<canvas id='smokeCanvas' style='position:fixed; top:0; left:0; width:100%; height:100%; z-index:5; pointer-events:none;'></canvas>")
+              f.write("<div id='welcome-screen' style='position:fixed; top:70px; left:0; width:100vw; height:100vh; background:#000; z-index:2000; overflow:hidden;'><img src='welcome page.png' style='width:100%; height:100%; object-fit:cover; filter:brightness(0.5);'><div style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; width:100%;'><h1 style='color:#fff; font-size:3.5em;'>환영합니다</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 눌러주세요</p></div></div>")
               f.write("<script>")
               f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff';")
               f.write("function openModal(){ document.querySelector('.modal').style.display='block'; }")
@@ -169,5 +166,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "UI: Restore header hover effects and fix background position" || exit 0
+          git commit -m "Fix UI: Restore Icons, Align Header, and Fix Python Syntax" || exit 0
           git push origin main
