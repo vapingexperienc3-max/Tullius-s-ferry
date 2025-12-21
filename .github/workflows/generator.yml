@@ -71,7 +71,7 @@ jobs:
 
           # INDEX 및 세퍼레이터 옆 이모지 제거 및 ElderScroll.webp 교체
           sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #ffffff44; display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_ferry_modpack}</div></details>{sidebar_ferry_normal}"
-          sv_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'><img src='railroad.jpg' style='width:20px; margin-right:10px;'> 모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_vault_modpack}</div></details>{sidebar_vault_normal}"
+          sv_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'><img src='railload.jpg' style='width:20px; height:20px; object-fit:contain; margin-right:10px; filter:invert(1) brightness(1.5);'> 모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_vault_modpack}</div></details>{sidebar_vault_normal}"
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
               f.write("body { margin: 0; min-height: 100vh; background-color: #000; font-family: sans-serif; color: #eee; overflow-x: hidden; transition: 0.4s; }")
@@ -109,8 +109,9 @@ jobs:
               f.write("<header class='top-header'><div class='header-container'><div>")
               f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'>")
               f.write("<img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(2); flex-shrink:0;'> Ferry (Skyrim)</button>")
-              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'>")
-              f.write("<img src='railroad.jpg' style='width:20px; height:20px; object-fit:contain; border-radius:2px; flex-shrink:0;'> Railroad (Fallout)</button></div>")
+              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; box-sizing:border-box; line-height:1; vertical-align:middle;'>")
+              # 이미지가 검은색 로고+흰색 배경이라면 아래 필터가 배경을 어둡게 만들고 로고를 노랗게/밝게 띄워줍니다.
+              f.write("<img src='railload.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) hue-rotate(180deg) brightness(1.5); border-radius:2px; flex-shrink:0;'> Railroad (Fallout)</button></div>")
               f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button>")
               f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
