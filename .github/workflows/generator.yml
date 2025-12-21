@@ -1,25 +1,4 @@
-name: Generate Index
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Generate nested index.html
-        run: |
-          python <<'EOF'
+python <<'EOF'
           import os
 
           def inject_width_style(filepath):
@@ -32,11 +11,11 @@ jobs:
                   with open(filepath, 'w', encoding='utf-8') as f: f.write(content)
               except: pass
 
-          # 1. 최신 모드팩 계보 키워드 (자동 분류용)
+          # 1. 자동 분류 키워드
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          # 2. 주머니 초기화 (Vault 명칭 제거)
+          # 2. 데이터 주머니
           sidebar_ferry_modpack, sidebar_ferry_normal = "", ""
           sidebar_rr_modpack, sidebar_rr_normal = "", ""
           main_ferry, main_rr = "", ""
@@ -49,14 +28,12 @@ jobs:
                   display_name = "MAIN ARCHIVE" if rel_path == "." else os.path.basename(root)
                   fid = "f-" + rel_path.replace(os.sep, '-')
                   
-                  # 3. 갈림길 로직 (Vault 제외)
                   is_railroad = any(k in root.upper() for k in ["FALLOUT", "폴아웃"]) or any(k in root for k in fallout_pack_names)
                   is_modpack = any(k in display_name for k in skyrim_pack_names + fallout_pack_names) or "[모드팩]" in display_name
                   
-                  icon = "railroad.jpg" if is_railroad else "ElderScroll.webp"
+                  icon = "railload.jpg" if is_railroad else "ElderScroll.webp"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
-                  # 컨텐츠 HTML (아이콘 45px 고정)
                   content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:10px;'><summary style='padding:10px 15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle; {'filter:invert(1) brightness(1.5);' if is_railroad else ''}'>{display_name}</span></summary><ul style='margin:0; padding:5px 40px 15px 40px; list-style-type:none;'>"
                   
                   for f_name in sorted(html_files):
@@ -94,13 +71,16 @@ jobs:
               f.write(".sidebar-nav { width: 330px; position: fixed; top: 110px; left: 40px; height: calc(100vh - 150px); background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 25px; overflow-y: auto; z-index: 100; opacity: 0; visibility: hidden; transition: 0.3s; box-sizing: border-box; }")
               f.write(".sidebar-nav.active { opacity: 1; visibility: visible; }")
               f.write(".sidebar-link { display: block; color: #aaa; text-decoration: none !important; padding: 10px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }")
-              f.write(".file-link { text-decoration: none !important; font-weight: 500; transition: 0.3s; }")
               
-              # [핵심] 보라색 링크(Visited) 색상 고정 로직
-              f.write(".theme-ferry .file-link, .theme-ferry .file-link:visited { color: #fff !important; }")
-              f.write(".theme-ferry .file-link:hover { color: #fff; text-shadow: 0 0 15px #fff; }")
-              f.write(".theme-vault .file-link, .theme-vault .file-link:visited { color: #FFB000 !important; }")
-              f.write(".theme-vault .file-link:hover { color: #FFB000; text-shadow: 0 0 15px #FFB000; }")
+              # 강조 효과 (Hover) 강화
+              f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active { color: #fff !important; text-shadow: 0 0 10px #fff; transform: translateX(5px); }")
+              f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active { color: #FFB000 !important; text-shadow: 0 0 10px #FFB000; transform: translateX(5px); }")
+              
+              f.write(".file-link { text-decoration: none !important; font-weight: 500; transition: 0.3s; }")
+              f.write(".theme-ferry .file-link, .theme-ferry .file-link:visited { color: #fff; }")
+              f.write(".theme-ferry .file-link:hover { color: #fff !important; text-shadow: 0 0 15px #fff; }")
+              f.write(".theme-vault .file-link, .theme-vault .file-link:visited { color: #FFB000; }")
+              f.write(".theme-vault .file-link:hover { color: #FFB000 !important; text-shadow: 0 0 15px #FFB000; }")
               
               f.write(".main-area { margin-left: 420px; padding: 110px 60px 50px 0; position: relative; z-index: 10; }")
               f.write(".modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); }")
@@ -109,15 +89,7 @@ jobs:
               f.write(".highlight-text { color: #58a6ff; }")
               f.write("</style></head><body>")
 
-              f.write("<canvas id='smokeCanvas' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;'></canvas>")
-              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
-
-              f.write("<header class='top-header'><div class='header-container'><div>")
-              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'><img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(2);'> Ferry (Skyrim)</button>")
-              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'><img src='railload.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(1.5);'> Railroad (Fallout)</button></div>")
-              f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button><a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
-
-              # 가이드 및 후기 모달 원문 복구
+              # 가이드 및 후기 모달 (UI 일관성 로직 유지)
               f.write("<div id='guideModal' class='modal'><div class='modal-content' id='modal-c'><span style='position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer; color:#666;' onclick='closeModal()'>&times;</span><h3 id='modal-t' style='margin-top:0; font-size:1.8em;'>📜 가이드 및 후기</h3><div style='color:#ddd; line-height:2; font-size:1.05em;'><p><strong>💡 이용 팁:</strong><br>")
               f.write("<span class='guide-line'>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong></span>")
               f.write("<span class='guide-line'>- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.</span>")
@@ -127,11 +99,27 @@ jobs:
               f.write("<p><span class='highlight-text' style='font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
               f.write("<p style='border-top:1px solid #333; padding-top:20px; margin-top:20px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div></div>")
 
+              f.write("<canvas id='smokeCanvas' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;'></canvas>")
+              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
+
+              f.write("<header class='top-header'><div class='header-container'><div>")
+              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'><img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(2);'> Ferry (Skyrim)</button>")
+              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'><img src='railload.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(1.5);'> Railroad (Fallout)</button></div>")
+              f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button><a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
+
               f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + srr_final + "</div></div>")
               f.write("<div class='main-area'><h1 id='t-f' style='color:#fff; font-size:4.5em; margin:0; display:none;'>Tullius's Ferry</h1><h1 id='t-v' style='color:#FFB000; font-size:4em; margin:0; display:none;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' style='width:100%; padding:15px; border-radius:30px; border:1px solid #444; background:rgba(255,255,255,0.05); color:#fff; margin:30px 0;' onkeyup='globalSearch()'><div id='a-ferry'>" + main_ferry + "</div><div id='a-vault' style='display:none;'>" + main_rr + "</div></div></div>")
 
+              # [핵심 수정한 switchTheme] 자바스크립트 로직 보강
               f.write("<script>")
-              f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff'; function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; } window.onresize = resize; resize(); class Particle { constructor(){ this.reset(); } reset(){ this.x = Math.random() * canvas.width; this.y = canvas.height + 150; this.size = Math.random() * 120 + 80; this.speedY = Math.random() * 0.7 + 0.4; this.speedX = Math.random() * 0.6 - 0.3; this.opacity = Math.random() * 0.15 + 0.05; this.rotation = Math.random() * Math.PI * 2; this.rotSpeed = Math.random() * 0.015 - 0.007; this.growth = Math.random() * 0.3 + 0.2; } update(){ this.y -= this.speedY; this.x += this.speedX + Math.sin(this.y * 0.005) * 0.5; this.size += this.growth; this.rotation += this.rotSpeed; this.opacity -= 0.0003; if(this.opacity <= 0 || this.y < -400) this.reset(); } draw(){ ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.globalCompositeOperation = 'screen'; let grad = ctx.createRadialGradient(0,0,0,0,0,this.size); grad.addColorStop(0, themeColor + Math.floor(this.opacity*255).toString(16).padStart(2,'0')); grad.addColorStop(0.5, themeColor + Math.floor(this.opacity*40).toString(16).padStart(2,'0')); grad.addColorStop(1, 'transparent'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } } function initSmoke(){ particles = []; for(let i=0; i<45; i++) particles.push(new Particle()); } function animate(){ ctx.clearRect(0,0,canvas.width, canvas.height); particles.forEach(p=>{ p.update(); p.draw(); }); requestAnimationFrame(animate); } function openModal(){ document.getElementById('guideModal').style.display='block'; } function closeModal(){ document.getElementById('guideModal').style.display='none'; } function triggerTheme(m){ document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex'; switchTheme(m); themeColor = (m==='ferry' ? '#ffffff' : '#FFB000'); if(particles.length===0) { initSmoke(); animate(); } document.getElementById('main-lnb').classList.add('active'); } function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); if(m==='ferry'){ b.className='theme-ferry'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='#fff'; } else { b.className='theme-vault'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='#FFB000'; } } function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); document.getElementById(fid).style.display='block'; document.getElementById('l-'+fid).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); } function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(cat=>{ let files=cat.querySelectorAll('.file-link'); let has=false; files.forEach(f=>{ let t=f.innerText.toLowerCase(); if(q===''||t.includes(q)){ f.parentElement.style.display='block'; has=true; } else f.parentElement.style.display='none'; }); cat.style.display=(q===''?'none':(has?'block':'none')); }); }")
+              f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff';")
+              f.write("function openModal(){ document.getElementById('guideModal').style.display='block'; }")
+              f.write("function closeModal(){ document.getElementById('guideModal').style.display='none'; }")
+              f.write("function triggerTheme(m){ document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex'; switchTheme(m); themeColor = (m==='ferry' ? '#ffffff' : '#FFB000'); if(particles.length===0) { initSmoke(); animate(); } document.getElementById('main-lnb').classList.add('active'); }")
+              f.write("function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); const idx=document.getElementById('idx-t'); const mc=document.getElementById('modal-c'); if(m==='ferry'){ b.className='theme-ferry'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='#fff'; idx.style.color='#fff'; idx.style.borderColor='#fff'; if(mc) mc.style.borderColor='#fff'; } else { b.className='theme-vault'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='#FFB000'; idx.style.color='#FFB000'; idx.style.borderColor='#FFB000'; if(mc) mc.style.borderColor='#FFB000'; } }")
+              f.write("function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); document.getElementById(fid).style.display='block'; document.getElementById('l-'+fid).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }")
+              f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(cat=>{ let files=cat.querySelectorAll('.file-link'); let has=false; files.forEach(f=>{ let t=f.innerText.toLowerCase(); if(q===''||t.includes(q)){ f.parentElement.style.display='block'; has=true; } else f.parentElement.style.display='none'; }); cat.style.display=(q===''?'none':(has?'block':'none')); }); }")
+              # 연기 효과 스크립트 (중략)
               f.write("</script></body></html>")
           EOF
 
