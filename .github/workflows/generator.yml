@@ -96,8 +96,9 @@ jobs:
               f.write("html { overflow-y: scroll; scroll-behavior: smooth; }")
               f.write("body { margin:0; min-height:100vh; background-color:#000; font-family:sans-serif; color:#eee; overflow-x:hidden; transition:0.4s; background-attachment: fixed !important; background-size: cover !important; }")
               f.write("a, a:link, a:visited { text-decoration: none !important; color: inherit !important; }")
-              f.write(".sidebar-link { display:block; padding:10px 0; font-size:0.95em; border-bottom:1px solid rgba(255,255,255,0.05); transition:0.3s; }
-              f.write(".sidebar-link-f { color:#aaa !important; transition: 0.3s; } .sidebar-link-f:hover, .sidebar-link-f.active { color:#fff !important; padding-left:12px; text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(0,200,255,0.5); }
+              f.write(".sidebar-link { display:block; padding:10px 0; font-size:0.95em; border-bottom:1px solid rgba(255,255,255,0.05); transition:0.3s; cursor:pointer; }")
+              f.write(".sidebar-link-f { color:#aaa !important; transition: 0.3s; }")
+              f.write(".sidebar-link-f:hover, .sidebar-link-f.active { color:#ffffff !important; padding-left:15px; text-shadow: 0 0 5px #fff, 0 0 12px #00d2ff, 0 0 25px #008cff, 0 0 40px rgba(0,210,255,0.6); font-weight: bold; }")
               f.write(".sidebar-link-v { color:#b37d00 !important; } .sidebar-link-v:hover, .sidebar-link-v.active { color:#FFB000 !important; padding-left:5px; }")
               f.write(".top-header { position:fixed; top:0; left:0; width:100%; height:70px; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; line-height: 1; z-index:1000; border-bottom:2px solid rgba(255,255,255,0.1); backdrop-filter:blur(5px); }")
               f.write(".header-container { width:100%; max-width:1400px; display:flex; justify-content:space-between; align-items:center; padding:0 40px; box-sizing:border-box; }")
