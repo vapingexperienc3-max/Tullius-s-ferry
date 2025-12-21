@@ -32,68 +32,61 @@ jobs:
                   with open(filepath, 'w', encoding='utf-8') as f: f.write(content)
               except: pass
 
+          # 1. 최신 모드팩 계보 키워드 (이름만으로 자동 분류)
+          skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
+          fallout_pack_names = ["짬통팩", "스위트폴"]
+
+          # 2. 주머니 초기화 (Vault 명칭 완전 제거)
           sidebar_ferry_modpack, sidebar_ferry_normal = "", ""
-          sidebar_vault_modpack, sidebar_vault_normal = "", ""
-          main_ferry, main_vault = "", ""
+          sidebar_rr_modpack, sidebar_rr_normal = "", ""
+          main_ferry, main_rr = "", ""
           
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
               if html_files:
                   rel_path = os.path.relpath(root, '.')
-                  display_name = "MAIN ARCHIVE" if rel_path == "." else rel_path.upper()
+                  display_name = "MAIN ARCHIVE" if rel_path == "." else os.path.basename(root)
                   fid = "f-" + rel_path.replace(os.sep, '-')
-                  is_vault = any(kw in display_name for kw in ["VAULT", "FALLOUT", "폴아웃"])
                   
-                  # 스카이림 카테고리 로고 ElderScroll.webp로 교체
-                  icon = "https://img.icons8.com/color/48/vault-boy.png" if is_vault else "ElderScroll.webp"
+                  # 3. 갈림길 로직 (Vault 키워드 제외)
+                  is_railroad = any(k in root.upper() for k in ["FALLOUT", "폴아웃"]) or any(k in root for k in fallout_pack_names)
+                  is_modpack = any(k in display_name for k in skyrim_pack_names + fallout_pack_names) or "[모드팩]" in display_name
+                  
+                  icon = "railload.jpg" if is_railroad else "ElderScroll.webp"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
-                  content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:10px;'><summary style='padding:10px 15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle;'>{display_name}</span></summary><ul style='margin:0; padding:5px 40px 15px 40px; list-style-type:none;'>"
+                  # 컨텐츠 HTML 생성 (아이콘 45px 고정 및 필터 적용)
+                  content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:10px;'><summary style='padding:10px 15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle; {'filter:invert(1) brightness(1.5);' if is_railroad else ''}'>{display_name}</span></summary><ul style='margin:0; padding:5px 40px 15px 40px; list-style-type:none;'>"
+                  
                   for f_name in sorted(html_files):
                       path = os.path.join(root, f_name)
                       inject_width_style(path)
                       url = os.path.relpath(path, '.').replace(os.sep, '/')
                       disp = f_name.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                      # 파일명 앞에 드래곤 로고(ElderScroll.webp)를 직접 삽입하고 간격을 조절합니다.
-                      file_icon = f"<img src='ElderScroll.webp' style='width:16px; margin-right:8px; vertical-align:middle;'>" if not is_vault else "▪️ "
-                      content_html += f'<li style="margin:8px 0; display:flex; align-items:center;">{file_icon}<a href="{url}" target="_blank" class="file-link" style="font-size:0.95em;">{disp}</a></li>'
+                      f_icon = f"<img src='ElderScroll.webp' style='width:16px; margin-right:8px; vertical-align:middle;'>" if not is_railroad else "▪️ "
+                      content_html += f'<li style="margin:8px 0; display:flex; align-items:center;">{f_icon}<a href="{url}" target="_blank" class="file-link" style="font-size:0.95em;">{disp}</a></li>'
                   content_html += "</ul></details></div>"
 
-                  if "[모드팩]" in display_name:
-                      if is_vault: sidebar_vault_modpack += link_html
-                      else: sidebar_ferry_modpack += link_html
+                  if is_railroad:
+                      main_rr += content_html
+                      if is_modpack: sidebar_rr_modpack += link_html
+                      else: sidebar_rr_normal += link_html
                   else:
-                      if is_vault: sidebar_vault_normal += link_html
+                      main_ferry += content_html
+                      if is_modpack: sidebar_ferry_modpack += link_html
                       else: sidebar_ferry_normal += link_html
-                  if is_vault: main_vault += content_html
-                  else: main_ferry += content_html
 
-          # INDEX 및 세퍼레이터 옆 이모지 제거 및 ElderScroll.webp 교체
+          # 4. 사이드바 세퍼레이터 (Vault 제거본)
           sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #ffffff44; display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_ferry_modpack}</div></details>{sidebar_ferry_normal}"
-          # [수정] 모드팩은 모드팩끼리 접히고, 일반 폴더는 그 아래에 별도로 표시되도록 분리
-          sv_final = f"""
-          <details open style='margin-bottom:15px;'>
-          <summary style='color:#FFB000; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'>
-          <img src='railload.jpg' style='width:20px; height:20px; object-fit:contain; margin-right:10px; filter:invert(1) brightness(1.5);'> 모드팩 아카이브
-          </summary>
-          <div style='padding-left:10px;'>
-          {sidebar_vault_modpack}
-          </div>
-          </details>
-          <div style='margin-top:10px;'>
-          {sidebar_vault_normal}
-          </div>
-          """
+          srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'><img src='railload.jpg' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px; filter:invert(1) brightness(1.5);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_rr_modpack}</div></details>{sidebar_rr_normal}"
+
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
               f.write("body { margin: 0; min-height: 100vh; background-color: #000; font-family: sans-serif; color: #eee; overflow-x: hidden; transition: 0.4s; }")
-              
-              # 백업 7의 암전 개선 그라데이션
               smooth_grad = "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 5%, rgba(0,0,0,0) 20%)"
               f.write(f".theme-ferry {{ background: {smooth_grad}, url('skyrim.png') center 10%/cover no-repeat fixed; }}")
               f.write(f".theme-vault {{ background: {smooth_grad}, url('fallout.png') center top 70px/cover no-repeat fixed; }}")
-              
               f.write(".top-header { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; border-bottom: 2px solid rgba(255,255,255,0.1); }")
               f.write(".header-container { width: 100%; max-width: 1400px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; box-sizing: border-box; }")
               f.write(".header-btn { padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid; background: transparent; transition: 0.3s; text-decoration: none !important; font-size: 0.9em; position: relative; }")
@@ -104,47 +97,38 @@ jobs:
               f.write(".sidebar-link { display: block; color: #aaa; text-decoration: none !important; padding: 10px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }")
               f.write(".file-link { text-decoration: none !important; font-weight: 500; transition: 0.3s; }")
               f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active { color: #fff !important; text-shadow: 0 0 10px #fff; transform: translateX(5px); }")
-              f.write(".theme-ferry .file-link { color: #fff; }")
-              f.write(".theme-ferry .file-link:hover { color: #fff; text-shadow: 0 0 15px #fff; }")
               f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active { color: #FFB000 !important; text-shadow: 0 0 10px #FFB000; transform: translateX(5px); }")
-              f.write(".theme-vault .file-link { color: #FFB000; }")
-              f.write(".theme-vault .file-link:hover { color: #FFB000; text-shadow: 0 0 15px #FFB000; }")
               f.write(".main-area { margin-left: 420px; padding: 110px 60px 50px 0; position: relative; z-index: 10; }")
               f.write(".modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); }")
               f.write(".modal-content { background: #111; margin: 5% auto; padding: 50px; border: 1px solid; border-radius: 15px; width: 90%; max-width: 1000px; position: relative; max-height: 85vh; overflow-y: auto; box-sizing: border-box; word-break: keep-all; }")
               f.write(".guide-line { margin-bottom: 12px; display: block; }")
-              f.write(".highlight-text { color: #58a6ff; }") # 피드백 문구 강조용 스타일
+              f.write(".highlight-text { color: #58a6ff; }")
               f.write("</style></head><body>")
-              
+
               f.write("<canvas id='smokeCanvas' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;'></canvas>")
-              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; text-shadow: 0 0 20px #000;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
+              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
 
               f.write("<header class='top-header'><div class='header-container'><div>")
-              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'>")
-              f.write("<img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(2); flex-shrink:0;'> Ferry (Skyrim)</button>")
-              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; box-sizing:border-box; line-height:1; vertical-align:middle;'>")
-              # 이미지가 검은색 로고+흰색 배경이라면 아래 필터가 배경을 어둡게 만들고 로고를 노랗게/밝게 띄워줍니다.
-              f.write("<img src='railroad.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) hue-rotate(180deg) brightness(1.5); border-radius:2px; flex-shrink:0;'> Railroad (Fallout)</button></div>")
-              f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button>")
-              f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
+              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'><img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(2);'> Ferry (Skyrim)</button>")
+              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'><img src='railload.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(1.5);'> Railroad (Fallout)</button></div>")
+              f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button><a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
-              # 가이드 모달 섹션 - 피드백 문구 핀셋 삽입
+              # 가이드 및 후기 모달 (원문 100% 복구)
               f.write("<div id='guideModal' class='modal'><div class='modal-content' id='modal-c'><span style='position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer; color:#666;' onclick='closeModal()'>&times;</span><h3 id='modal-t' style='margin-top:0; font-size:1.8em;'>📜 가이드 및 후기</h3><div style='color:#ddd; line-height:2; font-size:1.05em;'><p><strong>💡 이용 팁:</strong><br>")
               f.write("<span class='guide-line'>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong></span>")
               f.write("<span class='guide-line'>- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.</span>")
               f.write("<span class='guide-line'>- <strong>미해결 탭</strong>의 경우 해결되지 않았다고 생각되는 이슈들을 백업해 놓았습니다. <strong>해결된 문제가 있으면 피드백 부탁드립니다.</strong></span>")
               f.write("<span class='guide-line'>- 자잘한 픽스나 번역은 원본 대신 HTML 링크로 백업되었으며, <strong>외부 링크(구드/메가)가 터지는 경우는 대처가 어렵습니다.</strong></span>")
               f.write("<span class='guide-line'>- <strong>모드팩, 프리셋, 의상, 동료</strong> 등 주요 자료는 테라박스에 원본으로 백업되어 있습니다. <span style='color:#FFB000; font-weight:bold;'>(파일 암호 필수 확인)</span></span></p>")
-              # 요청하신 피드백 삽입부
               f.write("<p><span class='highlight-text' style='font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
               f.write("<p style='border-top:1px solid #333; padding-top:20px; margin-top:20px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div></div>")
 
-              # INDEX 옆 이모지 제거
-              f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + sv_final + "</div></div>")
-              f.write("<div class='main-area'><h1 id='t-f' style='color:#fff; font-size:4.5em; margin:0; display:none;'>Tullius's Ferry</h1><h1 id='t-v' style='color:#FFB000; font-size:4em; margin:0; display:none;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' style='width:100%; padding:15px; border-radius:30px; border:1px solid #444; background:rgba(255,255,255,0.05); color:#fff; margin:30px 0;' onkeyup='globalSearch()'><div id='a-ferry'>" + main_ferry + "</div><div id='a-vault' style='display:none;'>" + main_vault + "</div></div></div>")
+              # 메인 구조 및 검색바
+              f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + srr_final + "</div></div>")
+              f.write("<div class='main-area'><h1 id='t-f' style='color:#fff; font-size:4.5em; margin:0; display:none;'>Tullius's Ferry</h1><h1 id='t-v' style='color:#FFB000; font-size:4em; margin:0; display:none;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' style='width:100%; padding:15px; border-radius:30px; border:1px solid #444; background:rgba(255,255,255,0.05); color:#fff; margin:30px 0;' onkeyup='globalSearch()'><div id='a-ferry'>" + main_ferry + "</div><div id='a-vault' style='display:none;'>" + main_rr + "</div></div></div>")
 
               f.write("<script>")
-              f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff'; function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; } window.onresize = resize; resize(); class Particle { constructor(){ this.reset(); } reset(){ this.x = Math.random() * canvas.width; this.y = canvas.height + 150; this.size = Math.random() * 120 + 80; this.speedY = Math.random() * 0.7 + 0.4; this.speedX = Math.random() * 0.6 - 0.3; this.opacity = Math.random() * 0.15 + 0.05; this.rotation = Math.random() * Math.PI * 2; this.rotSpeed = Math.random() * 0.015 - 0.007; this.growth = Math.random() * 0.3 + 0.2; } update(){ this.y -= this.speedY; this.x += this.speedX + Math.sin(this.y * 0.005) * 0.5; this.size += this.growth; this.rotation += this.rotSpeed; this.opacity -= 0.0003; if(this.opacity <= 0 || this.y < -400) this.reset(); } draw(){ ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.globalCompositeOperation = 'screen'; let grad = ctx.createRadialGradient(0,0,0,0,0,this.size); grad.addColorStop(0, themeColor + Math.floor(this.opacity*255).toString(16).padStart(2,'0')); grad.addColorStop(0.5, themeColor + Math.floor(this.opacity*40).toString(16).padStart(2,'0')); grad.addColorStop(1, 'transparent'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } } function initSmoke(){ particles = []; for(let i=0; i<45; i++) particles.push(new Particle()); } function animate(){ ctx.clearRect(0,0,canvas.width, canvas.height); particles.forEach(p=>{ p.update(); p.draw(); }); requestAnimationFrame(animate); } function openModal(){ document.getElementById('guideModal').style.display='block'; } function closeModal(){ document.getElementById('guideModal').style.display='none'; } function triggerTheme(m){ document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex'; switchTheme(m); themeColor = (m==='ferry' ? '#ffffff' : '#FFB000'); if(particles.length===0) { initSmoke(); animate(); } document.getElementById('main-lnb').classList.add('active'); } function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); const idx=document.getElementById('idx-t'); const mc=document.getElementById('modal-c'); if(m==='ferry'){ b.className='theme-ferry'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='#fff'; idx.style.color='#fff'; idx.style.borderColor='#fff'; mc.style.borderColor='#fff'; } else { b.className='theme-vault'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='#FFB000'; idx.style.color='#FFB000'; idx.style.borderColor='#FFB000'; mc.style.borderColor='#FFB000'; } } function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); document.getElementById(fid).style.display='block'; document.getElementById('l-'+fid).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); } function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(cat=>{ let files=cat.querySelectorAll('.file-link'); let has=false; files.forEach(f=>{ let t=f.innerText.toLowerCase(); if(q===''||t.includes(q)){ f.parentElement.style.display='block'; has=true; } else f.parentElement.style.display='none'; }); cat.style.display=(q===''?'none':(has?'block':'none')); }); }")
+              f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff'; function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; } window.onresize = resize; resize(); class Particle { constructor(){ this.reset(); } reset(){ this.x = Math.random() * canvas.width; this.y = canvas.height + 150; this.size = Math.random() * 120 + 80; this.speedY = Math.random() * 0.7 + 0.4; this.speedX = Math.random() * 0.6 - 0.3; this.opacity = Math.random() * 0.15 + 0.05; this.rotation = Math.random() * Math.PI * 2; this.rotSpeed = Math.random() * 0.015 - 0.007; this.growth = Math.random() * 0.3 + 0.2; } update(){ this.y -= this.speedY; this.x += this.speedX + Math.sin(this.y * 0.005) * 0.5; this.size += this.growth; this.rotation += this.rotSpeed; this.opacity -= 0.0003; if(this.opacity <= 0 || this.y < -400) this.reset(); } draw(){ ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.globalCompositeOperation = 'screen'; let grad = ctx.createRadialGradient(0,0,0,0,0,this.size); grad.addColorStop(0, themeColor + Math.floor(this.opacity*255).toString(16).padStart(2,'0')); grad.addColorStop(0.5, themeColor + Math.floor(this.opacity*40).toString(16).padStart(2,'0')); grad.addColorStop(1, 'transparent'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } } function initSmoke(){ particles = []; for(let i=0; i<45; i++) particles.push(new Particle()); } function animate(){ ctx.clearRect(0,0,canvas.width, canvas.height); particles.forEach(p=>{ p.update(); p.draw(); }); requestAnimationFrame(animate); } function openModal(){ document.getElementById('guideModal').style.display='block'; } function closeModal(){ document.getElementById('guideModal').style.display='none'; } function triggerTheme(m){ document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex'; switchTheme(m); themeColor = (m==='ferry' ? '#ffffff' : '#FFB000'); if(particles.length===0) { initSmoke(); animate(); } document.getElementById('main-lnb').classList.add('active'); } function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); if(m==='ferry'){ b.className='theme-ferry'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='#fff'; } else { b.className='theme-vault'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='#FFB000'; } } function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); document.getElementById(fid).style.display='block'; document.getElementById('l-'+fid).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); } function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(cat=>{ let files=cat.querySelectorAll('.file-link'); let has=false; files.forEach(f=>{ let t=f.innerText.toLowerCase(); if(q===''||t.includes(q)){ f.parentElement.style.display='block'; has=true; } else f.parentElement.style.display='none'; }); cat.style.display=(q===''?'none':(has?'block':'none')); }); }")
               f.write("</script></body></html>")
           EOF
 
@@ -153,5 +137,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "FIX: Pinpoint Restore Feedback Text and ElderScroll.webp on Backup 7" || exit 0
+          git commit -m "FIX: Restore Guide & Feedback Text + Refine Classification" || exit 0
           git push origin main
