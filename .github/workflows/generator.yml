@@ -56,15 +56,13 @@ jobs:
               bg_color = "rgba(0,0,0,0.6)"
               border_color = "rgba(255,176,0,0.3)" if is_rr else "rgba(255,255,255,0.1)"
               
-              # 스카이림 아이콘 45px로 크게, 폴아웃 28px
               img_w = "28px" if is_rr else "45px"
-              # 폴아웃 아이콘이 처져 보이지 않도록 margin-top 보정
               img_style = f"width:{img_w}; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle;"
               if is_rr: 
                   img_style += " filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.1); margin-top:-2px;"
               
               margin = f"margin-left:{depth * 15}px;"
-              html = f"<div style='{margin} margin-bottom:12px; width:100%;'>"
+              html = f"<div style='{margin} margin-bottom:12px; width:100%;' class='tree-node'>"
               html += f"<details open style='background:{bg_color}; border:1px solid {border_color}; border-radius:12px; overflow:hidden;'>"
               html += f"<summary style='padding:15px; font-weight:bold; color:{text_color}; cursor:pointer; list-style:none; display:flex; align-items:center; background:rgba(255,255,255,0.03); border-bottom:1px solid {border_color};'>"
               html += f"<img src='{icon}' style='{img_style}'>{node_name}</summary>"
@@ -74,7 +72,6 @@ jobs:
                   inject_width_style(f_path)
                   url = f_path.replace(os.sep, '/')
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                  # 리스트 내 엘더스크롤 아이콘도 24px로 확대
                   f_icon = f"<span style='color:#FFB000; margin-right:10px; font-size:12px;'>●</span>" if is_rr else f"<img src='ElderScroll.webp' style='width:24px; margin-right:10px; vertical-align:middle;'>"
                   link_class = "file-link-v" if is_rr else "file-link-f"
                   html += f'<li style="margin:12px 0;"><a href="{url}" target="_blank" class="{link_class}">{f_icon}{disp}</a></li>'
@@ -131,7 +128,6 @@ jobs:
               f.write("<p><span style='color:#58a6ff; font-weight: bold;'>* 백업 관련 피드백은 좌측 상단의 제보 버튼(깃허브 로그인 필요)이나 아카라이브(코네) 피드백 글에 댓글 부탁드립니다.</span></p>")
               f.write("<p style='border-top:1px solid #333; padding-top:20px; margin-top:20px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div></div>")
 
-              # 헤더 (정렬 보정 적용)
               f.write("<header class='top-header'><div class='header-container'><div class='header-group'>")
               f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff;'><img src='ship.PNG' style='width:22px; filter:invert(1) brightness(2); vertical-align:middle;'> Ferry (Skyrim)</button>")
               f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'><img src='railroad.png' style='width:18px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg); vertical-align:middle; margin-top:-2px;'> Railroad (Fallout)</button></div>")
@@ -145,18 +141,23 @@ jobs:
               f.write("<div class='main-area'><h1 id='t-f' style='display:none; color:#fff; font-size:4.5em; margin:0;'>Tullius's Ferry</h1><h1 id='t-v' style='display:none; color:#FFB000; font-size:4.5em; margin:0;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
 
               f.write("<canvas id='smokeCanvas' style='position:fixed; top:0; left:0; width:100%; height:100%; z-index:5; pointer-events:none;'></canvas>")
-              f.write("<div id='welcome-screen' style='position:fixed; top:70px; left:0; width:100vw; height:100vh; background:#000; z-index:2000; overflow:hidden;'><img src='welcome page.png' style='width:100%; height:100%; object-fit:cover; filter:brightness(0.5);'><div style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; width:100%;'><h1 style='color:#fff; font-size:3.5em;'>환영합니다</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 눌러주세요</p></div></div>")
+              
+              # [환영 문구 원문 복구 완료]
+              f.write("<div id='welcome-screen' style='position:fixed; top:70px; left:0; width:100vw; height:100vh; background:#000; z-index:2000; overflow:hidden;'><img src='welcome page.png' style='width:100%; height:100%; object-fit:cover; filter:brightness(0.5);'><div style='position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; width:100%;'><h1 style='color:#fff; font-size:3.5em;'>환영합니다, 나그네여.</h1><p style='color:#ccc; font-size:1.6em;'>어떤 세계의 기록을 찾으러 오셨습니까?</p><p style='color:#aaa;'>상단의 버튼을 클릭하여 이동하세요.</p></div></div>")
+              
               f.write("<script>")
               f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff';")
               f.write("function openModal(){ document.querySelector('.modal').style.display='block'; }")
               f.write("function closeModal(){ document.querySelector('.modal').style.display='none'; }")
               f.write("function triggerTheme(m){ document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex'; switchTheme(m); themeColor = (m==='ferry' ? '#ffffff' : '#FFB000'); if(particles.length===0) { initSmoke(); animate(); } document.getElementById('main-lnb').classList.add('active'); }")
-              f.write("function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); const idx=document.getElementById('idx-t'); const sb=document.getElementById('search-bar'); if(m==='ferry'){ b.style.backgroundImage=\"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('skyrim.png')\"; b.style.backgroundAttachment='fixed'; b.style.backgroundSize='cover'; b.style.backgroundPosition='center'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='rgba(255,255,255,0.2)'; idx.style.color='#fff'; idx.style.borderColor='#fff'; sb.style.borderColor='rgba(255,255,255,0.2)'; } else { b.style.backgroundImage=\"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('fallout.png')\"; b.style.backgroundAttachment='fixed'; b.style.backgroundSize='cover'; b.style.backgroundPosition='center 20%'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='rgba(255,176,0,0.3)'; idx.style.color='#FFB000'; idx.style.borderColor='#FFB000'; sb.style.borderColor='rgba(255,176,0,0.3)'; } }")
+              # [배경 위치 수정: 스카이림 center, 폴아웃 15% 보정]
+              f.write("function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); const idx=document.getElementById('idx-t'); const sb=document.getElementById('search-bar'); if(m==='ferry'){ b.style.backgroundImage=\"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('skyrim.png')\"; b.style.backgroundAttachment='fixed'; b.style.backgroundSize='cover'; b.style.backgroundPosition='center'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='rgba(255,255,255,0.2)'; idx.style.color='#fff'; idx.style.borderColor='#fff'; sb.style.borderColor='rgba(255,255,255,0.2)'; } else { b.style.backgroundImage=\"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('fallout.png')\"; b.style.backgroundAttachment='fixed'; b.style.backgroundSize='cover'; b.style.backgroundPosition='center 15%'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='rgba(255,176,0,0.3)'; idx.style.color='#FFB000'; idx.style.borderColor='#FFB000'; sb.style.borderColor='rgba(255,176,0,0.3)'; } }")
               f.write("class Particle { constructor(){ this.reset(); } reset(){ this.x = Math.random() * canvas.width; this.y = canvas.height + 150; this.size = Math.random() * 120 + 80; this.speedY = Math.random() * 0.7 + 0.4; this.speedX = Math.random() * 0.6 - 0.3; this.opacity = Math.random() * 0.15 + 0.05; this.rotation = Math.random() * Math.PI * 2; this.rotSpeed = Math.random() * 0.015 - 0.007; this.growth = Math.random() * 0.3 + 0.2; } update(){ this.y -= this.speedY; this.x += this.speedX + Math.sin(this.y * 0.005) * 0.5; this.size += this.growth; this.rotation += this.rotSpeed; this.opacity -= 0.0003; if(this.opacity <= 0 || this.y < -400) this.reset(); } draw(){ ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.globalCompositeOperation = 'screen'; let grad = ctx.createRadialGradient(0,0,0,0,0,this.size); grad.addColorStop(0, themeColor + Math.floor(this.opacity*255).toString(16).padStart(2,'0')); grad.addColorStop(0.5, themeColor + Math.floor(this.opacity*40).toString(16).padStart(2,'0')); grad.addColorStop(1, 'transparent'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } }")
               f.write("function initSmoke(){ particles = []; for(let i=0; i<45; i++) particles.push(new Particle()); }")
               f.write("function animate(){ ctx.clearRect(0,0,canvas.width, canvas.height); particles.forEach(p=>{ p.update(); p.draw(); }); requestAnimationFrame(animate); }")
               f.write("function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); if(document.getElementById(fid)) document.getElementById(fid).style.display='block'; if(document.getElementById('l-'+fid)) document.getElementById('l-'+fid).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }")
-              f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.file-link-f, .file-link-v').forEach(f=>{ let t=f.innerText.toLowerCase(); if(q===''||t.includes(q)){ f.parentElement.style.display='block'; } else f.parentElement.style.display='none'; }); }")
+              # [검색 기능: 모든 탭 대상]
+              f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.file-link-f, .file-link-v').forEach(f=>{ let t=f.innerText.toLowerCase(); let node = f.closest('.tree-node'); if(q===''||t.includes(q)){ f.parentElement.style.display='block'; if(node) node.style.display='block'; } else { f.parentElement.style.display='none'; } }); document.querySelectorAll('.tree-node').forEach(node=>{ if(q !== '' && node.querySelectorAll('li[style*=\"display: block\"]').length === 0){ node.style.display='none'; } else { node.style.display='block'; } }); }")
               f.write("window.onresize = ()=>{ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }; canvas.width = window.innerWidth; canvas.height = window.innerHeight;")
               f.write("</script></body></html>")
           EOF
@@ -166,5 +167,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Fix UI: Restore Icons, Align Header, and Fix Python Syntax" || exit 0
+          git commit -m "Final Fix: Restore original welcome text, search scope, and background alignment" || exit 0
           git push origin main
