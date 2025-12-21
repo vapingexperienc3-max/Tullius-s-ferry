@@ -50,16 +50,13 @@ jobs:
               for p in parts[:-1]: curr_node = curr_node[p]['_dirs']
               curr_node[parts[-1]]['_files'] = sorted(html_files)
 
-          # 하위 폴더 렌더링 (모두 open 상태로 시작)
           def render_tree(node_name, node_data, depth, is_rr, full_path):
               icon = "railroad.jpg" if is_rr else "ElderScroll.webp"
               img_style = "width:28px; aspect-ratio:1/1; object-fit:contain; margin-right:10px; vertical-align:middle;"
               if is_rr: img_style += " filter:invert(1) brightness(1.5);"
-              
               margin = f"margin-left:{depth * 15}px;"
               
-              # 모든 폴더를 기본적으로 'open' 상태로 설정
-              html = f"<div style='{margin} margin-bottom:8px;'>"
+              html = f"<div style='{margin} margin-bottom:8px; width: 100%; box-sizing: border-box;'>"
               html += f"<details open style='background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:8px; overflow:hidden;'>"
               html += f"<summary style='padding:12px 15px; font-weight:bold; color:#fff; cursor:pointer; list-style:none; display:flex; align-items:center; background:rgba(255,255,255,0.03);'>"
               html += f"<img src='{icon}' style='{img_style}'>{node_name}</summary>"
@@ -72,14 +69,9 @@ jobs:
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
                   f_icon = "▪️ " if is_rr else f"<img src='ElderScroll.webp' style='width:16px; margin-right:8px;'>"
                   html += f'<li style="margin:8px 0;"><a href="{url}" target="_blank" class="file-link">{f_icon}{disp}</a></li>'
-              
-              if not node_data['_files'] and not node_data['_dirs']:
-                  html += "<li style='color:#666; font-size:0.9em;'>내용이 없습니다.</li>"
               html += "</ul>"
-              
               for child_name, child_data in node_data['_dirs'].items():
                   html += render_tree(child_name, child_data, depth+1, is_rr, os.path.join(full_path, child_name))
-              
               html += "</details></div>"
               return html
 
@@ -90,7 +82,7 @@ jobs:
               is_rr = any(k in top_folder.upper() for k in ["FALLOUT", "폴아웃"]) or any(k in top_folder for k in fallout_pack_names)
               theme_key = "railroad" if is_rr else "ferry"
               fid = "f-" + top_folder.replace(os.sep, '-')
-              main_contents[theme_key] += f"<div id='{fid}' class='cat-content' style='display:none;'>" + render_tree(top_folder, data, 0, is_rr, top_folder) + "</div>"
+              main_contents[theme_key] += f"<div id='{fid}' class='cat-content' style='display:none; width: 100%;'>" + render_tree(top_folder, data, 0, is_rr, top_folder) + "</div>"
               is_modpack = any(k in top_folder for k in skyrim_pack_names + fallout_pack_names) or "[모드팩]" in top_folder
               category = "modpack" if is_modpack else "normal"
               sidebar_data[theme_key][category] += f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {top_folder}</a>"
@@ -100,7 +92,7 @@ jobs:
               f.write("html { overflow-y: scroll; scroll-behavior: smooth; }")
               f.write("body { margin: 0; min-height: 100vh; background-color: #000; font-family: sans-serif; color: #eee; overflow-x: hidden; transition: 0.4s; }")
               f.write("a, button, summary, .sidebar-link { cursor: pointer !important; }")
-              f.write("summary::-webkit-details-marker { display:none; }") 
+              f.write("summary::-webkit-details-marker { display:none; }")
               
               smooth_grad = "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 5%, rgba(0,0,0,0) 20%)"
               f.write(f".theme-ferry {{ background: {smooth_grad}, url('skyrim.png') center 10%/cover no-repeat fixed; }}")
@@ -108,19 +100,18 @@ jobs:
               
               f.write(".top-header { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; border-bottom: 2px solid rgba(255,255,255,0.1); }")
               f.write(".header-container { width: 100%; max-width: 1400px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; box-sizing: border-box; }")
-              f.write(".header-btn { padding: 8px 18px; border-radius: 6px; font-weight: bold; border: 1px solid; background: transparent; transition: 0.3s; text-decoration: none !important; font-size: 0.9em; display: inline-flex; align-items: center; gap: 8px; }")
-              f.write("#btn-f:hover { background: rgba(255,255,255,0.15); box-shadow: 0 0 20px #fff; color: #fff; }")
-              f.write("#btn-v:hover { background: rgba(255,176,0,0.15); box-shadow: 0 0 20px #FFB000; color: #FFB000; }")
-              
               f.write(".sidebar-nav { width: 330px; position: fixed; top: 110px; left: 40px; height: calc(100vh - 150px); background: rgba(0,0,0,0.85); border: 1px solid #444; border-radius: 8px; padding: 25px; overflow-y: auto; z-index: 100; opacity: 0; visibility: hidden; transition: 0.3s; box-sizing: border-box; }")
               f.write(".sidebar-nav.active { opacity: 1; visibility: visible; }")
+              
+              # 메인 영역 너비 고정 및 검색창 스타일 수정
+              f.write(".main-area { margin-left: 420px; padding: 110px 60px 50px 0; position: relative; z-index: 10; width: calc(100% - 480px); max-width: 1200px; box-sizing: border-box; }")
+              f.write("#search-bar { width: 100% !important; box-sizing: border-box; padding: 15px 25px; border-radius: 30px; border: 1px solid #444; background: rgba(255,255,255,0.05); color: #fff; margin: 20px 0; display: block; }")
+              
+              f.write(".main-title { font-size: 4.5em; margin: 0 0 10px 0; line-height: 1.1; font-weight: bold; }")
+              f.write("#t-f { color: #fff; } #t-v { color: #FFB000; }")
               f.write(".sidebar-link { display: block; color: #aaa; text-decoration: none !important; padding: 10px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }")
               f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active { color: #fff !important; text-shadow: 0 0 10px #fff; transform: translateX(5px); }")
               f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active { color: #FFB000 !important; text-shadow: 0 0 10px #FFB000; transform: translateX(5px); }")
-              
-              f.write(".main-area { margin-left: 420px; padding: 110px 60px 50px 0; position: relative; z-index: 10; }")
-              f.write(".main-title { font-size: 4.5em; margin: 0 0 10px 0; line-height: 1.1; font-weight: bold; }")
-              f.write("#t-f { color: #fff; } #t-v { color: #FFB000; }")
               f.write(".file-link { text-decoration: none !important; font-weight: 500; transition: 0.3s; color: inherit; }")
               f.write(".theme-ferry .file-link:hover { color: #fff !important; text-shadow: 0 0 15px #fff; }")
               f.write(".theme-vault .file-link:hover { color: #FFB000 !important; text-shadow: 0 0 15px #FFB000; }")
@@ -139,25 +130,26 @@ jobs:
               f.write("<p style='border-top:1px solid #333; padding-top:20px; margin-top:20px;'><strong>✍️ 후기:</strong><br>공장장 이 개같은 년, 너 아니었음 이거 시작도 안 했어 알아? 알면 소븐가드에서 우릴 위해 술잔이나 들어달라고. <br>툴붕이들은 아프지 말고. 너네 없어지면 15년 동안 후속작 유기하는 토드 새끼 누가 욕해주냐?</p></div></div></div>")
 
               f.write("<canvas id='smokeCanvas' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;'></canvas>")
-              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
+              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
               
               f.write("<header class='top-header'><div class='header-container'><div>")
-              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px;'><img src='ship.PNG' style='width:20px; height:20px; filter:invert(1) brightness(2);'> Ferry (Skyrim)</button>")
-              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'><img src='railroad.jpg' style='width:20px; height:20px; filter:invert(1) brightness(1.5);'> Railroad (Fallout)</button></div>")
+              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px; cursor:pointer;'>Ferry (Skyrim)</button>")
+              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; cursor:pointer;'>Railroad (Fallout)</button></div>")
               f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button><a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
               sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; padding:5px 0; border-bottom:1px solid #ffffff44; display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['ferry']['modpack']}</div></details>{sidebar_data['ferry']['normal']}"
               srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'><img src='railroad.jpg' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px; filter:invert(1) brightness(1.5);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
 
               f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + srr_final + "</div></div>")
-              f.write("<div class='main-area'><h1 id='t-f' class='main-title' style='display:none;'>Tullius's Ferry</h1><h1 id='t-v' class='main-title' style='display:none;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' style='width:100%; padding:15px; border-radius:30px; border:1px solid #444; background:rgba(255,255,255,0.05); color:#fff; margin:20px 0;' onkeyup='globalSearch()'><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
+              # 여기서 search-bar를 감싸는 영역의 width를 명시적으로 제어합니다.
+              f.write("<div class='main-area'><h1 id='t-f' class='main-title' style='display:none;'>Tullius's Ferry</h1><h1 id='t-v' class='main-title' style='display:none;'>The Sole Survivor's Railroad</h1><div style='width:100%; display:block;'><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'></div><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
 
               f.write("<script>")
               f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff';")
               f.write("function openModal(){ document.getElementById('guideModal').style.display='block'; }")
               f.write("function closeModal(){ document.getElementById('guideModal').style.display='none'; }")
               f.write("function triggerTheme(m){ document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex'; switchTheme(m); themeColor = (m==='ferry' ? '#ffffff' : '#FFB000'); if(particles.length===0) { initSmoke(); animate(); } document.getElementById('main-lnb').classList.add('active'); }")
-              f.write("function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); const idx=document.getElementById('idx-t'); const mc=document.getElementById('modal-c'); if(m==='ferry'){ b.className='theme-ferry'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='#fff'; idx.style.color='#fff'; idx.style.borderColor='#fff'; if(mc) mc.style.borderColor='#fff'; } else { b.className='theme-vault'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='#FFB000'; idx.style.color='#FFB000'; idx.style.borderColor='#FFB000'; if(mc) mc.style.borderColor='#FFB000'; } }")
+              f.write("function switchTheme(m){ const b=document.body; const lnb=document.getElementById('main-lnb'); const idx=document.getElementById('idx-t'); if(m==='ferry'){ b.className='theme-ferry'; document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; lnb.style.borderColor='#fff'; idx.style.color='#fff'; idx.style.borderColor='#fff'; } else { b.className='theme-vault'; document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; lnb.style.borderColor='#FFB000'; idx.style.color='#FFB000'; idx.style.borderColor='#FFB000'; } }")
               f.write("class Particle { constructor(){ this.reset(); } reset(){ this.x = Math.random() * canvas.width; this.y = canvas.height + 150; this.size = Math.random() * 120 + 80; this.speedY = Math.random() * 0.7 + 0.4; this.speedX = Math.random() * 0.6 - 0.3; this.opacity = Math.random() * 0.15 + 0.05; this.rotation = Math.random() * Math.PI * 2; this.rotSpeed = Math.random() * 0.015 - 0.007; this.growth = Math.random() * 0.3 + 0.2; } update(){ this.y -= this.speedY; this.x += this.speedX + Math.sin(this.y * 0.005) * 0.5; this.size += this.growth; this.rotation += this.rotSpeed; this.opacity -= 0.0003; if(this.opacity <= 0 || this.y < -400) this.reset(); } draw(){ ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.globalCompositeOperation = 'screen'; let grad = ctx.createRadialGradient(0,0,0,0,0,this.size); grad.addColorStop(0, themeColor + Math.floor(this.opacity*255).toString(16).padStart(2,'0')); grad.addColorStop(0.5, themeColor + Math.floor(this.opacity*40).toString(16).padStart(2,'0')); grad.addColorStop(1, 'transparent'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } }")
               f.write("function initSmoke(){ particles = []; for(let i=0; i<45; i++) particles.push(new Particle()); }")
               f.write("function animate(){ ctx.clearRect(0,0,canvas.width, canvas.height); particles.forEach(p=>{ p.update(); p.draw(); }); requestAnimationFrame(animate); }")
@@ -172,5 +164,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "FIX: Keep sub-folders expanded by default, but collapsible" || exit 0
+          git commit -m "FIX: Search bar width issue on folder toggle" || exit 0
           git push origin main
