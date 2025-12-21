@@ -1,4 +1,25 @@
-python <<'EOF'
+name: Generate Index
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate nested index.html
+        run: |
+          python <<'EOF'
           import os
 
           def inject_width_style(filepath):
@@ -14,11 +35,9 @@ python <<'EOF'
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          # 사이드바 및 메인 영역 데이터 저장소
           sidebar_data = {"ferry": {"modpack": "", "normal": ""}, "railroad": {"modpack": "", "normal": ""}}
           main_contents = {"ferry": "", "railroad": ""}
           
-          # 폴더 구조를 먼저 파악하여 계층형으로 렌더링
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
@@ -26,7 +45,6 @@ python <<'EOF'
               if html_files:
                   rel_path = os.path.relpath(root, '.')
                   path_parts = rel_path.split(os.sep)
-                  # 최상위 폴더명 혹은 현재 폴더명 결정
                   display_name = "MAIN ARCHIVE" if rel_path == "." else path_parts[-1]
                   fid = "f-" + rel_path.replace(os.sep, '-')
                   
@@ -36,7 +54,6 @@ python <<'EOF'
                   icon = "railroad.jpg" if is_rr else "ElderScroll.webp"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
-                  # 메인 콘텐츠 생성
                   img_style = "width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle;"
                   if is_rr: img_style += " filter:invert(1) brightness(1.5);"
 
@@ -52,37 +69,25 @@ python <<'EOF'
                   content_html += "</ul></details></div>"
 
                   main_contents[theme_key] += content_html
-
-                  # 사이드바 분류 (모드팩 여부 확인)
                   is_modpack = any(k in rel_path for k in skyrim_pack_names + fallout_pack_names) or "[모드팩]" in display_name
                   category = "modpack" if is_modpack else "normal"
                   sidebar_data[theme_key][category] += link_html
 
-          # 최종 사이드바 HTML 조립
           sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #ffffff44; display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['ferry']['modpack']}</div></details>{sidebar_data['ferry']['normal']}"
           srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'><img src='railroad.jpg' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px; filter:invert(1) brightness(1.5);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
 
-         with open('index.html', 'w', encoding='utf-8') as f:
+          with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
-              # 1. 레이아웃 시프트 방지: 스크롤바 여백 강제 고정
               f.write("html { overflow-y: scroll; scroll-behavior: smooth; }") 
-              f.write("body { margin: 0; min-height: 100vh; background-color: #000; font-family: sans-serif; color: #eee; overflow-x: hidden; transition: background-color 0.4s; }")
-              
-              # 2. 배경 이미지 고정 (컨테이너 밀림 방지)
+              f.write("body { margin: 0; min-height: 100vh; background-color: #000; font-family: sans-serif; color: #eee; overflow-x: hidden; transition: 0.4s; }")
               smooth_grad = "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 5%, rgba(0,0,0,0) 20%)"
               f.write(f".theme-ferry {{ background: {smooth_grad}, url('skyrim.png') center 10%/cover no-repeat fixed; }}")
               f.write(f".theme-vault {{ background: {smooth_grad}, url('fallout.png') center top 70px/cover no-repeat fixed; }}")
-              
-              # 3. 헤더 고정 (좌우 흔들림 방지)
               f.write(".top-header { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; border-bottom: 2px solid rgba(255,255,255,0.1); }")
-              # header-container 너비를 %가 아닌 고정 비율이나 유연한 계산식으로 변경
               f.write(".header-container { width: 100%; max-width: 1400px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; box-sizing: border-box; }")
-              
-              # 4. 검색창 및 메인 영역 고정 (width: 100% 대신 max-width 사용)
-              f.write(".main-area { margin-left: 420px; padding: 110px 60px 50px 0; position: relative; z-index: 10; max-width: 1000px; }")
-              f.write("#search-bar { width: 100%; box-sizing: border-box; padding: 15px 25px; border-radius: 30px; border: 1px solid #444; background: rgba(255,255,255,0.05); color: #fff; margin: 30px 0; outline: none; transition: 0.3s; }")
-              
-              # 사이드바 스타일 (기존과 동일)
+              f.write(".header-btn { padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; border: 1px solid; background: transparent; transition: 0.3s; text-decoration: none !important; font-size: 0.9em; position: relative; }")
+              f.write("#btn-f:hover { background: rgba(255,255,255,0.15); box-shadow: 0 0 20px #fff; color: #fff; }")
+              f.write("#btn-v:hover { background: rgba(255,176,0,0.15); box-shadow: 0 0 20px #FFB000; color: #FFB000; }")
               f.write(".sidebar-nav { width: 330px; position: fixed; top: 110px; left: 40px; height: calc(100vh - 150px); background: rgba(0,0,0,0.85); border: 1px solid #444; border-radius: 8px; padding: 25px; overflow-y: auto; z-index: 100; opacity: 0; visibility: hidden; transition: 0.3s; box-sizing: border-box; }")
               f.write(".sidebar-nav.active { opacity: 1; visibility: visible; }")
               f.write(".sidebar-link { display: block; color: #aaa; text-decoration: none !important; padding: 10px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }")
@@ -98,7 +103,6 @@ python <<'EOF'
               f.write(".modal-content { background: #111; margin: 5% auto; padding: 50px; border: 1px solid; border-radius: 15px; width: 90%; max-width: 1000px; position: relative; max-height: 85vh; overflow-y: auto; box-sizing: border-box; word-break: keep-all; }")
               f.write("</style></head><body>")
 
-              # 가이드 모달
               f.write("<div id='guideModal' class='modal'><div class='modal-content' id='modal-c'><span style='position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer; color:#666;' onclick='closeModal()'>&times;</span><h3 id='modal-t' style='margin-top:0; font-size:1.8em;'>📜 가이드 및 후기</h3><div style='color:#ddd; line-height:2; font-size:1.05em;'><p><strong>💡 이용 팁:</strong><br>")
               f.write("<span style='margin-bottom:12px; display:block;'>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong></span>")
               f.write("<span style='margin-bottom:12px; display:block;'>- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.</span>")
@@ -133,3 +137,11 @@ python <<'EOF'
               f.write("window.onresize = ()=>{ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }; canvas.width = window.innerWidth; canvas.height = window.innerHeight;")
               f.write("</script></body></html>")
           EOF
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "FIX: YAML structure, Railroad typo, Layout Shift, and Sidebar Visibility" || exit 0
+          git push origin main
