@@ -111,7 +111,7 @@ jobs:
               f.write("<img src='ship.PNG' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(2); flex-shrink:0;'> Ferry (Skyrim)</button>")
               f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; box-sizing:border-box; line-height:1; vertical-align:middle;'>")
               # 이미지가 검은색 로고+흰색 배경이라면 아래 필터가 배경을 어둡게 만들고 로고를 노랗게/밝게 띄워줍니다.
-              f.write("<img src='railload.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) hue-rotate(180deg) brightness(1.5); border-radius:2px; flex-shrink:0;'> Railroad (Fallout)</button></div>")
+              f.write("<img src='railroad.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) hue-rotate(180deg) brightness(1.5); border-radius:2px; flex-shrink:0;'> Railroad (Fallout)</button></div>")
               f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button>")
               f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
