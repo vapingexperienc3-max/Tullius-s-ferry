@@ -35,50 +35,59 @@ jobs:
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          sidebar_data = {"ferry": {"modpack": "", "normal": ""}, "railroad": {"modpack": "", "normal": ""}}
-          main_contents = {"ferry": "", "railroad": ""}
-          
+          tree = {}
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               html_files = [f for f in files if f.endswith('.html') and f != 'index.html']
-              
-              if html_files:
-                  rel_path = os.path.relpath(root, '.')
-                  path_parts = rel_path.split(os.sep)
-                  display_name = "MAIN ARCHIVE" if rel_path == "." else path_parts[-1]
-                  fid = "f-" + rel_path.replace(os.sep, '-')
-                  
-                  is_rr = any(k in rel_path.upper() for k in ["FALLOUT", "폴아웃"]) or any(k in rel_path for k in fallout_pack_names)
-                  theme_key = "railroad" if is_rr else "ferry"
-                  
-                  icon = "railroad.jpg" if is_rr else "ElderScroll.webp"
-                  link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
-                  
-                  img_style = "width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle;"
-                  if is_rr: img_style += " filter:invert(1) brightness(1.5);"
+              if not html_files and not dirs: continue
+              rel_path = os.path.relpath(root, '.')
+              if rel_path == ".": continue
+              parts = rel_path.split(os.sep)
+              curr = tree
+              for p in parts:
+                  if p not in curr: curr[p] = {'_files': [], '_dirs': {}}
+                  curr = curr[p]['_dirs']
+              curr_node = tree
+              for p in parts[:-1]: curr_node = curr_node[p]['_dirs']
+              curr_node[parts[-1]]['_files'] = sorted(html_files)
 
-                  content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:10px;'><summary style='padding:10px 15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='{img_style}'>{display_name}</span></summary><ul style='margin:0; padding:5px 40px 15px 40px; list-style-type:none;'>"
-                  
-                  for f_name in sorted(html_files):
-                      path = os.path.join(root, f_name)
-                      inject_width_style(path)
-                      url = os.path.relpath(path, '.').replace(os.sep, '/')
-                      disp = f_name.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                      f_icon = f"<img src='ElderScroll.webp' style='width:16px; margin-right:8px; vertical-align:middle;'>" if not is_rr else "▪️ "
-                      content_html += f'<li style="margin:8px 0; display:flex; align-items:center;">{f_icon}<a href="{url}" target="_blank" class="file-link" style="font-size:0.95em;">{disp}</a></li>'
-                  content_html += "</ul></details></div>"
+          def render_tree(node_name, node_data, depth, is_rr, full_path):
+              fid = "f-" + full_path.replace(os.sep, '-')
+              icon = "railroad.jpg" if is_rr else "ElderScroll.webp"
+              img_style = "width:30px; aspect-ratio:1/1; object-fit:contain; margin-right:8px; vertical-align:middle;"
+              if is_rr: img_style += " filter:invert(1) brightness(1.5);"
+              margin = f"margin-left:{depth*20}px;"
+              html = f"<div style='{margin} background:rgba(0,0,0,0.2); border-left:2px solid rgba(255,255,255,0.1); margin-bottom:10px; border-radius:8px;'>"
+              html += f"<div style='padding:12px 15px; font-weight:bold; color:#fff; display:flex; align-items:center; background:rgba(255,255,255,0.05); border-radius:8px 8px 0 0;'><img src='{icon}' style='{img_style}'>{node_name}</div>"
+              html += "<ul style='margin:0; padding:10px 20px 15px 35px; list-style-type:none;'>"
+              for f in node_data['_files']:
+                  f_path = os.path.join(full_path, f)
+                  inject_width_style(f_path)
+                  url = f_path.replace(os.sep, '/')
+                  disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
+                  f_icon = "▪️ " if is_rr else f"<img src='ElderScroll.webp' style='width:16px; margin-right:8px;'>"
+                  html += f'<li style="margin:8px 0;"><a href="{url}" target="_blank" class="file-link">{f_icon}{disp}</a></li>'
+              html += "</ul>"
+              for child_name, child_data in node_data['_dirs'].items():
+                  html += render_tree(child_name, child_data, depth+1, is_rr, os.path.join(full_path, child_name))
+              html += "</div>"
+              return html
 
-                  main_contents[theme_key] += content_html
-                  is_modpack = any(k in rel_path for k in skyrim_pack_names + fallout_pack_names) or "[모드팩]" in display_name
-                  category = "modpack" if is_modpack else "normal"
-                  sidebar_data[theme_key][category] += link_html
+          main_contents = {"ferry": "", "railroad": ""}
+          sidebar_data = {"ferry": {"modpack": "", "normal": ""}, "railroad": {"modpack": "", "normal": ""}}
 
-          sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #ffffff44; display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['ferry']['modpack']}</div></details>{sidebar_data['ferry']['normal']}"
-          srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'><img src='railroad.jpg' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px; filter:invert(1) brightness(1.5);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
+          for top_folder, data in tree.items():
+              is_rr = any(k in top_folder.upper() for k in ["FALLOUT", "폴아웃"]) or any(k in top_folder for k in fallout_pack_names)
+              theme_key = "railroad" if is_rr else "ferry"
+              fid = "f-" + top_folder.replace(os.sep, '-')
+              main_contents[theme_key] += f"<div id='{fid}' class='cat-content' style='display:none;'>" + render_tree(top_folder, data, 0, is_rr, top_folder) + "</div>"
+              is_modpack = any(k in top_folder for k in skyrim_pack_names + fallout_pack_names) or "[모드팩]" in top_folder
+              category = "modpack" if is_modpack else "normal"
+              sidebar_data[theme_key][category] += f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {top_folder}</a>"
 
           with open('index.html', 'w', encoding='utf-8') as f:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
-              f.write("html { overflow-y: scroll; scroll-behavior: smooth; }") 
+              f.write("html { overflow-y: scroll; scroll-behavior: smooth; }")
               f.write("body { margin: 0; min-height: 100vh; background-color: #000; font-family: sans-serif; color: #eee; overflow-x: hidden; transition: 0.4s; }")
               smooth_grad = "linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 5%, rgba(0,0,0,0) 20%)"
               f.write(f".theme-ferry {{ background: {smooth_grad}, url('skyrim.png') center 10%/cover no-repeat fixed; }}")
@@ -93,16 +102,20 @@ jobs:
               f.write(".sidebar-link { display: block; color: #aaa; text-decoration: none !important; padding: 10px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }")
               f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active { color: #fff !important; text-shadow: 0 0 10px #fff; transform: translateX(5px); }")
               f.write(".theme-vault .sidebar-link:hover, .theme-vault .sidebar-link.active { color: #FFB000 !important; text-shadow: 0 0 10px #FFB000; transform: translateX(5px); }")
-              f.write(".file-link { text-decoration: none !important; font-weight: 500; transition: 0.3s; }")
-              f.write(".theme-ferry .file-link, .theme-ferry .file-link:visited { color: #fff; }")
+              f.write(".file-link { text-decoration: none !important; font-weight: 500; transition: 0.3s; color: inherit; }")
               f.write(".theme-ferry .file-link:hover { color: #fff !important; text-shadow: 0 0 15px #fff; }")
-              f.write(".theme-vault .file-link, .theme-vault .file-link:visited { color: #FFB000; }")
               f.write(".theme-vault .file-link:hover { color: #FFB000 !important; text-shadow: 0 0 15px #FFB000; }")
+              
+              # 높이 불균형 해결: 두 제목의 폰트 사이즈와 margin을 완전히 통일
               f.write(".main-area { margin-left: 420px; padding: 110px 60px 50px 0; position: relative; z-index: 10; }")
+              f.write(".main-title { font-size: 4.5em; margin: 0 0 10px 0; line-height: 1.1; font-weight: bold; }")
+              f.write("#t-f { color: #fff; } #t-v { color: #FFB000; }")
+
               f.write(".modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); }")
               f.write(".modal-content { background: #111; margin: 5% auto; padding: 50px; border: 1px solid; border-radius: 15px; width: 90%; max-width: 1000px; position: relative; max-height: 85vh; overflow-y: auto; box-sizing: border-box; word-break: keep-all; }")
               f.write("</style></head><body>")
 
+              # 가이드 및 후기
               f.write("<div id='guideModal' class='modal'><div class='modal-content' id='modal-c'><span style='position:absolute; top:20px; right:25px; font-size:28px; cursor:pointer; color:#666;' onclick='closeModal()'>&times;</span><h3 id='modal-t' style='margin-top:0; font-size:1.8em;'>📜 가이드 및 후기</h3><div style='color:#ddd; line-height:2; font-size:1.05em;'><p><strong>💡 이용 팁:</strong><br>")
               f.write("<span style='margin-bottom:12px; display:block;'>- 대부분의 파일은 HTML 양식으로 백업되어 있습니다. <strong>(기술적 한계로 영상은 출력되지 않습니다.)</strong></span>")
               f.write("<span style='margin-bottom:12px; display:block;'>- <strong>질문, 피드백, 로그</strong>의 경우 일일히 버전이나 문제 유형을 구분하기 어려워 <strong>폴더 하나에 구분없이 넣었습니다.</strong> 양해 바랍니다.</span>")
@@ -120,8 +133,11 @@ jobs:
               f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000; height:38px; display:inline-flex; align-items:center; gap:8px; padding:0 15px; vertical-align:middle;'><img src='railroad.jpg' style='width:20px; height:20px; object-fit:contain; filter:invert(1) brightness(1.5);'> Railroad (Fallout)</button></div>")
               f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc; margin-right:12px;' onclick='openModal()'>📖 가이드 & 후기</button><a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
+              sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #ffffff44; display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['ferry']['modpack']}</div></details>{sidebar_data['ferry']['normal']}"
+              srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; cursor:pointer; padding:5px 0; border-bottom:1px solid #FFB00044; display:flex; align-items:center;'><img src='railroad.jpg' style='width:45px; aspect-ratio:1/1; object-fit:contain; margin-right:10px; filter:invert(1) brightness(1.5);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
+
               f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + srr_final + "</div></div>")
-              f.write("<div class='main-area'><h1 id='t-f' style='color:#fff; font-size:4.5em; margin:0; display:none;'>Tullius's Ferry</h1><h1 id='t-v' style='color:#FFB000; font-size:4em; margin:0; display:none;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' style='width:100%; padding:15px; border-radius:30px; border:1px solid #444; background:rgba(255,255,255,0.05); color:#fff; margin:30px 0;' onkeyup='globalSearch()'><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
+              f.write("<div class='main-area'><h1 id='t-f' class='main-title' style='display:none;'>Tullius's Ferry</h1><h1 id='t-v' class='main-title' style='display:none;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' style='width:100%; padding:15px; border-radius:30px; border:1px solid #444; background:rgba(255,255,255,0.05); color:#fff; margin:20px 0;' onkeyup='globalSearch()'><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
 
               f.write("<script>")
               f.write("const canvas = document.getElementById('smokeCanvas'); const ctx = canvas.getContext('2d'); let particles = []; let themeColor = '#ffffff';")
@@ -132,7 +148,7 @@ jobs:
               f.write("class Particle { constructor(){ this.reset(); } reset(){ this.x = Math.random() * canvas.width; this.y = canvas.height + 150; this.size = Math.random() * 120 + 80; this.speedY = Math.random() * 0.7 + 0.4; this.speedX = Math.random() * 0.6 - 0.3; this.opacity = Math.random() * 0.15 + 0.05; this.rotation = Math.random() * Math.PI * 2; this.rotSpeed = Math.random() * 0.015 - 0.007; this.growth = Math.random() * 0.3 + 0.2; } update(){ this.y -= this.speedY; this.x += this.speedX + Math.sin(this.y * 0.005) * 0.5; this.size += this.growth; this.rotation += this.rotSpeed; this.opacity -= 0.0003; if(this.opacity <= 0 || this.y < -400) this.reset(); } draw(){ ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.globalCompositeOperation = 'screen'; let grad = ctx.createRadialGradient(0,0,0,0,0,this.size); grad.addColorStop(0, themeColor + Math.floor(this.opacity*255).toString(16).padStart(2,'0')); grad.addColorStop(0.5, themeColor + Math.floor(this.opacity*40).toString(16).padStart(2,'0')); grad.addColorStop(1, 'transparent'); ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(0,0,this.size,0,Math.PI*2); ctx.fill(); ctx.restore(); } }")
               f.write("function initSmoke(){ particles = []; for(let i=0; i<45; i++) particles.push(new Particle()); }")
               f.write("function animate(){ ctx.clearRect(0,0,canvas.width, canvas.height); particles.forEach(p=>{ p.update(); p.draw(); }); requestAnimationFrame(animate); }")
-              f.write("function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); document.getElementById(fid).style.display='block'; document.getElementById('l-'+fid).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }")
+              f.write("function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); if(document.getElementById(fid)) document.getElementById(fid).style.display='block'; if(document.getElementById('l-'+fid)) document.getElementById('l-'+fid).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }")
               f.write("function globalSearch(){ let q=document.getElementById('search-bar').value.toLowerCase(); document.querySelectorAll('.cat-content').forEach(cat=>{ let files=cat.querySelectorAll('.file-link'); let has=false; files.forEach(f=>{ let t=f.innerText.toLowerCase(); if(q===''||t.includes(q)){ f.parentElement.style.display='block'; has=true; } else f.parentElement.style.display='none'; }); cat.style.display=(q===''?'none':(has?'block':'none')); }); }")
               f.write("window.onresize = ()=>{ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }; canvas.width = window.innerWidth; canvas.height = window.innerHeight;")
               f.write("</script></body></html>")
@@ -143,5 +159,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "FIX: YAML structure, Railroad typo, Layout Shift, and Sidebar Visibility" || exit 0
+          git commit -m "FIX: Title Height Sync, Nested Folders, and Railroad UI" || exit 0
           git push origin main
