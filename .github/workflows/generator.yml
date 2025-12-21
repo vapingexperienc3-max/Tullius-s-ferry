@@ -73,9 +73,9 @@ jobs:
               f.write("<!DOCTYPE html><html lang='ko'><head><meta charset='UTF-8'><title>Tullius Archive</title><style>")
               f.write("body { margin: 0; min-height: 100vh; background-color: #000; font-family: sans-serif; color: #eee; overflow-x: hidden; transition: 0.4s; }")
               
-              # 🖼️ 배경 위치 수정: Vault 테마의 머리 짤림 해결을 위한 정밀 조정
+              # 🖼️ 배경 위치 긴급 수정: 줌(85%) 및 상단 고정(top 15%)으로 머리 짤림 해결
               f.write(".theme-ferry { background: linear-gradient(to top, #000 0%, transparent 60%), url('skyrim.png') center 10%/cover no-repeat fixed; }")
-              f.write(".theme-vault { background: linear-gradient(to top, #000 0%, transparent 60%), url('fallout.png') center 45%/110% no-repeat fixed; }")
+              f.write(".theme-vault { background: linear-gradient(to top, #000 0%, transparent 60%), url('fallout.png') right 5% top 15%/85% no-repeat fixed; }")
               
               f.write(".top-header { position: fixed; top: 0; left: 0; width: 100%; height: 70px; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; border-bottom: 2px solid rgba(255,255,255,0.1); }")
               f.write(".header-container { width: 100%; max-width: 1400px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; box-sizing: border-box; }")
@@ -89,7 +89,6 @@ jobs:
               f.write(".sidebar-nav { width: 330px; position: fixed; top: 110px; left: 40px; height: calc(100vh - 150px); background: rgba(0,0,0,0.85); border: 1px solid; border-radius: 8px; padding: 25px; overflow-y: auto; z-index: 100; opacity: 0; visibility: hidden; transition: 0.3s; box-sizing: border-box; }")
               f.write(".sidebar-nav.active { opacity: 1; visibility: visible; }")
               
-              # ✨ 유지: 사이드바/파일 발광 효과
               f.write(".sidebar-link { display: block; color: #aaa; text-decoration: none !important; padding: 10px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }")
               f.write(".file-link { text-decoration: none !important; font-weight: 500; transition: 0.3s; }")
               f.write(".theme-ferry .sidebar-link:hover, .theme-ferry .sidebar-link.active { color: #fff !important; text-shadow: 0 0 10px #fff; transform: translateX(5px); }")
@@ -109,7 +108,7 @@ jobs:
               f.write(".guide-line { margin-bottom: 12px; display: block; }")
               f.write("</style></head><body>")
               
-              # ✨ 유지: 은은한 연기 효과
+              # ✨ 유지: 연기 효과
               f.write("<canvas id='smokeCanvas' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;'></canvas>")
               f.write("<div id='welcome-screen'><img id='welcome-img' src='welcome page.png'><div class='welcome-text-box'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
 
@@ -146,5 +145,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Final Background Adjust and Effects Keep" || exit 0
+          git commit -m "Fix Fallout Background: Shrink zoom and Align top" || exit 0
           git push origin main
