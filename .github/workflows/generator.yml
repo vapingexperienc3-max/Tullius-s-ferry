@@ -49,7 +49,7 @@ jobs:
                   icon = "https://img.icons8.com/color/48/vault-boy.png" if is_vault else "ElderScroll.webp"
                   link_html = f"<a href='javascript:void(0)' onclick='showCat(\"{fid}\")' class='sidebar-link' id='l-{fid}'>- {display_name}</a>"
                   
-                  content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:20px;'><summary style='padding:15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='width:{'18px' if is_vault else '40px'}; margin-right:10px; vertical-align:middle;'>{display_name}</span></summary><ul style='margin:0; padding:15px 40px; list-style-type:square;'>"
+                  content_html = f"<div id='{fid}' class='cat-content' style='display:none;'><details open style='background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:20px;'><summary style='padding:15px; font-weight:bold; color:#fff; cursor:pointer; display:flex; align-items:center;'><span><img src='{icon}' style='width:{'18px' if is_vault else '65px'}; aspect-ratio: 1/1; object-fit: contain; margin-right:15px; vertical-align:middle;'>{display_name}</span></summary><ul style='margin:0; padding:15px 40px; list-style-type:square;'>"
                   for f_name in sorted(html_files):
                       path = os.path.join(root, f_name)
                       inject_width_style(path)
@@ -103,7 +103,7 @@ jobs:
               f.write("</style></head><body>")
               
               f.write("<canvas id='smokeCanvas' style='position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;'></canvas>")
-              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: calc(100vh - 70px); background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; text-shadow: 0 0 20px #000;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
+              f.write("<div id='welcome-screen' style='position: fixed; top: 70px; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 2000; overflow: hidden;'><img src='welcome page.png' style='width: 100%; height: 100%; object-fit: cover; object-position: center; filter: brightness(0.5);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; text-shadow: 0 0 20px #000;'><h1 style='color:#fff; font-size:3.5em; margin-bottom:10px;'>환영합니다, 드래곤본과 생존자 여러분</h1><p style='color:#ccc; font-size:1.6em;'>상단의 버튼을 누르면 아카이브로 연결됩니다</p></div></div>")
 
               f.write("<header class='top-header'><div class='header-container'><div>")
               f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff; margin-right:12px;'>🚣 Ferry (Skyrim)</button>")
