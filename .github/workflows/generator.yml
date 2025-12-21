@@ -172,16 +172,16 @@ jobs:
               f.write("    }); ")
               
               # 파일이 하나라도 있는 폴더(tree-node)는 펼치고 보여줌
-              f.write("    cat.querySelectorAll('.tree-node').forEach(node => { ")
-              f.write("      let nodeHasMatch = Array.from(node.querySelectorAll('li')).some(li => li.style.display !== 'none'); ")
-              f.write("      if(nodeHasMatch){ node.style.setProperty('display', 'block', 'important'); node.querySelector('details').open = true; } ")
-              f.write("      else { node.style.setProperty('display', 'none', 'important'); } ")
-              f.write("    }); ")
+              f.write("     cat.querySelectorAll('.tree-node').forEach(node => { ")
+              f.write("       let nodeHasMatch = Array.from(node.querySelectorAll('li')).some(li => li.style.display !== 'none'); ")
+              f.write("       if(nodeHasMatch){ node.style.setProperty('display', 'block', 'important'); node.querySelector('details').open = true; } ")
+              f.write("       else { node.style.setProperty('display', 'none', 'important'); } ")
+              f.write("     }); ")
               
               # 카테고리 자체의 노출 여부 결정
-              f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
-              f.write("  }); ")
-              f.write("} ")
+              f.write("     cat.style.display = catHasMatch ? 'block' : 'none'; ")
+              f.write("   }); ")
+              f.write("}  ")
               
               f.write("</script></body></html>")
           EOF
