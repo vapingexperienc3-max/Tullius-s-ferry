@@ -103,7 +103,7 @@ jobs:
               f.write(".sidebar-link-v:hover, .sidebar-link-v.active { color:#FFB000 !important; padding-left:15px; text-shadow: 0 0 10px rgba(255,176,0,0.8), 0 0 20px rgba(255,100,0,0.5); }")
               f.write(".top-header { position:fixed; top:0; left:0; width:100%; height:70px; background:rgba(0,0,0,0.95); display:flex; align-items:center; justify-content:center; line-height: 1; z-index:1000; border-bottom:2px solid rgba(255,255,255,0.1); backdrop-filter:blur(5px); }")
               f.write(".header-container { width:100%; max-width:1400px; display:flex; justify-content:space-between; align-items:center; padding:0 40px; box-sizing:border-box; }")
-              f.write(".header-btn { background:rgba(255,255,255,0.03); border:1px solid; border-radius:6px; " padding:0 18px; height:42px; font-weight:bold; font-size:0.95em;  display:inline-flex; align-items:center; gap:8px; transition:0.3s; cursor:pointer; color:inherit !important; }")
+              f.write(".header-btn { background:rgba(255,255,255,0.03); border:1px solid; border-radius:6px; padding:0 18px; height:42px; font-weight:bold; font-size:0.95em; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:0.3s; cursor:pointer; color:inherit !important; line-height:1; box-sizing:border-box; }")
               f.write("#btn-f:hover { background:rgba(255,255,255,0.15) !important; border-color:#fff !important; box-shadow: 0 0 15px #fff; transform:translateY(-2px); }")
               f.write("#btn-v:hover { background:rgba(255,176,0,0.15) !important; border-color:#FFB000 !important; box-shadow: 0 0 15px #FFB000; transform:translateY(-2px); }")
               f.write(".sidebar-nav { width:330px; position:fixed; top:110px; left:40px; height:calc(100vh - 150px); background:rgba(0,0,0,0.85); border:1px solid #444; border-radius:8px; padding:25px; overflow-y:auto; z-index:100; opacity:0; visibility:hidden; transition:0.3s; box-sizing:border-box; }")
@@ -127,8 +127,15 @@ jobs:
 
               # 헤더
               f.write("<header class='top-header'><div class='header-container'><div>")
-              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff;'><img src='ship.PNG' style='width:22px; filter:invert(1) brightness(2); vertical-align:middle;'> Ferry (Skyrim)</button>")
-              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'><img src='railroad.png' style='width:18px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg); vertical-align:middle; margin-top:-2px;'> Railroad (Fallout)</button></div>")
+              # 1. 스카이림 버튼 (기존의 아이콘 크기와 필터 효과를 유지하면서 정렬만 개선)
+              f.write("<button class='header-btn' id='btn-f' onclick='triggerTheme(\"ferry\")' style='border-color:#fff; color:#fff;'>")
+              f.write("<img src='ship.PNG' style='height:22px; width:auto; display:block; filter:invert(1) brightness(2);'>")
+              f.write("<span style='line-height:1;'>Ferry (Skyrim)</span></button>")
+
+              # 2. 폴아웃 버튼 (기존의 아이콘 크기와 Railroad 특유의 색상 필터를 유지)
+              f.write("<button class='header-btn' id='btn-v' onclick='triggerTheme(\"vault\")' style='border-color:#FFB000; color:#FFB000;'>")
+              f.write("<img src='railroad.png' style='height:18px; width:auto; display:block; filter:invert(1) sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.1);'>")
+              f.write("<span style='line-height:1;'>Railroad (Fallout)</span></button>")
               f.write("<div><button class='header-btn' style='border-color:#ccc; color:#ccc;' onclick='openModal()'>📖 가이드 & 후기</button>")
               f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
