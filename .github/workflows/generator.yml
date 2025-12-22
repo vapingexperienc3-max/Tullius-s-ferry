@@ -164,7 +164,7 @@ jobs:
               f.write("    cats.forEach(cat => { ")
               f.write("      cat.style.display = 'none'; ")
               f.write("      cat.querySelectorAll('li, .tree-node').forEach(el => el.style.display = 'block'); ")
-              f.write("      cat.querySelectorAll('details').forEach(d => d.open = true); ") // 모든 폴더 펼침
+              f.write("      cat.querySelectorAll('details').forEach(d => d.open = true); ")
               f.write("    }); ")
               f.write("    switchTheme(currentTheme); ")
               f.write("    return; ")
@@ -185,7 +185,7 @@ jobs:
               f.write("      let nodeHasMatch = Array.from(node.querySelectorAll('li')).some(li => li.style.display !== 'none'); ")
               f.write("      if(nodeHasMatch){ ")
               f.write("        node.style.setProperty('display', 'block', 'important'); ")
-              f.write("        node.querySelector('details').open = true; ") // 매칭된 결과가 있으면 펼침
+              f.write("        node.querySelector('details').open = true; ")
               f.write("      } else { ")
               f.write("        node.style.setProperty('display', 'none', 'important'); ")
               f.write("      } ")
