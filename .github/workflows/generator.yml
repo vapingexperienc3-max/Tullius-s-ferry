@@ -155,40 +155,37 @@ jobs:
               # [검색 알고리즘 핵심 수정]
               f.write("function globalSearch(){ ")
               f.write("  let q = document.getElementById('search-bar').value.toLowerCase(); ")
-              f.write("  let targetID = (currentTheme === 'ferry') ? 'a-ferry' : 'a-vault'; ") # 현재 테마 영역만 타겟
-              f.write("  let otherID = (currentTheme === 'ferry') ? 'a-vault' : 'a-ferry'; ")
-              f.write("  document.getElementById(otherID).style.display = 'none'; ") # 다른 테마는 숨김 유지
-              
-              f.write("  if(q === ''){ switchTheme(currentTheme); return; } ") # 검색어 없으면 초기화
-              
+              f.write("  let targetID = (currentTheme === 'ferry') ? 'a-ferry' : 'a-vault'; ")
               f.write("  let container = document.getElementById(targetID); ")
-              f.write("  container.style.display = 'block'; ")
-              
-              # 모든 카테고리(cat-content) 일단 다 뒤져서 결과가 있는지 확인
               f.write("  let cats = container.querySelectorAll('.cat-content'); ")
+              f.write("  ")
+              f.write("  if(q === ''){ ") 
+              # 검색어가 비었을 때: 모든 카테고리를 숨기고, 내부 파일/노드를 전부 'block'으로 초기화
+              f.write("    cats.forEach(cat => { ")
+              f.write("      cat.style.display = 'none'; ")
+              f.write("      cat.querySelectorAll('li, .tree-node').forEach(el => el.style.display = 'block'); ")
+              f.write("      cat.querySelectorAll('details').forEach(d => d.open = false); ") # 검색 끝나면 폴더 다시 닫기
+              f.write("    }); ")
+              f.write("    return; ")
+              f.write("  } ")
+              f.write("  ")
+              f.write("  container.style.display = 'block'; ")
               f.write("  cats.forEach(cat => { ")
               f.write("    let fileLinks = cat.querySelectorAll('a[class^=\"file-link-\"]'); ")
               f.write("    let catHasMatch = false; ")
-              
-              # 파일들 필터링
               f.write("    fileLinks.forEach(a => { ")
               f.write("      let li = a.parentElement; ")
               f.write("      if(a.innerText.toLowerCase().includes(q)){ li.style.setProperty('display', 'block', 'important'); catHasMatch = true; } ")
               f.write("      else { li.style.setProperty('display', 'none', 'important'); } ")
               f.write("    }); ")
-              
-              # 파일이 하나라도 있는 폴더(tree-node)는 펼치고 보여줌
               f.write("    cat.querySelectorAll('.tree-node').forEach(node => { ")
               f.write("      let nodeHasMatch = Array.from(node.querySelectorAll('li')).some(li => li.style.display !== 'none'); ")
               f.write("      if(nodeHasMatch){ node.style.setProperty('display', 'block', 'important'); node.querySelector('details').open = true; } ")
               f.write("      else { node.style.setProperty('display', 'none', 'important'); } ")
               f.write("    }); ")
-              
-              # 카테고리 자체의 노출 여부 결정
               f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
               f.write("  }); ")
               f.write("} ")
-              
               f.write("</script></body></html>")
           EOF
 
