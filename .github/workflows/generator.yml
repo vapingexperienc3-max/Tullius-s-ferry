@@ -162,7 +162,7 @@ jobs:
               f.write("  if(q === ''){ ")
               f.write("    // 검색어 비울 시: 모든 요소를 보이고 '모든 폴더를 펼침' 상태로 초기화 ")
               f.write("    cats.forEach(cat => { ")
-              f.write("      cat.style.display = 'none'; ") // 카테고리 선택 전까지는 숨김 (기존 방식 유지)
+              f.write("      cat.style.display = 'none'; ")
               f.write("      cat.querySelectorAll('li, .tree-node').forEach(el => el.style.display = 'block'); ")
               f.write("      cat.querySelectorAll('details').forEach(d => d.open = true); ") // 모든 폴더 펼침
               f.write("    }); ")
