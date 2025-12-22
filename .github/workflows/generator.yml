@@ -149,7 +149,7 @@ jobs:
               f.write("function openModal(){ document.getElementById('guideModal').style.display='block'; }")
               f.write("function closeModal(){ document.getElementById('guideModal').style.display='none'; }")
               
-              f.write("function triggerTheme(m){ currentTheme = m; themeColor = (m==='ferry') ? '#ffffff' : '#FFB000';"
+              f.write("function triggerTheme(m){ currentTheme = m; themeColor = (m==='ferry') ? '#ffffff' : '#FFB000'; }")
               f.write("document.getElementById('welcome-screen').style.display='none'; document.getElementById('main-wrapper').style.display='flex';")
               f.write("switchTheme(m); document.getElementById('main-lnb').classList.add('active'); initSmoke(); }")
               
