@@ -213,23 +213,25 @@ jobs:
               f.write("} ")
               # 중괄호 충돌을 방지하기 위해 f-string 대신 % 포맷팅을 사용합니다.
               # %s 자리에 json.dumps(link_map) 데이터가 들어갑니다.
-              resolver_js = r"""
-const backupLinkMap = %s;
-document.addEventListener('click', function(e) {
-    const a = e.target.closest('a');
-    if (a && a.href && a.href.includes('arca.live')) {
-        try {
-            const m = a.href.match(/\/(\d+)(\?|$)/);
-            if (m && backupLinkMap[m[1]]) {
-                e.preventDefault();
-                let targetPath = backupLinkMap[m[1]].replace(/\\/g, '/');
-                const baseUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-                window.location.href = baseUrl + encodeURI(targetPath);
-            }
-        } catch(err) { console.error("Resolver Error:", err); }
-    }
-}, true);
-""" % json.dumps(link_map)
+              f.write("} ")
+              # 이 버전은 파이썬 들여쓰기 라인을 그대로 따라갑니다.
+              resolver_js = """
+              const backupLinkMap = %s;
+              document.addEventListener('click', function(e) {
+                  const a = e.target.closest('a');
+                  if (a && a.href && a.href.includes('arca.live')) {
+                      try {
+                          const m = a.href.match(/\/(\d+)(\\?|$)/);
+                          if (m && backupLinkMap[m[1]]) {
+                              e.preventDefault();
+                              let targetPath = backupLinkMap[m[1]].replace(/\\\\/g, '/');
+                              const baseUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+                              window.location.href = baseUrl + encodeURI(targetPath);
+                          }
+                      } catch(err) { console.error("Resolver Error:", err); }
+                  }
+              }, true);
+              """ % json.dumps(link_map)
 
               # 위에서 이미 <script>를 열었으므로 내용만 쓰고 </script>로 닫습니다.
               f.write(resolver_js)
