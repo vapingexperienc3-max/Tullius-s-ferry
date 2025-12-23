@@ -4,9 +4,15 @@ document.addEventListener('click', function(e) {
     const a = e.target.closest('a');
     if (a && a.href && a.href.includes('arca.live')) {
         try {
+            // 1. 주소창 숫자 추출
             const parts = a.href.split('/');
             const lastPart = parts[parts.length - 1].split('?')[0];
-            const articleId = lastPart.replace(/[^0-9]/g, '');
+            let articleId = lastPart.replace(/[^0-9]/g, '');
+            
+            // 2. 텍스트 숫자 추출 (낚시 링크 방어)
+            const textNum = a.innerText.replace(/[^0-9]/g, '');
+            if (textNum.length >= 8) { articleId = textNum; }
+            
             if (articleId && backupLinkMap[articleId]) {
                 e.preventDefault();
                 let targetPath = backupLinkMap[articleId];
