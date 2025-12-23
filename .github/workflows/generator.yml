@@ -200,7 +200,7 @@ jobs:
               f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
               f.write("  }); ")
               f.write("} ")
-              r# 중괄호 충돌을 방지하기 위해 f-string 대신 % 포맷팅을 사용합니다.
+              # 중괄호 충돌을 방지하기 위해 f-string 대신 % 포맷팅을 사용합니다.
               # %s 자리에 json.dumps(link_map) 데이터가 들어갑니다.
               resolver_js = """
               const backupLinkMap = %s;
