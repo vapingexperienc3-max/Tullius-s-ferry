@@ -199,21 +199,23 @@ jobs:
               f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
               f.write("  }); ")
               f.write("} ")
-              resolver_script = f"""
-              const backupLinkMap = {json.dumps(link_map)};
-              document.addEventListener('click', function(e) {{
+              r# 중괄호 충돌을 방지하기 위해 f-string 대신 % 포맷팅을 사용합니다.
+              # %s 자리에 json.dumps(link_map) 데이터가 들어갑니다.
+              resolver_js = """
+              const backupLinkMap = %s;
+              document.addEventListener('click', function(e) {
                   const a = e.target.closest('a');
-                  if (a && a.href.includes('arca.live')) {{
+                  if (a && a.href.includes('arca.live')) {
                       const m = a.href.match(/arca\\.live\\/b\\/[^/]+\\/(\\d+)/);
-                      if (m && backupLinkMap[m[1]]) {{
+                      if (m && backupLinkMap[m[1]]) {
                           e.preventDefault();
                           window.location.href = './' + backupLinkMap[m[1]];
-                      }}
-                  }}
-              }}, true);
-              """
-              # f.write 안에 직접 넣을 때 중괄호를 조심해야 합니다. 아래 방식이 가장 안전합니다.
-              f.write(f"<script>{resolver_script}</script>")
+                      }
+                  }
+              }, true);
+              """ % json.dumps(link_map)
+
+              f.write("<script>" + resolver_js + "</script>")
               f.write("</body></html>")
           EOF
 
