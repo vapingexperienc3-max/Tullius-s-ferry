@@ -30,6 +30,7 @@ jobs:
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
+                      # 바로 윗줄(content)과 왼쪽 끝 시작 위치를 자석처럼 딱 맞춰야 합니다!
                       url_match = re.search(r'url: https://arca\.live/b/[^/]+/(\d+)', content[:1000])
                       if url_match:
                           article_id = url_match.group(1)
