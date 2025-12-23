@@ -29,11 +29,11 @@ jobs:
               style_code = """<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
-                       content = f.read()
-                       url_match = re.search(r'url: https://arca\.live/b/[^/]+/(\d+)', content[:1000])
-                       if url_match:
-                           article_id = url_match.group(1)                         
-                           link_map[article_id] = filepath.replace("\\", "/").replace("./", "")
+                      content = f.read()
+                      url_match = re.search(r'url: https://arca\.live/b/[^/]+/(\d+)', content[:1000])
+                      if url_match:
+                          article_id = url_match.group(1)
+                          link_map[article_id] = filepath.replace("\\", "/").replace("./", "")
                  
                   for nick in ["Ryl3", "ryl3", "RYL3"]: content = content.replace(nick, "")
                   if '<head>' in content: content = content.replace('<head>', '<head>' + style_code)
