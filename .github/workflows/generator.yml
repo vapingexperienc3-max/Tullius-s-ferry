@@ -21,12 +21,20 @@ jobs:
         run: |
           python <<'EOF'
           import os
-
+          import re    # 추가: 게시글 번호를 찾기 위한 도구
+          import json  # 추가: 찾은 번호들을 리스트로 저장하기 위한 도구
+          
+          link_map = {}
           def inject_width_style(filepath):
               style_code = """<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
-                      content = f.read()
+                       content = f.read()
+                       url_match = re.search(r'url: https://arca\.live/b/[^/]+/(\d+)', content[:1000])
+                       if url_match:
+                           article_id = url_match.group(1)                         
+                           link_map[article_id] = filepath.replace("\\", "/").replace("./", "")
+                 
                   for nick in ["Ryl3", "ryl3", "RYL3"]: content = content.replace(nick, "")
                   if '<head>' in content: content = content.replace('<head>', '<head>' + style_code)
                   with open(filepath, 'w', encoding='utf-8') as f: f.write(content)
@@ -191,7 +199,22 @@ jobs:
               f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
               f.write("  }); ")
               f.write("} ")
-              f.write("</script></body></html>")
+              resolver_script = f"""
+              const backupLinkMap = {json.dumps(link_map)};
+              document.addEventListener('click', function(e) {{
+                  const a = e.target.closest('a');
+                  if (a && a.href.includes('arca.live')) {{
+                      const m = a.href.match(/arca\\.live\\/b\\/[^/]+\\/(\\d+)/);
+                      if (m && backupLinkMap[m[1]]) {{
+                          e.preventDefault();
+                          window.location.href = './' + backupLinkMap[m[1]];
+                      }}
+                  }}
+              }}, true);
+              """
+              # f.write 안에 직접 넣을 때 중괄호를 조심해야 합니다. 아래 방식이 가장 안전합니다.
+              f.write(f"<script>{resolver_script}</script>")
+              f.write("</body></html>")
           EOF
 
       - name: Commit and Push
