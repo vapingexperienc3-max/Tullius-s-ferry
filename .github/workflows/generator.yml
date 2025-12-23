@@ -196,7 +196,7 @@ jobs:
 
               f.write("function showCat(fid){ document.querySelectorAll('.cat-content').forEach(c=>c.style.display='none'); document.querySelectorAll('.sidebar-link').forEach(l=>l.classList.remove('active')); const target = document.getElementById(fid); if(target) target.style.display='block'; const link = document.getElementById('l-'+fid); if(link) link.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }")
               
-              # 5. 검색 로직
+              # 5. 검색 로직 (기존 코드 유지)
               f.write("function globalSearch(){ ")
               f.write("  let q = document.getElementById('search-bar').value.toLowerCase(); ")
               f.write("  let targetID = (currentTheme === 'ferry') ? 'a-ferry' : 'a-vault'; ")
@@ -210,29 +210,32 @@ jobs:
               f.write("    cat.querySelectorAll('.tree-node').forEach(node => { let nodeHasMatch = Array.from(node.querySelectorAll('li')).some(li => li.style.display !== 'none'); if(nodeHasMatch){ node.style.setProperty('display', 'block', 'important'); node.querySelector('details').open = true; } else { node.style.setProperty('display', 'none', 'important'); } }); ")
               f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
               f.write("  }); ")
-              f.write("} ")
-              # 중괄호 충돌을 방지하기 위해 f-string 대신 % 포맷팅을 사용합니다.
-              # %s 자리에 json.dumps(link_map) 데이터가 들어갑니다.
-              f.write("} ")
-              # 이 버전은 파이썬 들여쓰기 라인을 그대로 따라갑니다.
+              f.write("} \n") # globalSearch 함수 끝
+
+              # 링크 리졸버 로직 시작
               f.write("const backupLinkMap = " + json.dumps(link_map) + ";\n")
               f.write("document.addEventListener('click', function(e) {\n")
               f.write("    const a = e.target.closest('a');\n")
               f.write("    if (a && a.href && a.href.includes('arca.live')) {\n")
               f.write("        try {\n")
-              f.write("            // 역슬래시 문제를 피하기 위해 new RegExp를 사용합니다.\n")
-              f.write("            const re = new RegExp('/(\\\\d+)(\\\\?|$)');\n")
-              f.write("            const m = a.href.match(re);\n")
-              f.write("            if (m && backupLinkMap[m[1]]) {\n")
+              f.write("            const parts = a.href.split('/');\n")
+              f.write("            const lastPart = parts[parts.length - 1].split('?')[0];\n")
+              f.write("            const articleId = lastPart.replace(/[^0-9]/g, '');\n")
+              f.write("            if (articleId && backupLinkMap[articleId]) {\n")
               f.write("                e.preventDefault();\n")
-              f.write("                let targetPath = backupLinkMap[m[1]].replace(/\\\\\\\\/g, '/');\n")
+              f.write("                let targetPath = backupLinkMap[articleId];\n")
+              f.write("                targetPath = targetPath.split('\\\\').join('/');\n")
               f.write("                const baseUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');\n")
               f.write("                window.location.href = baseUrl + encodeURI(targetPath);\n")
               f.write("            }\n")
               f.write("        } catch(err) { console.error('Resolver Error:', err); }\n")
               f.write("    }\n")
               f.write("}, true);\n")
-              f.write("</script></body></html>")
+
+              # 마지막에 딱 한 번만 닫아줍니다.
+              f.write("</script>\n")
+              f.write("</body>\n")
+              f.write("</html>")
 
               # 위에서 이미 <script>를 열었으므로 내용만 쓰고 </script>로 닫습니다.
               f.write("</script>")
