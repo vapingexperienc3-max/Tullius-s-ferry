@@ -207,11 +207,20 @@ jobs:
               document.addEventListener('click', function(e) {
                   const a = e.target.closest('a');
                   if (a && a.href && a.href.includes('arca.live')) {
-                      const m = a.href.match(/arca\.live\/b\/[^/]+\/(\d+)/);
-                      if (m && backupLinkMap[m[1]]) {
-                          e.preventDefault();
-                          window.location.href = './' + backupLinkMap[m[1]];
-                      }
+                      // URL 객체를 사용해 파라미터(?...)를 제외한 순수 경로에서 번호만 추출합니다.
+                      try {
+                          const urlObj = new URL(a.href);
+                          const path = urlObj.pathname;
+                          const match = path.match(/\/(\d+)/);
+                          
+                          if (match && backupLinkMap[match[1]]) {
+                              e.preventDefault();
+                              // 경로가 \\로 되어 있을 경우를 대비해 /로 치환합니다.
+                              let targetPath = backupLinkMap[match[1]].replace(/\\\\/g, '/');
+                              // 현재 위치 기준 상대 경로로 이동 (./ 추가)
+                              window.location.href = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + targetPath;
+                          }
+                      } catch(err) { console.error("Link resolver error:", err); }
                   }
               }, true);
               """ % json.dumps(link_map)
