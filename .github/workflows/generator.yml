@@ -235,7 +235,6 @@ jobs:
               f.write("</script></body></html>")
 
               # 위에서 이미 <script>를 열었으므로 내용만 쓰고 </script>로 닫습니다.
-              f.write(resolver_js)
               f.write("</script>")
               f.write("</body></html>")
           EOF
