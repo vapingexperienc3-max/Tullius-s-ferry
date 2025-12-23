@@ -215,23 +215,22 @@ jobs:
               # %s 자리에 json.dumps(link_map) 데이터가 들어갑니다.
               f.write("} ")
               # 이 버전은 파이썬 들여쓰기 라인을 그대로 따라갑니다.
-              resolver_js = """
-              const backupLinkMap = %s;
-              document.addEventListener('click', function(e) {
-                  const a = e.target.closest('a');
-                  if (a && a.href && a.href.includes('arca.live')) {
-                      try {
-                          const m = a.href.match(/\/(\d+)(\\?|$)/);
-                          if (m && backupLinkMap[m[1]]) {
-                              e.preventDefault();
-                              let targetPath = backupLinkMap[m[1]].replace(/\\\\/g, '/');
-                              const baseUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
-                              window.location.href = baseUrl + encodeURI(targetPath);
-                          }
-                      } catch(err) { console.error("Resolver Error:", err); }
-                  }
-              }, true);
-              """ % json.dumps(link_map)
+              f.write("const backupLinkMap = " + json.dumps(link_map) + ";\n")
+              f.write("document.addEventListener('click', function(e) {\n")
+              f.write("    const a = e.target.closest('a');\n")
+              f.write("    if (a && a.href && a.href.includes('arca.live')) {\n")
+              f.write("        try {\n")
+              f.write("            const m = a.href.match(/\/(\d+)(\\\\?|$)/);\n")
+              f.write("            if (m && backupLinkMap[m[1]]) {\n")
+              f.write("                e.preventDefault();\n")
+              f.write("                let targetPath = backupLinkMap[m[1]].replace(/\\\\\\\\/g, '/');\n")
+              f.write("                const baseUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');\n")
+              f.write("                window.location.href = baseUrl + encodeURI(targetPath);\n")
+              f.write("            }\n")
+              f.write("        } catch(err) { console.error('Resolver Error:', err); }\n")
+              f.write("    }\n")
+              f.write("}, true);\n")
+              f.write("</script></body></html>")
 
               # 위에서 이미 <script>를 열었으므로 내용만 쓰고 </script>로 닫습니다.
               f.write(resolver_js)
