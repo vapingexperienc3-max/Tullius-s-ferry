@@ -36,7 +36,7 @@ jobs:
                           print(f"Mapped: {article_id} -> {rel_path}")
 
           def inject_width_style(filepath, link_map_data):
-              """개별 게시물 가공: 닉네임 삭제, 스타일 주입, 리졸버 삽입"""
+              """개별 게시글 가공 로직 시작"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
