@@ -45,7 +45,7 @@ jobs:
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
-                 style_rules = [
+                  style_rules = [
                       "body, .fr-view, #content, .main-container, .article-content, div[class*='content'] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 20px !important; background-color: #1a1a1a !important; color: #eee !important; box-sizing: border-box !important; }",
                       "img, video, iframe { max-width: 100% !important; height: auto !important; display: block; margin: 15px auto; }",
                       "table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; word-break: break-all !important; }",
