@@ -53,7 +53,6 @@ jobs:
                       return
 
                   link_map_json = json.dumps(link_map_data)
-                  # 들여쓰기 영향을 안 받도록 리스트로 관리 후 합침
                   code_lines = [
                       '<style>',
                       'body, .fr-view, #content, .main-container, .article-content { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; }',
@@ -61,27 +60,29 @@ jobs:
                       '</style>',
                       '<script>',
                       '(function() {',
-                      f'    console.log("🚀 Resolver Loaded for: " + window.location.pathname);',
+                      '    console.log("🚀 Resolver Ready");',
                       f'    const backupLinkMap = {link_map_json};',
-                      '    function handleLink(e) {',
-                      "        const a = e.target.closest('a');",
-                      "        if (!a || !a.href || a.href.indexOf('arca.live') === -1) return;",
-                      "        const parts = a.href.split('/');",
-                      "        const lastPart = parts[parts.length - 1].split('?')[0].split('#')[0];",
-                      "        const articleId = lastPart.replace(/[^0-9]/g, '');",
+                      '    document.addEventListener("click", function(e) {',
+                      '        const a = e.target.closest("a");',
+                      '        if (!a || !a.href || a.href.indexOf("arca.live") === -1) return;',
+                      '',
+                      '        const parts = a.href.split("/");',
+                      '        const lastPart = parts[parts.length - 1].split("?")[0].split("#")[0];',
+                      '        const articleId = lastPart.replace(/[^0-9]/g, "");',
+                      '',
                       '        if (articleId && backupLinkMap[articleId]) {',
                       '            e.preventDefault(); e.stopImmediatePropagation();',
                       '            const repoName = "Tullius-ferry";',
                       '            const path = window.location.pathname;',
-                      '            const repoBase = path.substring(0, path.toLowerCase().indexOf(repoName.toLowerCase()) + repoName.length);',
-                      "            const targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');",
+                      '            const repoIdx = path.toLowerCase().indexOf(repoName.toLowerCase());',
+                      '            if (repoIdx === -1) return;',
+                      '            const repoBase = path.substring(0, repoIdx + repoName.length);',
+                      '            const targetPath = backupLinkMap[articleId].replace(/\\\\/g, "/");',
                       '            const finalUrl = window.location.origin + repoBase + "/" + encodeURI(targetPath);',
-                      "            console.log('✅ Redirecting:', finalUrl);",
-                      '            window.location.href = finalUrl; return false;',
+                      '            console.log("✅ Redirecting:", finalUrl);',
+                      '            window.location.href = finalUrl;',
                       '        }',
-                      '    }',
-                      "    document.addEventListener('click', handleLink, true);",
-                      "    document.addEventListener('mousedown', handleLink, true);",
+                      '    }, true);',
                       '})();',
                       '</script>'
                   ]
@@ -93,13 +94,10 @@ jobs:
                   else:
                       content = combined_code + content
 
-                  # 4. 최종 결과 저장
-                  with open(filepath, 'w', encoding='utf-8') as f:
+                  # 4. 최종 결과 저장 및 에러 처리
+                  with open(filepath, "w", encoding="utf-8") as f:
                       f.write(content)
-                  # f-string 시작 (따옴표 안쪽 내용은 YAML이 간섭하지 않도록 한 칸 더 들여씀)
-                  
               except Exception as e:
-                  # f-string의 중괄호 꼬임을 방지하기 위해 .format() 방식을 사용합니다.
                   print("❌ Error in {0}: {1}".format(filepath, e))
                   
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
