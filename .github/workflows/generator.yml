@@ -42,65 +42,74 @@ jobs:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
                   
-                  # 닉네임 제거
+                  # 1. 닉네임 제거
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
+                  # 중복 주입 방지
                   if 'backupLinkMap' in content:
                       with open(filepath, 'w', encoding='utf-8') as f:
                           f.write(content)
                       return
 
                   link_map_json = json.dumps(link_map_data)
-                  combined_code = f"""
-              <style>
-                  body, .fr-view, #content, .main-container, .article-content, div[class*="content"] {{ 
-                      max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
-                  }} 
-                  img {{ max-width: 100% !important; height: auto !important; }}
-              </style>
-              <script>
-                  (function() {{
-                      const backupLinkMap = {link_map_json};
-                      document.addEventListener('click', function(e) {{
-                          const a = e.target.closest('a');
-                          if (!a || !a.href || !a.href.includes('arca.live')) return;
-
-                          const parts = a.href.split('/');
-                          const lastPart = parts[parts.length - 1].split('?')[0];
-                          let articleId = lastPart.replace(/[^0-9]/g, '');
-                          
-                          if (articleId && backupLinkMap[articleId]) {{
-                              e.preventDefault();
-                              e.stopPropagation();
-                              
-                              const repoName = "Tullius-ferry";
-                              const path = window.location.pathname;
-                              const repoBase = path.substring(0, path.toLowerCase().indexOf(repoName.toLowerCase()) + repoName.length);
-                              
-                              const targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');
-                              const finalUrl = window.location.origin + repoBase + "/" + encodeURI(targetPath);
-                              
-                              console.log("Redirecting to:", finalUrl);
-                              window.location.href = finalUrl;
-                          }}
-                      }}, true);
-                  }})();
-              </script>
-              """
-                  # HTML 헤더에 코드 주입
-                  if '<head>' in content.lower():
-                      if '<head>' in content:
-                          content = content.replace('<head>', '<head>' + combined_code)
-                      else:
-                          content = content.replace('<HEAD>', '<HEAD>' + combined_code)
                   
+                  # 스크립트 시작 부분에 "Loaded" 로그를 넣어 주입 확인 기능을 추가했습니다.
+                  combined_code = f""
+              <style>
+        body, .fr-view, #content, .main-container, .article-content {{ 
+            max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
+        }}
+        img {{ max-width: 100% !important; height: auto !important; }}
+    </style>
+    <script>
+        (function() {{
+            console.log("🚀 Resolver Loaded for: " + window.location.pathname);
+            const backupLinkMap = {link_map_json};
+            
+            function handleLink(e) {{
+                const a = e.target.closest('a');
+                if (!a || !a.href || a.href.indexOf('arca.live') === -1) return;
+
+                const parts = a.href.split('/');
+                const lastPart = parts[parts.length - 1].split('?')[0].split('#')[0];
+                const articleId = lastPart.replace(/[^0-9]/g, '');
+                
+                if (articleId && backupLinkMap[articleId]) {{
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    
+                    const repoName = "Tullius-ferry";
+                    const path = window.location.pathname;
+                    const repoBase = path.substring(0, path.toLowerCase().indexOf(repoName.toLowerCase()) + repoName.length);
+                    
+                    const targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');
+                    const finalUrl = window.location.origin + repoBase + "/" + encodeURI(targetPath);
+                    
+                    console.log("✅ Redirecting to backup:", finalUrl);
+                    window.location.href = finalUrl;
+                    return false;
+                }}
+            }}
+            document.addEventListener('click', handleLink, true);
+            document.addEventListener('mousedown', handleLink, true);
+        }})();
+    </script>
+    """
+                  # 3. HTML 헤더에 코드 주입
+                  if '<head>' in content:
+                      content = content.replace('<head>', '<head>' + combined_code)
+                  elif '<HEAD>' in content:
+                      content = content.replace('<HEAD>', '<HEAD>' + combined_code)
+                  else:
+                      content = combined_code + content
+
+                  # 4. 최종 결과 저장
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                       
               except Exception as e:
-                  # f-string 출력 형식 수정
-                  print(f"❌ Error processing {{filepath}}: {{e}}")
+                  print(f"❌ Error in {{filepath}}: {{e}}")
                   
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
