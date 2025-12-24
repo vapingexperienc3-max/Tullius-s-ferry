@@ -24,7 +24,7 @@ jobs:
           import re
           import urllib.parse
 
-         # 1. 매핑 준비 및 함수 정의
+          # 1. 매핑 준비 및 함수 정의
           link_map = {}
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
@@ -82,7 +82,7 @@ jobs:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
                       inject_width_style(full_p, link_map)
-                  
+
           # 4. 트리 생성 및 인덱스 제작 로직 시작
           tree = {}
           for root, dirs, files in sorted(os.walk('.')):
