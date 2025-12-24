@@ -30,26 +30,43 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data=None):
-              # 백업 2의 순정 스타일 (100% 너비로 시원하게 보기)
+              # 1. 원본 느낌을 살리기 위해 불필요한 레이아웃 파괴 코드를 모두 제거
+              # 아카라이브 기본 폰트와 레이아웃이 깨지지 않게 최소한의 설정만 합니다.
               style_code = """
-              <style id="final-v2-style">
-                body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
-                  max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
+              <style id="original-recovery">
+                /* 전체 배경과 기본 폰트 설정 유지 */
+                body { background-color: #f8f9fa !important; margin: 0 !important; }
+                
+                /* 본문 영역만 중앙 정렬 및 너비 확보 */
+                .fr-view, .article-content, #content, .main-container { 
+                  max-width: 1100px !important; 
+                  width: 95% !important; 
+                  margin: 0 auto !important; 
+                  padding: 20px !important;
+                  background: #fff !important; /* 문서 같은 느낌을 위해 배경 흰색 */
+                  box-shadow: 0 0 10px rgba(0,0,0,0.1) !important; /* 종이 같은 느낌 */
                 }
+
+                /* 이미지/표는 본문 안에서만 놀게 함 */
                 img { max-width: 100% !important; height: auto !important; }
-                svg, .icon { max-width: 32px !important; height: auto !important; }
-                .navbar-wrapper .user-info, .navbar-wrapper .nav-item.member { display: none !important; }
+                table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }
+                
+                /* 거대 아이콘 방지 */
+                svg, .icon { max-width: 24px !important; height: auto !important; }
+                
+                /* 불필요한 웹 레이아웃 요소(로그인창 등) 제거 */
+                .navbar-wrapper, .user-info, .bottom-container, .side-menu { display: none !important; }
               </style>
               """
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제 (백업 2 방식)
+                  # 2. 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 링크 매핑 (백업 17의 핵심 기능)
+                  # 3. 링크 매핑 (백업 17 로직 유지)
                   if link_map_data:
                       try:
                           def link_replacer(match):
@@ -61,19 +78,18 @@ jobs:
                           content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                       except: pass
 
-                  # 3. 레이아웃 주입 (조건문 없이 강제 교체)
-                  # 기존에 박혀있을지 모르는 모든 구형 스타일 태그를 먼저 제거합니다.
-                  content = re.sub(r'<style.*?>.*?</style>', '', content, flags=re.DOTALL | re.IGNORECASE)
+                  # 4. 레이아웃 주입 (백업 2의 안전 삽입 방식)
+                  # 기존에 꼬여있던 스타일 태그들을 싹 비우고 깨끗하게 시작
+                  content = re.sub(r'<style id="recovery.*?</style>', '', content, flags=re.DOTALL)
+                  content = re.sub(r'<style id="final.*?</style>', '', content, flags=re.DOTALL)
                   
-                  # 그리고 가장 깨끗한 백업 2 스타일을 삽입합니다.
                   if '<head>' in content:
                       content = content.replace('<head>', '<head>' + style_code)
                   else:
                       content = style_code + content
                   
-                  # 4. CSP 제거 및 인라인 너비 초기화
+                  # 5. CSP 제거 및 인라인 너비 초기화
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
-                  content = content.replace('width: 1200px', 'width: 100%')
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
