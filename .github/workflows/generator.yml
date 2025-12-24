@@ -30,17 +30,20 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data):
-              # 백업 3번 시절의 그 가벼운 스타일 코드 (100% 대신 가독성 위해 1000px만 제한)
-              style_code = '<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제 (백업 3번 방식)
+                  # 1. 방해되는 기존 스타일/너비 설정 싹 다 밀어버리기 (초강수)
+                  # 기존에 박혀있는 거대한 <style>...</style> 블록들을 먼저 제거해서 충돌 방지
+                  content = re.sub(r'<style.*?>.*?</style>', '', content, flags=re.DOTALL | re.IGNORECASE)
+                  # 인라인으로 박힌 width: XXXpx 속성들도 강제 제거
+                  content = re.sub(r'width\s*:\s*\d+px', 'width: auto', content)
+
+                  # 2. 닉네임 삭제 및 링크 매핑 (백업 17 로직)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 링크 매핑 (백업 17의 핵심 기능)
                   def link_replacer(match):
                       aid = match.group(1)
                       if aid in link_map_data:
@@ -49,13 +52,15 @@ jobs:
                       return match.group(0)
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
 
-                  # 3. 레이아웃 주입 (백업 3번의 head 치환 방식)
-                  if '<head>' in content:
-                      content = content.replace('<head>', '<head>' + style_code)
+                  # 3. 백업 3의 순정 스타일 (깔끔하게 너비만 잡기)
+                  style_code = '<style>body, .fr-view, #content, .article-content { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 15px !important; background: #1a1a1a !important; color: #eee !important; } img { max-width: 100% !important; height: auto !important; display: block; margin: 10px auto; } table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }</style>'
+
+                  # 4. CSP 제거 및 스타일 주입
+                  content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
+                  if '<head>' in content.lower():
+                      content = re.sub(r'(<head.*?>)', r'\1' + style_code, content, flags=re.IGNORECASE)
                   else:
                       content = style_code + content
-
-                  content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
