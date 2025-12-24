@@ -30,26 +30,40 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data=None):
-              # 백업 2 스타일 + 파란 아이콘(svg) 강제 억제 코드 추가
+              # 레이아웃 박살을 잡기 위해 display: block !important를 강화했습니다.
               style_code = """
               <style>
-                body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
-                  max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; 
+                /* 전체 틀 고정 및 중앙 정렬 */
+                body, .fr-view, #content, .main-container, .article-content { 
+                  max-width: 1000px !important; width: 95% !important; 
+                  margin: 0 auto !important; padding: 10px !important; 
+                  display: block !important; float: none !important;
                 }
-                img { max-width: 100% !important; height: auto !important; }
-                svg, .icon, [class*="icon"] { max-width: 24px !important; height: auto !important; } 
-                .navbar-wrapper .user-info, .navbar-wrapper .nav-item.member { display: none !important; }
+                /* 내부 요소들이 밖으로 튀어나가거나 겹치는 것 방지 */
+                div, section, article { 
+                  max-width: 100% !important; 
+                  display: block !important; 
+                  position: static !important; 
+                  float: none !important;
+                }
+                /* 표와 이미지가 본문을 찢지 않도록 설정 */
+                table { width: 100% !important; table-layout: auto !important; word-break: break-all !important; }
+                img, video { max-width: 100% !important; height: auto !important; display: block; margin: 10px auto; }
+                /* 거대 파란 딱지(SVG) 및 아이콘 강제 억제 */
+                svg { max-width: 24px !important; height: 24px !important; }
+                /* 불필요한 UI 제거 */
+                .navbar-wrapper, .user-info { display: none !important; }
               </style>
               """
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제 (백업 2 방식)
+                  # 1. 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 링크 매핑 (가장 단순한 정규식만 사용)
+                  # 2. 링크 매핑 (백업 17 검증 로직)
                   if link_map_data:
                       try:
                           def link_replacer(match):
@@ -61,8 +75,8 @@ jobs:
                           content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                       except: pass
 
-                  # 3. 레이아웃 주입 (백업 2의 '무식하지만 확실한' replace 방식)
-                  # 복잡하게 체크하지 않고 <head>를 찾아 그 자리에 우리 스타일을 강제로 박습니다.
+                  # 3. 레이아웃 주입 (백업 2의 단순 replace 방식)
+                  # 기존에 엉망이 된 style 태그들을 덮어쓰기 위해 가장 처음에 삽입
                   if '<head>' in content:
                       content = content.replace('<head>', '<head>' + style_code)
                   else:
