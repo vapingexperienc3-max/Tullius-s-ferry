@@ -40,41 +40,42 @@ jobs:
           def inject_width_style(filepath, link_map_data):
               """개별 게시글 내부에 레이아웃 수정 CSS와 2차 링크 리졸버 주입"""
               combined_code = f"""
-    <style>
-        body, .fr-view, #content, .main-container, .article-content, div[class*="content"] {{ 
-            max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
-        }} 
-        img {{ max-width: 100% !important; height: auto !important; }}
-    </style>
-    <script>
-        (function() {{
-            const backupLinkMap = {json.dumps(link_map_data)};
-            function resolveLink(e) {{
-                const a = e.target.closest('a');
-                if (!a || !a.href || !a.href.includes('arca.live')) return;
+              <style>
+                  body, .fr-view, #content, .main-container, .article-content, div[class*="content"] {{ 
+                      max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
+                  }} 
+                  img {{ max-width: 100% !important; height: auto !important; }}
+              </style>
+              <script>
+                  (function() {{
+                      const backupLinkMap = {json.dumps(link_map_data)};
+                      function resolveLink(e) {{
+                          const a = e.target.closest('a');
+                          if (!a || !a.href || !a.href.includes('arca.live')) return;
 
-                const parts = a.href.split('/');
-                const lastPart = parts[parts.length - 1].split('?')[0];
-                let articleId = lastPart.replace(/[^0-9]/g, '');
-                const textNum = a.innerText.replace(/[^0-9]/g, '');
-                if (textNum.length >= 8) {{ articleId = textNum; }}
+                          const parts = a.href.split('/');
+                          const lastPart = parts[parts.length - 1].split('?')[0];
+                          let articleId = lastPart.replace(/[^0-9]/g, '');
+                          const textNum = a.innerText.replace(/[^0-9]/g, '');
+                          if (textNum.length >= 8) {{ articleId = textNum; }}
 
-                if (articleId && backupLinkMap[articleId]) {{
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    let targetPath = backupLinkMap[articleId].split('\\\\').join('/');
-                    const repoName = "Tullius-ferry";
-                    const currentUrl = window.location.href;
-                    const rootPath = currentUrl.split(repoName)[0] + repoName + "/";
-                    window.location.href = rootPath + encodeURI(targetPath);
-                    return false;
-                }}
-            }}
-            document.addEventListener('mousedown', resolveLink, true);
-            document.addEventListener('click', resolveLink, true);
-        }})();
-    </script>
-    """
+                          if (articleId && backupLinkMap[articleId]) {{
+                              e.preventDefault();
+                              e.stopImmediatePropagation();
+                              let targetPath = backupLinkMap[articleId].split('\\\\').join('/');
+                              const repoName = "Tullius-ferry";
+                              const currentUrl = window.location.href;
+                              const rootPath = currentUrl.split(repoName)[0] + repoName + "/";
+                              window.location.href = rootPath + encodeURI(targetPath);
+                              return false;
+                          }}
+                      }}
+                      document.addEventListener('mousedown', resolveLink, true);
+                      document.addEventListener('click', resolveLink, true);
+                  }})();
+              </script>
+              """
+    
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
