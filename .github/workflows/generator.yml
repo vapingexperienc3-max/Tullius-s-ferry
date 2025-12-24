@@ -29,7 +29,7 @@ jobs:
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-         def inject_width_style(filepath, link_map_data=None):
+          def inject_width_style(filepath, link_map_data=None):
               # 백업 2 기반의 스타일 + 모든 레이아웃 간섭 제거
               style_code = """
               <style>
