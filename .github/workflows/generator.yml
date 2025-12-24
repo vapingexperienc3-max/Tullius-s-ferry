@@ -45,20 +45,14 @@ jobs:
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
-                  style_rules = [
-                      "body, .fr-view, #content, .main-container, .article-content, div[class*='content'] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 20px !important; background-color: #1a1a1a !important; color: #eee !important; box-sizing: border-box !important; }",
-                      "img, video, iframe { max-width: 100% !important; height: auto !important; display: block; margin: 15px auto; }",
-                      "table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; word-break: break-all !important; }",
-                      "td, th { border: 1px solid #444 !important; padding: 8px !important; }",
-                      ".comment-wrapper, .reply-form, #comment { max-width: 1000px !important; width: 95% !important; margin: 20px auto !important; }"
-                  ]
-                  style_tag = '\n<style>' + ' '.join(style_rules) + '</style>\n'
+                  style_code = '<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
 
                   if '<head>' in content.lower():
-                      content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                      content = re.sub(r'(<head.*?>)', r'\1' + style_code, content, flags=re.IGNORECASE)
                   else:
-                      content = style_tag + content
+                      content = style_code + content
                   
+                  # CSP 제거
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
