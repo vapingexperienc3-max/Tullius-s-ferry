@@ -29,18 +29,27 @@ jobs:
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          def inject_width_style(filepath, link_map_data):
-              # 1. 백업 3에서 극찬받은 그 스타일 (변수명 하나 안 틀리고 복원)
-              style_code = """<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>"""
+          ddef inject_width_style(filepath, link_map_data):
+              # 백업 3의 순정 스타일 + 브라우저 캐시 무시용 ID 부여
+              style_code = """<style id="fix-style">
+                  body, .fr-view, #content, .article-content { 
+                      max-width: 1000px !important; 
+                      width: 95% !important; 
+                      margin: 0 auto !important; 
+                      padding: 10px !important; 
+                      display: block !important;
+                  } 
+                  img { max-width: 100% !important; height: auto !important; }
+              </style>"""
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 2. 닉네임 삭제
+                  # 1. 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 3. 링크 매핑 (백업 17 로직 - try/except로 감싸서 에러 시에도 스타일은 입히게 보호)
+                  # 2. 링크 매핑 (에러 방지용 try-except)
                   try:
                       def link_replacer(match):
                           aid = match.group(1)
@@ -50,15 +59,16 @@ jobs:
                           return match.group(0)
                       content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                   except:
-                      pass # 매핑 에러나도 레이아웃은 살려야 함
+                      pass
 
-                  # 4. 레이아웃 주입 (백업 3의 단순 replace 방식)
+                  # 3. 레이아웃 주입 (가장 원시적인 replace 방식)
+                  # 기존에 꼬였을지 모르는 모든 style_rules 흔적을 지우고 head 바로 아래 박습니다.
                   if '<head>' in content:
                       content = content.replace('<head>', '<head>' + style_code)
                   else:
                       content = style_code + content
                   
-                  # 5. CSP 제거 (백업 17의 필수 기능)
+                  # 4. CSP 제거
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
