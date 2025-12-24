@@ -236,8 +236,7 @@ jobs:
               # 여기서 'true'는 리스너 등록 함수의 인자로 들어갑니다.
               f.write("document.addEventListener('mousedown', resolveLink, true);\n")
               f.write("document.addEventListener('click', resolveLink, true);\n")
-              f.write("</script></body></html>")
-
+              
               # 마지막에 딱 한 번만 닫아줍니다.
               f.write("</script>\n")
               f.write("</body>\n")
