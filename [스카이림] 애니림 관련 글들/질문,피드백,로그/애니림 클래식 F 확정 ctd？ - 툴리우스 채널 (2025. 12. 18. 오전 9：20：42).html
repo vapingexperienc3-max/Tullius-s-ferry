@@ -1,54 +1,30 @@
 
-    <style id="original-recovery">
-      /* 전체 배경 설정 */
-      body { background-color: #f8f9fa !important; margin: 0 !important; }
+    <style id="pure-arca-style">
+      /* 1. 아카라이브 원본이 강제로 너비를 1300px 등으로 고정하는 것을 방지 */
+      html, body { width: 100% !important; min-width: auto !important; }
       
-      /* 본문 영역만 중앙 정렬 및 너비 확보 (문서 같은 느낌) */
-      .fr-view, .article-content, #content, .main-container { 
-        max-width: 1100px !important; 
-        width: 95% !important; 
-        margin: 20px auto !important; 
-        padding: 30px !important;
-        background: #fff !important; 
-        box-shadow: 0 0 15px rgba(0,0,0,0.1) !important;
-        border-radius: 8px !important;
+      /* 2. 본문 영역을 화면에 꽉 차게 혹은 적절하게 넓힘 */
+      .width-1300 .main-container, .width-1100 .main-container { 
+        max-width: 100% !important; 
+        width: 100% !important; 
+      }
+      
+      /* 3. 본문 텍스트가 양 끝에 붙지 않게 최소한의 여백만 부여 */
+      .article-content { 
+        max-width: 1200px !important; 
+        margin: 0 auto !important; 
       }
 
-      /* 이미지/표는 본문 안에서만 놀게 함 */
-      img { max-width: 100% !important; height: auto !important; display: inline-block !important; }
-      table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }
-      
-      /* 거대 아이콘 방지 */
+      /* 4. 거대 아이콘 방지 (이건 원본에서 CSS가 누락될 때만 필요) */
       svg, .icon { max-width: 24px !important; height: auto !important; }
-      
-      /* 불필요한 웹 UI 제거 */
-      .navbar-wrapper, .user-info, .bottom-container, .side-menu, #footer { display: none !important; }
+
+      /* 5. 깃허브에서 짜치게 보이는 웹 UI만 살짝 숨김 */
+      .navbar-wrapper, .bottom-container, .side-menu { display: none !important; }
     </style>
     
-    <style id="original-recovery">
-      /* 전체 배경과 기본 폰트 설정 유지 */
-      body { background-color: #f8f9fa !important; margin: 0 !important; }
-      
-      /* 본문 영역만 중앙 정렬 및 너비 확보 */
-      .fr-view, .article-content, #content, .main-container { 
-        max-width: 1100px !important; 
-        width: 95% !important; 
-        margin: 0 auto !important; 
-        padding: 20px !important;
-        background: #fff !important; /* 문서 같은 느낌을 위해 배경 흰색 */
-        box-shadow: 0 0 10px rgba(0,0,0,0.1) !important; /* 종이 같은 느낌 */
-      }
-
-      /* 이미지/표는 본문 안에서만 놀게 함 */
-      img { max-width: 100% !important; height: auto !important; }
-      table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }
-      
-      /* 거대 아이콘 방지 */
-      svg, .icon { max-width: 24px !important; height: auto !important; }
-      
-      /* 불필요한 웹 레이아웃 요소(로그인창 등) 제거 */
-      .navbar-wrapper, .user-info, .bottom-container, .side-menu { display: none !important; }
-    </style>
+    
+    
+    
     
     
     
