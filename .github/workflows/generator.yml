@@ -53,38 +53,38 @@ jobs:
 
                   import urllib.parse
         
-        # <a> 태그의 href 속성만 정밀 타격 (JS 코드는 건드리지 않음)
-        def link_replacer(match):
-            aid = match.group(1)
-            if aid in link_map_data:
-                target = link_map_data[aid].replace('\\', '/')
-                encoded_path = urllib.parse.quote(target)
-                return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{encoded_path}"'
-            return match.group(0)
+          # <a> 태그의 href 속성만 정밀 타격 (JS 코드는 건드리지 않음)
+          def link_replacer(match):
+              aid = match.group(1)
+              if aid in link_map_data:
+                  target = link_map_data[aid].replace('\\', '/')
+                  encoded_path = urllib.parse.quote(target)
+                  return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{encoded_path}"'
+              return match.group(0)
 
-        # 정규식 수정: href=" " 안에 있는 아카 링크만 찾음
-        content = re.sub(r'href="https://arca\.live/b/[^/]+/(\d+)[^"]*"', link_replacer, content)
+          # 정규식 수정: href=" " 안에 있는 아카 링크만 찾음
+          content = re.sub(r'href="https://arca\.live/b/[^/]+/(\d+)[^"]*"', link_replacer, content)
 
-        # 닉네임 삭제
-        for nick in ["Ryl3", "ryl3", "RYL3"]:
-            content = content.replace(nick, "")
+          # 닉네임 삭제
+          for nick in ["Ryl3", "ryl3", "RYL3"]:
+              content = content.replace(nick, "")
 
-        # 스타일 주입
-        style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
-        if '<head>' in content.lower() and style_tag not in content:
-            marker = '<head>' if '<head>' in content else '<HEAD>'
-            content = content.replace(marker, marker + style_tag)
+          # 스타일 주입
+          style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
+          if '<head>' in content.lower() and style_tag not in content:
+              marker = '<head>' if '<head>' in content else '<HEAD>'
+              content = content.replace(marker, marker + style_tag)
 
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(content)
-    except Exception as e:
-        print(f"❌ 수정 실패 ({filepath}): {e}")
+          with open(filepath, 'w', encoding='utf-8') as f:
+              f.write(content)
+      except Exception as e:
+          print(f"❌ 수정 실패 ({filepath}): {e}")
 
-# 3. [중요] 생성된 link_map을 가지고 모든 파일 수정 실행
-for root, dirs, files in os.walk('.'):
-    for f in files:
-        if f.endswith('.html') and f not in ['index.html', '404.html']:
-            inject_width_style(os.path.join(root, f), link_map)
+  # 3. [중요] 생성된 link_map을 가지고 모든 파일 수정 실행
+  for root, dirs, files in os.walk('.'):
+      for f in files:
+          if f.endswith('.html') and f not in ['index.html', '404.html']:
+              inject_width_style(os.path.join(root, f), link_map)
                   
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
