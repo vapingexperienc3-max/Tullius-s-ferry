@@ -24,20 +24,16 @@ jobs:
           import re    # 추가: 게시글 번호를 찾기 위한 도구
           import json  # 추가: 찾은 번호들을 리스트로 저장하기 위한 도구
           
-         
-          # 1. 링크 맵 생성을 위한 사전 탐색 (리졸버의 핵심 DB)
-         link_map = {}
+         # 1. 링크 맵 생성을 위한 사전 탐색
+          link_map = {}
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
-                      # 파일명에서 7~10자리 숫자(게시글 번호)를 모두 찾음
                       all_numbers = re.findall(r'\d{7,10}', f)
                       if all_numbers:
-                          # 가장 게시글 번호 같은 것(보통 첫 번째)을 ID로 채택
                           article_id = all_numbers[0]
                           rel_path = os.path.relpath(os.path.join(root, f), '.')
                           link_map[article_id] = rel_path
-                          # 빌드 로그 확인용
                           print(f"Mapped: {article_id} -> {rel_path}")
 
           def inject_width_style(filepath, link_map_data):
@@ -46,7 +42,6 @@ jobs:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
                   
-                  # 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
@@ -56,8 +51,6 @@ jobs:
                       return
 
                   link_map_json = json.dumps(link_map_data)
-                  
-                  # 자바스크립트 주입 (에러 방지를 위해 리스트 결합 방식 사용)
                   js_lines = [
                       '<style>',
                       'body, .fr-view, #content, .main-container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; }',
@@ -89,7 +82,6 @@ jobs:
                   ]
                   combined_code = "\\n".join(js_lines)
 
-                  # 헤더에 주입
                   if '<head>' in content.lower():
                       content = content.replace('<head>', '<head>' + combined_code) if '<head>' in content else content.replace('<HEAD>', '<HEAD>' + combined_code)
                   else:
@@ -100,7 +92,7 @@ jobs:
               except Exception as e:
                   print("❌ Error in {0}: {1}".format(filepath, e))
 
-                  # 2. 모든 파일에 주입 실행 (이 루프의 들여쓰기가 중요합니다)
+          # 2. 모든 파일에 주입 실행
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
