@@ -5714,3 +5714,26 @@ Please read the rule before using the Tullius Channel
  
  
  
+
+    <style id="final-nuclear-option">
+      /* 1. 모든 레이아웃 간섭 제거 및 중앙 정렬 */
+      html, body { background-color: #f8f9fa !important; }
+      .fr-view, .article-content, #content, .main-container, article { 
+        max-width: 1000px !important; 
+        width: 95% !important; 
+        margin: 20px auto !important; 
+        padding: 20px !important;
+        background: white !important;
+        display: block !important;
+        position: static !important;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1) !important;
+      }
+      /* 2. 이미지와 표가 화면을 찢는 것 방지 */
+      img { max-width: 100% !important; height: auto !important; }
+      table { width: 100% !important; table-layout: fixed !important; }
+      /* 3. 파란 딱지(SVG) 크기 강제 고정 */
+      svg, .icon { width: 24px !important; height: 24px !important; max-width: 24px !important; }
+      /* 4. 불필요한 UI 완전 제거 */
+      .navbar-wrapper, .user-info, .side-menu, #footer { display: none !important; }
+    </style>
+    
