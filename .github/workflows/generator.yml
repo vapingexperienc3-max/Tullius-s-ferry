@@ -40,7 +40,7 @@ jobs:
                           target = urllib.parse.quote(link_map_data[aid])
                           return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
                       return match.group(0)
-
+                      
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
