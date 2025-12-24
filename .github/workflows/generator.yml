@@ -29,52 +29,43 @@ jobs:
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          def inject_width_style(filepath, link_map_data):
-              # 백업 3의 순정 스타일 + 브라우저 캐시 무시용 ID 부여
-              style_code = """<style id="fix-style">
-                  body, .fr-view, #content, .article-content { 
-                      max-width: 1000px !important; 
-                      width: 95% !important; 
-                      margin: 0 auto !important; 
-                      padding: 10px !important; 
-                      display: block !important;
-                  } 
-                  img { max-width: 100% !important; height: auto !important; }
-              </style>"""
+          def inject_width_style(filepath, link_map_data=None):
+              # 1. 백업 3의 그 전설적인 스타일 (더 가볍게 수정)
+              style_code = '<style>body, .fr-view, #content, .article-content { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제
+                  # 2. 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 링크 매핑 (에러 방지용 try-except)
-                  try:
-                      def link_replacer(match):
-                          aid = match.group(1)
-                          if aid in link_map_data:
-                              target = urllib.parse.quote(link_map_data[aid])
-                              return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
-                          return match.group(0)
-                      content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
-                  except:
-                      pass
+                  # 3. 링크 매핑 (link_map_data가 있을 때만 작동)
+                  if link_map_data:
+                      try:
+                          def link_replacer(match):
+                              aid = match.group(1)
+                              if aid in link_map_data:
+                                  target = urllib.parse.quote(link_map_data[aid])
+                                  return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
+                              return match.group(0)
+                          content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
+                      except:
+                          pass
 
-                  # 3. 레이아웃 주입 (가장 원시적인 replace 방식)
-                  # 기존에 꼬였을지 모르는 모든 style_rules 흔적을 지우고 head 바로 아래 박습니다.
+                  # 4. 스타일 주입 (백업 3의 단순 교체 방식)
                   if '<head>' in content:
                       content = content.replace('<head>', '<head>' + style_code)
                   else:
                       content = style_code + content
                   
-                  # 4. CSP 제거
+                  # 5. CSP 제거
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
-              except:
+              except Exception as e:
                   return False
 
           # 2. 파일 탐색 및 매핑 (1차 순회)
