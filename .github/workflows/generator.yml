@@ -30,17 +30,13 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data):
+              # 백업 3의 핵심: 원본 스타일은 살리고 너비만 강제로 묶기
+              style_code = '<style>body, .fr-view, #content, .article-content { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 15px !important; box-sizing: border-box !important; } img { max-width: 100% !important; height: auto !important; } table { width: 100% !important; table-layout: auto !important; }</style>'
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 1. 방해되는 기존 스타일/너비 설정 싹 다 밀어버리기 (초강수)
-                  # 기존에 박혀있는 거대한 <style>...</style> 블록들을 먼저 제거해서 충돌 방지
-                  content = re.sub(r'<style.*?>.*?</style>', '', content, flags=re.DOTALL | re.IGNORECASE)
-                  # 인라인으로 박힌 width: XXXpx 속성들도 강제 제거
-                  content = re.sub(r'width\s*:\s*\d+px', 'width: auto', content)
-
-                  # 2. 닉네임 삭제 및 링크 매핑 (백업 17 로직)
+                  # 1. 닉네임 삭제 및 링크 매핑 (백업 17의 검증된 로직)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
@@ -52,15 +48,14 @@ jobs:
                       return match.group(0)
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
 
-                  # 3. 백업 3의 순정 스타일 (깔끔하게 너비만 잡기)
-                  style_code = '<style>body, .fr-view, #content, .article-content { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 15px !important; background: #1a1a1a !important; color: #eee !important; } img { max-width: 100% !important; height: auto !important; display: block; margin: 10px auto; } table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }</style>'
-
-                  # 4. CSP 제거 및 스타일 주입
-                  content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
+                  # 2. 기존 <style> 태그는 건드리지 않고, 우리 스타일만 맨 앞에 추가
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_code, content, flags=re.IGNORECASE)
                   else:
                       content = style_code + content
+
+                  # 3. CSP(보안 정책)만 제거 (이게 없으면 외부 이미지가 안 뜰 수 있음)
+                  content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
