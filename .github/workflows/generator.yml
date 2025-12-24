@@ -231,7 +231,7 @@ jobs:
               f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
               f.write("  }); ")
               f.write("} \n") # globalSearch 함수 끝
-              f.write("</body></html>")
+              f.write("</script></body></html>")
           EOF
 
       - name: Commit and Push
