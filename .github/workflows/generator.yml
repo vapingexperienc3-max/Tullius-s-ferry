@@ -38,7 +38,8 @@ jobs:
                           link_map[article_id] = rel_path
 
           def inject_width_style(filepath, link_map_data):
-              """개별 게시글 내부에 레이아웃 수정 CSS와 2차 링크 리졸버 주입"""
+              link_map_json = json.dumps(link_map_data)
+              
               combined_code = f"""
               <style>
                   body, .fr-view, #content, .main-container, .article-content, div[class*="content"] {{ 
@@ -48,30 +49,50 @@ jobs:
               </style>
               <script>
                   (function() {{
-                      const backupLinkMap = {json.dumps(link_map_data)};
+                      const backupLinkMap = {link_map_json};
+                      
                       function resolveLink(e) {{
                           const a = e.target.closest('a');
                           if (!a || !a.href || !a.href.includes('arca.live')) return;
 
-                          const parts = a.href.split('/');
-                          const lastPart = parts[parts.length - 1].split('?')[0];
+                          // 1. 게시글 ID 추출 로직 강화
+                          const urlParts = a.href.split('/');
+                          const lastPart = urlParts[urlParts.length - 1].split('?')[0].split('#')[0];
                           let articleId = lastPart.replace(/[^0-9]/g, '');
-                          const textNum = a.innerText.replace(/[^0-9]/g, '');
-                          if (textNum.length >= 8) {{ articleId = textNum; }}
+                          
+                          // 텍스트에 8자리 이상의 숫자가 있다면 그걸 우선시 (낚시 링크 방지)
+                          const textNumMatch = a.innerText.match(/\\d{{8,}}/);
+                          if (textNumMatch) {{ articleId = textNumMatch[0]; }}
 
                           if (articleId && backupLinkMap[articleId]) {{
                               e.preventDefault();
                               e.stopImmediatePropagation();
-                              let targetPath = backupLinkMap[articleId].split('\\\\').join('/');
-                              const repoName = "Tullius-ferry";
-                              const currentUrl = window.location.href;
-                              const rootPath = currentUrl.split(repoName)[0] + repoName + "/";
-                              window.location.href = rootPath + encodeURI(targetPath);
+                              
+                              let targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');
+                              
+                              // 2. 경로 계산 방식 변경: 도메인 루트로부터의 절대 경로 사용
+                              // 주소의 /Tullius-ferry/ 부분을 기준으로 경로를 재구성합니다.
+                              const pathSegments = window.location.pathname.split('/');
+                              const repoIdx = pathSegments.findIndex(s => s.toLowerCase() === 'tullius-ferry');
+                              
+                              let finalUrl;
+                              if (repoIdx !== -1) {{
+                                  const rootPrefix = pathSegments.slice(0, repoIdx + 1).join('/');
+                                  finalUrl = window.location.origin + rootPrefix + '/' + encodeURI(targetPath);
+                              }} else {{
+                                  // 예상치 못한 경로일 경우 현재 위치 기준 상대 경로 시도
+                                  finalUrl = window.location.origin + '/' + encodeURI(targetPath);
+                              }}
+
+                              console.log('✅ 로컬 리다이렉트 실행:', articleId, '->', finalUrl);
+                              window.location.href = finalUrl;
                               return false;
                           }}
                       }}
-                      document.addEventListener('mousedown', resolveLink, true);
+                      
+                      // 캡처링 단계에서 이벤트를 낚아챔 (가장 강력한 가로채기 방식)
                       document.addEventListener('click', resolveLink, true);
+                      document.addEventListener('mousedown', resolveLink, true);
                   }})();
               </script>
               """
@@ -263,7 +284,7 @@ jobs:
               f.write("        let articleId = lastPart.replace(/[^0-9]/g, '');\n")
               f.write("        if (articleId && backupLinkMap[articleId]) {\n")
               f.write("            e.preventDefault();\n")
-              f.write("            let targetPath = backupLinkMap[articleId].split('\\\\').join('/');\n")
+              f.write("            let targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');\n")
               f.write("            window.location.href = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + encodeURI(targetPath);\n")
               f.write("        }\n")
               f.write("    }\n")
