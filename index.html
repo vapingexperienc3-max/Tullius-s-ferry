@@ -8,7 +8,7 @@ function resolveLink(e) {
         let articleId = lastPart.replace(/[^0-9]/g, '');
         if (articleId && backupLinkMap[articleId]) {
             e.preventDefault();
-            let targetPath = backupLinkMap[articleId].split('\\').join('/');
+            let targetPath = backupLinkMap[articleId].replace(/\\/g, '/');
             window.location.href = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + encodeURI(targetPath);
         }
     }
