@@ -30,39 +30,41 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data=None):
-              # 아카라이브의 복잡한 레이아웃을 무시하고 "문서"처럼 보이게 만드는 최소한의 강제 코드
+              # 아카라이브 원본 클래스들을 그대로 살리면서 
+              # 화면이 좁아지는 현상만 물리적으로 해결합니다.
               style_code = """
-              <style id="final-nuclear-option">
-                /* 1. 모든 레이아웃 간섭 제거 및 중앙 정렬 */
-                html, body { background-color: #f8f9fa !important; }
-                .fr-view, .article-content, #content, .main-container, article { 
-                  max-width: 1000px !important; 
-                  width: 95% !important; 
-                  margin: 20px auto !important; 
-                  padding: 20px !important;
-                  background: white !important;
-                  display: block !important;
-                  position: static !important;
-                  box-shadow: 0 0 10px rgba(0,0,0,0.1) !important;
+              <style id="pure-arca-style">
+                /* 1. 아카라이브 원본이 강제로 너비를 1300px 등으로 고정하는 것을 방지 */
+                html, body { width: 100% !important; min-width: auto !important; }
+                
+                /* 2. 본문 영역을 화면에 꽉 차게 혹은 적절하게 넓힘 */
+                .width-1300 .main-container, .width-1100 .main-container { 
+                  max-width: 100% !important; 
+                  width: 100% !important; 
                 }
-                /* 2. 이미지와 표가 화면을 찢는 것 방지 */
-                img { max-width: 100% !important; height: auto !important; }
-                table { width: 100% !important; table-layout: fixed !important; }
-                /* 3. 파란 딱지(SVG) 크기 강제 고정 */
-                svg, .icon { width: 24px !important; height: 24px !important; max-width: 24px !important; }
-                /* 4. 불필요한 UI 완전 제거 */
-                .navbar-wrapper, .user-info, .side-menu, #footer { display: none !important; }
+                
+                /* 3. 본문 텍스트가 양 끝에 붙지 않게 최소한의 여백만 부여 */
+                .article-content { 
+                  max-width: 1200px !important; 
+                  margin: 0 auto !important; 
+                }
+
+                /* 4. 거대 아이콘 방지 (이건 원본에서 CSS가 누락될 때만 필요) */
+                svg, .icon { max-width: 24px !important; height: auto !important; }
+
+                /* 5. 깃허브에서 짜치게 보이는 웹 UI만 살짝 숨김 */
+                .navbar-wrapper, .bottom-container, .side-menu { display: none !important; }
               </style>
               """
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 닉네임 삭제
+                  # 닉네임 삭제 (백업 2 방식)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 링크 매핑 (백업 17 로직)
+                  # 링크 매핑 (백업 17 검증 로직)
                   if link_map_data:
                       try:
                           def link_replacer(match):
@@ -74,17 +76,17 @@ jobs:
                           content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                       except: pass
 
-                  # 5. 기존에 꼬인 스타일들 싹 지우기 (초기화)
-                  content = re.sub(r'<style id="recovery.*?</style>', '', content, flags=re.DOTALL)
-                  content = re.sub(r'<style id="final.*?</style>', '', content, flags=re.DOTALL)
+                  # 기존에 꼬여있던 우리의 모든 커스텀 스타일 삭제 (완전 초기화)
+                  content = re.sub(r'<style id=".*?style".*?</style>', '', content, flags=re.DOTALL)
+                  content = re.sub(r'<style id="original-recovery".*?</style>', '', content, flags=re.DOTALL)
 
-                  # 6. 레이아웃 주입 (맨 마지막에 박아서 모든 설정을 덮어씌움)
-                  if '</html>' in content:
-                      content = content.replace('</html>', style_code + '</html>')
+                  # 스타일 주입 (가장 안전한 head 뒤쪽)
+                  if '<head>' in content:
+                      content = content.replace('<head>', '<head>' + style_code)
                   else:
-                      content += style_code
+                      content = style_code + content
                   
-                  # 7. CSP 제거
+                  # CSP 제거
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
