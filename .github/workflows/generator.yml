@@ -45,9 +45,17 @@ jobs:
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
-                  style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
+                  style_rules = [
+                      "body, html, .fr-view, .article-content, .content, .container, .main, div[style*='width'] { max-width: 100% !important; width: 100% !important; margin: 0 auto !important; padding: 10px !important; box-sizing: border-box !important; float: none !important; }",
+                      "img, video, iframe { max-width: 100% !important; height: auto !important; }",
+                      ".article-wrapper, .post-wrapper { width: 100% !important; min-width: unset !important; }"
+                  ]
+                  style_tag = '\n<style>' + ' '.join(style_rules) + '</style>\n'
+
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                  else:
+                      content = style_tag + content
                   
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
