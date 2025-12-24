@@ -26,16 +26,24 @@ jobs:
           
          
           # 1. 링크 맵 생성을 위한 사전 탐색 (리졸버의 핵심 DB)
-          link_map = {}
+         link_map = {}
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
-                      match = re.search(r'(\d{8,})', f)
-                      if match:
-                          article_id = match.group(1)
+                      # 파일명 전체에서 숫자 7~10자리를 모두 찾아봅니다.
+                      # (게시글 번호는 보통 8자리 내외이므로 범위를 넓힘)
+                      all_numbers = re.findall(r'\d{7,10}', f)
+                      
+                      # 만약 파일명에 번호가 없다면, 파일 내부를 슥 훑어서 meta 태그의 og:url 등을 확인 (선택 사항)
+                      # 일단 파일명에서 가장 유력한 번호를 게시글 ID로 채택합니다.
+                      if all_numbers:
+                          # 여러 숫자 중 가장 게시글 번호 같은 것(보통 첫 번째나 긴 것)을 선택
+                          article_id = all_numbers[0] 
                           rel_path = os.path.relpath(os.path.join(root, f), '.')
                           link_map[article_id] = rel_path
-
+                          # 확인용 로그 (GitHub Actions 빌드 로그에서 볼 수 있음)
+                          print(f"Mapped: {article_id} -> {rel_path}")
+                          
           def inject_width_style(filepath, link_map_data):
               """개별 게시글 내부 가공: 닉네임 삭제, 스타일 주입, 리졸버 삽입"""
               try:
@@ -54,33 +62,29 @@ jobs:
 
                   link_map_json = json.dumps(link_map_data)
                   code_lines = [
-                      '<style>',
-                      'body, .fr-view, #content, .main-container, .article-content { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; }',
-                      'img { max-width: 100% !important; height: auto !important; }',
-                      '</style>',
                       '<script>',
                       '(function() {',
-                      '    console.log("🚀 Resolver Ready");',
-                      f'    const backupLinkMap = {link_map_json};',
-                      '    document.addEventListener("click", function(e) {',
+                      '    const backupLinkMap = ' + link_map_json + ';',
+                      '    console.log("🚀 Resolver Ready. Mapped IDs:", Object.keys(backupLinkMap).length);',
+                      '    window.addEventListener("mousedown", function(e) {',
                       '        const a = e.target.closest("a");',
-                      '        if (!a || !a.href || a.href.indexOf("arca.live") === -1) return;',
+                      '        if (!a || !a.href || !a.href.includes("arca.live")) return;',
                       '',
-                      '        const parts = a.href.split("/");',
-                      '        const lastPart = parts[parts.length - 1].split("?")[0].split("#")[0];',
-                      '        const articleId = lastPart.replace(/[^0-9]/g, "");',
+                      '        // 링크 주소에서 숫자 7~10자리만 추출',
+                      '        const match = a.href.match(/\\d{7,10}/);',
+                      '        const articleId = match ? match[0] : null;',
                       '',
                       '        if (articleId && backupLinkMap[articleId]) {',
                       '            e.preventDefault(); e.stopImmediatePropagation();',
-                      '            const repoName = "Tullius-ferry";',
-                      '            const path = window.location.pathname;',
-                      '            const repoIdx = path.toLowerCase().indexOf(repoName.toLowerCase());',
-                      '            if (repoIdx === -1) return;',
-                      '            const repoBase = path.substring(0, repoIdx + repoName.length);',
                       '            const targetPath = backupLinkMap[articleId].replace(/\\\\/g, "/");',
+                      '            const repoName = "Tullius-ferry";',
+                      '            const repoIdx = window.location.pathname.toLowerCase().indexOf(repoName.toLowerCase());',
+                      '            const repoBase = window.location.pathname.substring(0, repoIdx + repoName.length);',
                       '            const finalUrl = window.location.origin + repoBase + "/" + encodeURI(targetPath);',
-                      '            console.log("✅ Redirecting:", finalUrl);',
+                      '            console.log("✅ Match found! Redirecting to:", finalUrl);',
                       '            window.location.href = finalUrl;',
+                      '        } else {',
+                      '            console.log("❌ No match for ID:", articleId);',
                       '        }',
                       '    }, true);',
                       '})();',
