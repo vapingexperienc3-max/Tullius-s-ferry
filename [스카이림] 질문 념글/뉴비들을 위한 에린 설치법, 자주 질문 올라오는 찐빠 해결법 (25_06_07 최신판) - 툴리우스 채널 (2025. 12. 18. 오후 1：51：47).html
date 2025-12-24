@@ -1,5 +1,23 @@
 
     <style>
+      /* 1. 모든 컨테이너를 강제로 한 줄로 세우기 (flex/grid 파괴) */
+      * { max-width: 100% !important; box-sizing: border-box !important; }
+      body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
+        max-width: 1000px !important; width: 95% !important; 
+        margin: 0 auto !important; padding: 10px !important; 
+        display: block !important; float: none !important; 
+      }
+      /* 2. 내부 요소들이 옆으로 퍼지는 것을 방지 */
+      div, section, article, span { display: block !important; width: 100% !important; position: static !important; float: none !important; }
+      /* 3. 이미지와 표가 화면을 뚫고 나가는 것 방지 */
+      img, video { max-width: 100% !important; height: auto !important; display: block !important; margin: 10px auto !important; }
+      table { width: 100% !important; display: table !important; table-layout: fixed !important; word-break: break-all !important; }
+      /* 4. 거대 파란 딱지(SVG) 박멸 */
+      svg { max-width: 24px !important; height: 24px !important; }
+      .navbar-wrapper, .user-info { display: none !important; }
+    </style>
+    
+    <style>
       /* 전체 틀 고정 및 중앙 정렬 */
       body, .fr-view, #content, .main-container, .article-content { 
         max-width: 1000px !important; width: 95% !important; 
@@ -1000,7 +1018,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-34)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-34)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1058,7 +1076,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1112,7 +1130,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-34)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-34)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1167,7 +1185,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1400,7 +1418,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-43)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-43)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1454,7 +1472,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1508,7 +1526,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-43)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-43)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1562,7 +1580,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1618,7 +1636,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-43)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-43)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1672,7 +1690,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1792,7 +1810,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1848,7 +1866,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1902,7 +1920,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -1956,7 +1974,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2011,7 +2029,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2065,7 +2083,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2121,7 +2139,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2175,7 +2193,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2229,7 +2247,7 @@
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2285,7 +2303,7 @@ jslot 파일은 넣었습니다
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2340,7 +2358,7 @@ jslot 파일은 넣었습니다
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2394,7 +2412,7 @@ jslot 파일은 넣었습니다
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2452,7 +2470,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-45)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2506,7 +2524,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2537,7 +2555,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=emoticon-wrapper>
  
- <img loading=lazy class=emoticon src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill-opacity="0"/></svg>' data-id=224545776 width=100 height=100 style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-46)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy class=emoticon src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="200"><rect fill-opacity="0"/></svg>' data-id=224545776 width=100 height=100 style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-46)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  </div>
  
  
@@ -2584,7 +2602,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-47)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-47)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2638,7 +2656,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2692,7 +2710,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-47)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-47)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2746,7 +2764,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2800,7 +2818,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-47)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-47)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2866,7 +2884,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-48)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-48)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2920,7 +2938,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-48)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-48)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -2976,7 +2994,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-49)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-49)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3030,7 +3048,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3084,7 +3102,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-49)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-49)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3200,7 +3218,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-53)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-53)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3259,7 +3277,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3313,7 +3331,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-53)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-53)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3371,7 +3389,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3425,7 +3443,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3479,7 +3497,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3535,7 +3553,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3593,7 +3611,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3647,7 +3665,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3701,7 +3719,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-54)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3765,7 +3783,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3820,7 +3838,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3874,7 +3892,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3928,7 +3946,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -3982,7 +4000,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -4036,7 +4054,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -4093,7 +4111,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -4147,7 +4165,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -4201,7 +4219,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -4255,7 +4273,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-55)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -4381,7 +4399,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=avatar>
  
- <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy alt="유저 그라바타 이미지" src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="80"><rect fill-opacity="0"/></svg>' style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-35)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  
  </div>
  
@@ -4412,7 +4430,7 @@ FaceRim_SE-TA\SkyrimSE\overwrite\SKSE\Plugins\CharGen
  
  <div class=emoticon-wrapper>
  
- <img loading=lazy class=emoticon src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect fill-opacity="0"/></svg>' data-id=224545776 width=100 height=100 style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-46)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
+ <img loading=lazy class=emoticon src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="200"><rect fill-opacity="0"/></svg>' data-id=224545776 width=100 height=100 style="background-blend-mode:normal!important;background-clip:content-box!important;background-position:50% 50%!important;background-color:rgba(0,0,0,0)!important;background-image:var(--sf-img-46)!important;background-size:100% 100%!important;background-origin:content-box!important;background-repeat:no-repeat!important">
  </div>
  
  
@@ -5857,7 +5875,7 @@ Please read the rule before using the Tullius Channel
     <div class="stateful-spinner" data-state="LOADING">
       <div class="stateful-spinner-spacer">
         <svg viewBox="0 0 50 50">
-          <circle class="outline" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+          <circle class="outline" cx="25" cy="25" r="20" fill="none" stroke-width="100%"></circle>
           <circle class="effect1" cx="25" cy="25" r="22" fill="none"></circle>
           <circle class="background" cx="25" cy="25" r="22" fill="none"></circle>
           <path class="checkpath" stroke-linecap="round" stroke-linejoin="miter" fill-opacity="0" stroke-miterlimit="4" transform="scale(0.1) translate(250 250)"></path>
