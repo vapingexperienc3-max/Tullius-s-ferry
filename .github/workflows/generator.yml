@@ -22,7 +22,7 @@ jobs:
           python <<'EOF'
           import os
           import re
-          import json
+          import urllib.parse  # <--- 이과놈들의 필수 도구 (한글 주소 변환용)
 
          # [1] 설정 및 준비
           link_map = {}
