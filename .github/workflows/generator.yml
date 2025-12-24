@@ -224,6 +224,9 @@ jobs:
               f.write("        if (textNum.length >= 8) { articleId = textNum; }\n")
               f.write("        \n")
               f.write("        if (articleId && backupLinkMap[articleId]) {\n")
+              f.write("            console.log('✅ 매칭 성공!');\n")
+              f.write("            console.log('찾은 번호:', articleId);\n")
+              f.write("            console.log('이동할 경로:', backupLinkMap[articleId]);\n")
               f.write("            e.preventDefault();\n")
               f.write("            e.stopPropagation();\n")
               f.write("            let targetPath = backupLinkMap[articleId].split('\\\\').join('/');\n")
@@ -236,7 +239,7 @@ jobs:
               # 여기서 'true'는 리스너 등록 함수의 인자로 들어갑니다.
               f.write("document.addEventListener('mousedown', resolveLink, true);\n")
               f.write("document.addEventListener('click', resolveLink, true);\n")
-              
+        
               # 마지막에 딱 한 번만 닫아줍니다.
               f.write("</script>\n")
               f.write("</body>\n")
