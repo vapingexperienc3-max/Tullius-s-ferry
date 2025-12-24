@@ -37,30 +37,27 @@ jobs:
                           print(f"Mapped: {article_id} -> {link_map[article_id]}")
 
           def inject_width_style(filepath, link_map_data):
-              """JS 없이도 100% 작동하는 하드코딩 치환 방식"""
+              """개별 HTML 파일의 텍스트를 직접 수정하는 핵심 함수"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제
+                  # 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 정규식을 이용한 모든 아카라이브 링크 치환
-                  # 주소 형태: https://arca.live/b/채널이름/숫자... 를 찾아냅니다.
+                  # 강화된 정규식 치환 (arca.live 링크를 직접 깃허브 주소로)
                   def link_replacer(match):
-                      article_id = match.group(1) # 숫자 ID 추출
-                      if article_id in link_map_data:
-                          # 매핑된 로컬 파일 경로로 교체
-                          target_path = link_map_data[article_id].replace('\\', '/')
-                          return f"https://vapingexperienc3-max.github.io/Tullius-ferry/{target_path}"
-                      return match.group(0) # 매핑 데이터 없으면 원본 유지
+                      aid = match.group(1)
+                      if aid in link_map_data:
+                          target = link_map_data[aid].replace('\\', '/')
+                          return f"https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"
+                      return match.group(0)
 
-                  # 정규식 패턴: arca.live 링크에서 마지막 숫자 부분만 그룹화
-                  # 숫자 뒤에 슬래시(/)나 물음표(?)가 와도 숫자만 딱 뽑아옵니다.
+                  # 패턴: arca.live/b/채널/숫자 뒤에 붙는 모든 문자열 포함해서 매칭
                   content = re.sub(r'https://arca\.live/b/[^/]+/(\d+)[^"\'\s>]*', link_replacer, content)
 
-                  # 3. 스타일 주입 (이미 있다면 스킵)
+                  # 스타일 주입
                   style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
                   if '<head>' in content.lower() and style_tag not in content:
                       marker = '<head>' if '<head>' in content else '<HEAD>'
@@ -71,12 +68,11 @@ jobs:
               except Exception as e:
                   print(f"❌ Error in {filepath}: {e}")
 
-          # 2. 모든 파일에 실행
+          # 2. 모든 게시글 파일 수정 (미리 한 번에 끝냄)
           for root, dirs, files in os.walk('.'):
               for f in files:
-                  if f.endswith('.html') and f != 'index.html':
-                      f_path = os.path.join(root, f)
-                      inject_width_style(f_path, link_map)
+                  if f.endswith('.html') and f not in ['index.html', '404.html']:
+                      inject_width_style(os.path.join(root, f), link_map)
                   
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
