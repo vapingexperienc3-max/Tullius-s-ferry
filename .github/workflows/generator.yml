@@ -24,30 +24,12 @@ jobs:
           import re
           import json
 
-          # 1. 변수 초기화 (에러 방지를 위해 반드시 먼저 선언)
+         # [1] 설정 및 준비
           link_map = {}
-          print("--- Mapping Start ---")
-          for root, dirs, files in os.walk('.'):
-              dirs[:] = [d for d in dirs if not d.startswith('.')]
-              for f in files:
-                  if f.endswith('.html') and f not in ['index.html', '404.html']:
-                      filepath = os.path.join(root, f)
-                      article_id = None
-                      nums = re.findall(r'\d{7,11}', f)
-                      if nums: article_id = nums[0]
-                      if not article_id:
-                          try:
-                              with open(filepath, 'r', encoding='utf-8', errors='ignore') as tmp:
-                                  sample = tmp.read(5000)
-                                  match = re.search(r'arca\.live/b/[^/]+/(\d+)', sample)
-                                  if match: article_id = match.group(1)
-                          except: pass
-                      if article_id:
-                          rel_path = os.path.relpath(filepath, '.').replace('\\', '/')
-                          link_map[article_id] = rel_path
-                          print(f"✅ Mapping: {article_id} -> {rel_path}")
+          skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
+          fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          # 2. 함수 이름 복구: inject_width_style
+          # [2] 본문 수정 함수 (이과놈들의 도구상자 포함)
           def inject_width_style(filepath, link_map_data):
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
@@ -60,37 +42,47 @@ jobs:
                           return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
                       return match.group(0)
 
-                  # 정규식 치환
+                  # 링크 치환 & 닉네임 삭제 & 스타일 주입
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
+                  for nick in ["Ryl3", "ryl3", "RYL3"]: content = content.replace(nick, "")
                   
-                  # 닉네임 삭제
-                  for nick in ["Ryl3", "ryl3", "RYL3"]:
-                      content = content.replace(nick, "")
-
-                  # 스타일 주입
                   style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                  
+                  # CSP 메타 태그 제거 (스크린샷 에러 방지)
+                  content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
-              except Exception as e:
-                  print(f"❌ Error in {filepath}: {e}")
-                  return False
+              except: return False
 
-          # 3. 실행 (기존 render_tree나 하단 호출부에서 찾을 수 있도록 함)
-          print("--- Processing Files ---")
+          # [3] 파일 탐색 및 매핑 (1차 순회)
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if not d.startswith('.')]
+              for f in files:
+                  if f.endswith('.html') and f not in ['index.html', '404.html']:
+                      path = os.path.join(root, f)
+                      aid = None
+                      nums = re.findall(r'\d{7,11}', f)
+                      if nums: aid = nums[0]
+                      if not aid:
+                          try:
+                              with open(path, 'r', encoding='utf-8', errors='ignore') as tmp:
+                                  m = re.search(r'arca\.live/b/[^/]+/(\d+)', tmp.read(5000))
+                                  if m: aid = m.group(1)
+                          except: pass
+                      if aid:
+                          link_map[aid] = os.path.relpath(path, '.').replace('\\', '/')
+
+          # [4] 모든 파일 본문 수정 실행 (2차 순회)
+          print("--- 본문 수정 시작 ---")
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
-                      full_path = os.path.join(root, f)
-                      if inject_width_style(full_path, link_map):
-                          print(f"✔️ Success: {full_path}")
+                      inject_width_style(os.path.join(root, f), link_map)
                   
-          skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
-          fallout_pack_names = ["짬통팩", "스위트폴"]
-
           tree = {}
           for root, dirs, files in sorted(os.walk('.')):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -107,6 +99,7 @@ jobs:
               curr_node[parts[-1]]['_files'] = sorted(html_files)
 
           def render_tree(node_name, node_data, depth, is_rr, full_path):
+              # 1. 기존의 화려한 스타일/아이콘 로직 (그대로 유지)
               icon = "railroad.png" if is_rr else "ElderScroll.webp"
               text_color = "#FFB000" if is_rr else "#fff"
               bg_color = "rgba(0,0,0,0.6)"
@@ -121,16 +114,21 @@ jobs:
               html += f"<summary style='padding:15px; font-weight:bold; color:{text_color}; cursor:pointer; list-style:none; display:flex; align-items:center; background:rgba(255,255,255,0.03); border-bottom:1px solid {border_color};'>"
               html += f"<img src='{icon}' style='{img_style}'>{node_name}</summary>"
               html += "<ul style='margin:0; padding:15px 25px 20px 45px; list-style-type:none;'>"
+              
+              # 2. 파일 리스트 처리
               for f in node_data['_files']:
                   f_path = os.path.join(full_path, f)
-                  # 중요: link_map을 인자로 넘겨줍니다.
-                  inject_width_style(f_path, link_map)
+                  
+                  # [중요] 여기서 inject_width_style(f_path, link_map) 한 줄만 삭제했습니다!
+                  
                   url = f_path.replace(os.sep, '/')
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
                   f_icon = f"<span style='color:#FFB000; margin-right:10px; font-size:12px;'>●</span>" if is_rr else f"<img src='ElderScroll.webp' style='width:30px; margin-right:10px; vertical-align:middle;'>"
                   link_class = "file-link-v" if is_rr else "file-link-f"
                   html += f'<li style="margin:12px 0;"><a href="{url}" target="_blank" class="{link_class}">{f_icon}{disp}</a></li>'
+              
               html += "</ul>"
+              # 3. 하위 디렉토리 재귀 호출
               for child_name, child_data in node_data['_dirs'].items():
                   html += render_tree(child_name, child_data, depth+1, is_rr, os.path.join(full_path, child_name))
               html += "</details></div>"
