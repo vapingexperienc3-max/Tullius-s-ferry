@@ -29,18 +29,19 @@ jobs:
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          def inject_width_style(filepath, link_map_data):
-              # 백업 3에서 사용했던 가볍고 확실한 스타일 (폭만 100%로 잡음)
-              style_code = '<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
+         def inject_width_style(filepath, link_map_data):
+              # 백업 3의 핵심: 원본 스타일은 그대로 두고, 본문 너비만 딱 1000px로 가두기
+              # !important를 최소화하여 원본 레이아웃과의 충돌을 방지합니다.
+              style_code = '<style>body, .fr-view, #content, .article-content { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제 (백업 3 & 17 공통 로직)
+                  # 1. 닉네임 삭제 (백업 3 방식)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 링크 매핑 (백업 17의 검증된 로직 - 건드리지 않음)
+                  # 2. 링크 매핑 (백업 17 성공 로직)
                   def link_replacer(match):
                       aid = match.group(1)
                       if aid in link_map_data:
@@ -49,13 +50,13 @@ jobs:
                       return match.group(0)
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
 
-                  # 3. 레이아웃 주입 (백업 3 방식: 원본 스타일은 유지하고 우리 걸 앞에 덧붙임)
+                  # 3. 레이아웃 주입 (백업 3 방식: 원본 스타일은 유지하고 우리 코드를 head 바로 뒤에 삽입)
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_code, content, flags=re.IGNORECASE)
                   else:
                       content = style_code + content
-                  
-                  # 4. CSP 제거 (백업 17에서 추가된 필수 기능)
+
+                  # 4. CSP 제거 (백업 17 필수 로직 - 이미지 차단 방지)
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
