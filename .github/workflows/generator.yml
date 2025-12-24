@@ -17,14 +17,26 @@ jobs:
         with:
           fetch-depth: 0
 
+      네, 맞습니다. EOF는 무조건 한 번만 있어야 합니다.
+
+사용자님 말씀대로 스크립트 맨 끝에 이미 EOF가 있다면, 제가 드린 코드 끝부분에 포함된 EOF와 중복되어 에러가 발생했을 것입니다. GitHub Actions의 run: | 블록에서 python <<'EOF' 구문은 **"여기서부터 'EOF'라는 글자가 나올 때까지 전부 파이썬 코드로 간주해라"**라는 뜻이기 때문입니다.
+
+현재 19번 라인 에러와 들여쓰기 문제를 해결하기 위해, 기존의 python <<'EOF'부터 마지막 EOF까지의 구간을 아래 코드로 완전히 교체해 주세요. (중복 방지를 위해 EOF는 맨 마지막에 딱 한 번만 넣었습니다.)
+
+🛠️ 교정된 전체 구간 (복사해서 덮어쓰기)
+Python
+
       - name: Generate nested index.html
         run: |
           python <<'EOF'
           import os
-          import re    # 추가: 게시글 번호를 찾기 위한 도구
-          import json  # 추가: 찾은 번호들을 리스트로 저장하기 위한 도구
-          
-         # 1. 링크 맵 생성을 위한 사전 탐색
+          import re
+          import json
+
+          # 1. 변수 초기화 (에러 방지를 위해 반드시 먼저 선언)
+          link_map = {}
+
+          # 2. 링크 맵 생성을 위한 사전 탐색
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
@@ -36,17 +48,15 @@ jobs:
                           print(f"Mapped: {article_id} -> {rel_path}")
 
           def inject_width_style(filepath, link_map_data):
-              """개별 게시글 가공 로직 시작"""
+              """개별 게시글 가공 로직"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
-                  
+
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
                   if 'backupLinkMap' in content:
-                      with open(filepath, 'w', encoding='utf-8') as f:
-                          f.write(content)
                       return
 
                   link_map_json = json.dumps(link_map_data)
@@ -62,7 +72,7 @@ jobs:
                       '    window.addEventListener("mousedown", function(e) {',
                       '        const a = e.target.closest("a");',
                       '        if (!a || !a.href || !a.href.includes("arca.live")) return;',
-                      '        const match = a.href.match(/\\d{7,10}/);',
+                      '        const match = a.href.match(/\\d{{7,10}}/);', # 중괄호 이중 처리
                       '        const articleId = match ? match[0] : null;',
                       '        if (articleId && backupLinkMap[articleId]) {',
                       '            e.preventDefault(); e.stopImmediatePropagation();',
@@ -82,7 +92,8 @@ jobs:
                   combined_code = "\\n".join(js_lines)
 
                   if '<head>' in content.lower():
-                      content = content.replace('<head>', '<head>' + combined_code) if '<head>' in content else content.replace('<HEAD>', '<HEAD>' + combined_code)
+                      marker = '<head>' if '<head>' in content else '<HEAD>'
+                      content = content.replace(marker, marker + combined_code)
                   else:
                       content = combined_code + content
 
@@ -91,7 +102,7 @@ jobs:
               except Exception as e:
                   print("❌ Error in {0}: {1}".format(filepath, e))
 
-          # 2. 모든 파일에 주입 실행
+          # 3. 모든 파일에 주입 실행
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
