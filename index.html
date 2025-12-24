@@ -10,6 +10,9 @@ function resolveLink(e) {
         if (textNum.length >= 8) { articleId = textNum; }
         
         if (articleId && backupLinkMap[articleId]) {
+            console.log('✅ 매칭 성공!');
+            console.log('찾은 번호:', articleId);
+            console.log('이동할 경로:', backupLinkMap[articleId]);
             e.preventDefault();
             e.stopPropagation();
             let targetPath = backupLinkMap[articleId].split('\\').join('/');
