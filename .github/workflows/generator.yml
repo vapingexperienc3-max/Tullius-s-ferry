@@ -29,7 +29,7 @@ jobs:
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          ddef inject_width_style(filepath, link_map_data):
+          def inject_width_style(filepath, link_map_data):
               # 백업 3의 순정 스타일 + 브라우저 캐시 무시용 ID 부여
               style_code = """<style id="fix-style">
                   body, .fr-view, #content, .article-content { 
