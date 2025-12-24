@@ -80,11 +80,11 @@ jobs:
       except Exception as e:
           print(f"❌ 수정 실패 ({filepath}): {e}")
 
-  # 3. [중요] 생성된 link_map을 가지고 모든 파일 수정 실행
-  for root, dirs, files in os.walk('.'):
-      for f in files:
-          if f.endswith('.html') and f not in ['index.html', '404.html']:
-              inject_width_style(os.path.join(root, f), link_map)
+          # 3. [중요] 생성된 link_map을 가지고 모든 파일 수정 실행
+          for root, dirs, files in os.walk('.'):
+              for f in files:
+                  if f.endswith('.html') and f not in ['index.html', '404.html']:
+                      inject_width_style(os.path.join(root, f), link_map)
                   
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
