@@ -70,17 +70,16 @@ jobs:
 
                   # 내부에서 사용할 보조 함수
                   def link_replacer(match):
-                      full_url = match.group(0)
                       aid = match.group(1)
                       if aid in link_map_data:
                           target = link_map_data[aid].replace('\\', '/')
                           encoded_path = urllib.parse.quote(target)
-                          # 깃허브 주소로 변환 (뒤에 붙은 쿼리나 해시는 제거하여 깔끔하게 연결)
-                          return f'https://vapingexperienc3-max.github.io/Tullius-ferry/{encoded_path}'
-                      return full_url
+                          # 결과물은 표준을 지키기 위해 따옴표(")를 감싸서 내보냅니다.
+                          return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{encoded_path}"'
+                      return match.group(0)
 
                   # 링크 치환 수행
-                  content = re.sub(r'https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*', link_replacer, content)
+                  content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
 
                   # 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
