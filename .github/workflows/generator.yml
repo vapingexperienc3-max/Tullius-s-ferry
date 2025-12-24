@@ -26,8 +26,6 @@ jobs:
 
           # 1. 변수 초기화 (에러 방지를 위해 반드시 먼저 선언)
           link_map = {}
-
-          # 2. 링크 맵 생성을 위한 사전 탐색
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
@@ -35,53 +33,41 @@ jobs:
                       if all_numbers:
                           article_id = all_numbers[0]
                           rel_path = os.path.relpath(os.path.join(root, f), '.')
-                          link_map[article_id] = rel_path
-                          print(f"Mapped: {article_id} -> {rel_path}")
+                          link_map[article_id] = rel_path.replace('\\', '/')
+                          print(f"Mapped: {article_id} -> {link_map[article_id]}")
 
           def inject_width_style(filepath, link_map_data):
-              """JS 리졸버 대신, HTML 내의 모든 아카라이브 링크를 직접 수정"""
+              """본문 내 링크 치환 및 스타일 주입"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제
+                  # (1) 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 본문 내 아카라이브 링크를 로컬 링크로 강제 치환
-                  # 아카라이브 게시글 주소 패턴을 찾습니다.
-                  arca_pattern = r'https://arca\.live/b/[^/]+/(\d+)'
-                  
-                  def replace_url(match):
-                      aid = match.group(1)
-                      if aid in link_map_data:
-                          # 깃허브 내부 경로로 변환 (상대 경로 계산)
-                          target = link_map_data[aid].replace('\\', '/')
-                          # 파일이 위치한 깊이에 따라 상대 경로 조절 (단순화 위해 절대경로 활용 권장)
-                          return f"/{aid}.html" # 이 부분은 실제 파일 구조에 맞춰 조정 필요
-                      return match.group(0) # 매칭 안되면 유지
-
-                  # 정규식으로 링크 자체를 텍스트 단계에서 교체
-                      for aid, path in link_map_data.items():
+                  # (2) 아카라이브 링크를 깃허브 내부 링크로 강제 치환
+                  for aid, path in link_map_data.items():
                       old_url = f"https://arca.live/b/tullius/{aid}"
-                      # 깃허브 저장소 이름(Tullius-ferry) 기반 경로 생성
-                      new_url = f"https://vapingexperienc3-max.github.io/Tullius-ferry/{path.replace('\\', '/')}"
+                      # 저장소 주소에 맞춰 경로 생성
+                      new_url = f"https://vapingexperienc3-max.github.io/Tullius-ferry/{path}"
                       content = content.replace(old_url, new_url)
 
-                  # 3. 스타일만 깔끔하게 주입
-                  style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; }</style>'
-                  if '<head>' in content:
-                      content = content.replace('<head>', '<head>' + style_tag)
+                  # (3) 스타일 주입
+                  style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
+                  if '<head>' in content.lower():
+                      marker = '<head>' if '<head>' in content else '<HEAD>'
+                      content = content.replace(marker, marker + style_tag)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
               except Exception as e:
-                  print("❌ Error: {0}".format(e))
+                  print(f"❌ Error in {filepath}: {e}")
 
-                  # 3. 모든 파일에 주입 실행
-                  for root, dirs, files in os.walk('.'):
-                      for f in files:
-                      if f.endswith('.html') and f != 'index.html':
+          # 2. 모든 파일에 실행
+          for root, dirs, files in os.walk('.'):
+              for f in files:
+                  if f.endswith('.html') and f != 'index.html':
                       f_path = os.path.join(root, f)
                       inject_width_style(f_path, link_map)
                   
