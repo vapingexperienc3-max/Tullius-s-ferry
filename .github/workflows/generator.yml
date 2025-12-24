@@ -58,30 +58,45 @@ jobs:
                   return False
 
           # 2. 파일 탐색 및 매핑 (1차 순회)
+          print("--- 1단계: 파일 탐색 및 매핑 시작 ---")
+          print(f"Current Directory: {os.getcwd()}")
+          
           for root, dirs, files in os.walk('.'):
+              # 숨김 폴더나 .git 등 제외
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       path = os.path.join(root, f)
                       aid = None
+                      # 파일명에서 숫자 추출 (게시글 번호)
                       nums = re.findall(r'\d{7,11}', f)
                       if nums: aid = nums[0]
+                      
+                      # 파일명에 숫자가 없으면 본문 앞부분에서 추출
                       if not aid:
                           try:
                               with open(path, 'r', encoding='utf-8', errors='ignore') as tmp:
                                   m = re.search(r'arca\.live/b/[^/]+/(\d+)', tmp.read(5000))
                                   if m: aid = m.group(1)
                           except: pass
+                      
                       if aid:
-                          link_map[aid] = os.path.relpath(path, '.').replace('\\', '/')
+                          rel_p = os.path.relpath(path, '.').replace('\\', '/')
+                          link_map[aid] = rel_p
+                          # 매핑된 파일 로그 찍기
+                          print(f"🔗 매핑 발견: {aid} -> {rel_p}")
 
           # 3. 실제 수정 작업 실행 (2차 순회)
-          print("--- 수정 작업 시작 ---")
+          print(f"\n--- 2단계: 본문 수정 시작 (총 {len(link_map)}개 대상) ---")
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
-                      inject_width_style(full_p, link_map)
+                      if inject_width_style(full_p, link_map):
+                          # 수정 성공 로그 (이게 보여야 진짜 수정된 것임)
+                          print(f"✔️ 수정 완료: {full_p}")
+                      else:
+                          print(f"❌ 수정 실패 또는 스킵: {full_p}")
 
           # 4. 트리 생성 및 인덱스 제작 로직 시작
           tree = {}
