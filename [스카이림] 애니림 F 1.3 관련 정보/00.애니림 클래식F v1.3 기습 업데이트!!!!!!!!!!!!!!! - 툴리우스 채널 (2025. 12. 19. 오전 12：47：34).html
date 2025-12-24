@@ -1,4 +1,20 @@
 
+    <style id="recovery-v2">
+      /* 본문 컨테이너 너비만 제한 (백업 2 로직) */
+      body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
+        max-width: 1000px !important; 
+        width: 95% !important; 
+        margin: 0 auto !important; 
+        padding: 10px !important; 
+      }
+      /* 이미지가 본문을 뚫고 나가는 것만 방지 */
+      img { max-width: 100% !important; height: auto !important; }
+      /* 아이콘 크기만 정상화 */
+      svg, .icon { max-width: 32px !important; height: auto !important; }
+      /* 상단 불필요 UI 제거 */
+      .navbar-wrapper .user-info, .navbar-wrapper .nav-item.member { display: none !important; }
+    </style>
+    
     <style id="final-fix">
       /* 모든 레이아웃 강제 수직 정렬 */
       html, body { overflow-x: hidden !important; width: 100% !important; height: auto !important; }
