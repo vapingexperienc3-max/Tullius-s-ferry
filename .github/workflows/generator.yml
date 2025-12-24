@@ -40,7 +40,7 @@ jobs:
                           target = urllib.parse.quote(link_map_data[aid])
                           return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
                       return match.group(0)
-                      
+
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
@@ -54,11 +54,10 @@ jobs:
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
-              except Exception as e:
-                  print(f"Error: {e}")
+              except:
                   return False
 
-          # 파일 탐색
+          # 파일 탐색 및 매핑
           for root, dirs, files in os.walk('.'):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               for f in files:
@@ -76,14 +75,13 @@ jobs:
                       if aid:
                           link_map[aid] = os.path.relpath(path, '.').replace('\\', '/')
 
-          # 수정 실행
-          print("--- Processing ---")
+          # 실제 수정 실행
+          print("--- 수정 작업 시작 ---")
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
-                      if inject_width_style(full_p, link_map):
-                          print(f"✔️ Done: {full_p}")
+                      inject_width_style(full_p, link_map)
                   
           tree = {}
           for root, dirs, files in sorted(os.walk('.')):
