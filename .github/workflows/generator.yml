@@ -24,12 +24,11 @@ jobs:
           import re
           import urllib.parse
 
-         # [1] 설정 및 준비
+         # 1. 매핑 준비
           link_map = {}
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-          # [2] 본문 수정 함수
           def inject_width_style(filepath, link_map_data):
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
@@ -38,12 +37,10 @@ jobs:
                   def link_replacer(match):
                       aid = match.group(1)
                       if aid in link_map_data:
-                          # 한글 경로 인코딩을 위해 urllib.parse 사용
                           target = urllib.parse.quote(link_map_data[aid])
                           return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
                       return match.group(0)
 
-                  # 링크 치환 & 닉네임 삭제 & 스타일 주입
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
@@ -52,17 +49,16 @@ jobs:
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
                   
-                  # CSP 메타 태그 제거
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
               except Exception as e:
-                  print(f"Error processing {filepath}: {e}")
+                  print(f"Error: {e}")
                   return False
 
-          # [3] 파일 탐색 및 매핑 (1차 순회)
+          # 파일 탐색
           for root, dirs, files in os.walk('.'):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               for f in files:
@@ -80,14 +76,14 @@ jobs:
                       if aid:
                           link_map[aid] = os.path.relpath(path, '.').replace('\\', '/')
 
-          # [4] 모든 파일 본문 수정 실행 (2차 순회)
-          print("--- 본문 수정 시작 ---")
+          # 수정 실행
+          print("--- Processing ---")
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
                       if inject_width_style(full_p, link_map):
-                          print(f"✔️ 수정 완료: {full_p}")
+                          print(f"✔️ Done: {full_p}")
                   
           tree = {}
           for root, dirs, files in sorted(os.walk('.')):
