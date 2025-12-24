@@ -27,14 +27,29 @@ jobs:
           # 1. 변수 초기화 (에러 방지를 위해 반드시 먼저 선언)
           link_map = {}
           for root, dirs, files in os.walk('.'):
-              for f in files:
-                  if f.endswith('.html') and f != 'index.html':
-                      all_numbers = re.findall(r'\d{7,10}', f)
-                      if all_numbers:
-                          article_id = all_numbers[0]
-                          rel_path = os.path.relpath(os.path.join(root, f), '.')
-                          link_map[article_id] = rel_path.replace('\\', '/')
-                          print(f"Mapped: {article_id} -> {link_map[article_id]}")
+          for f in files:
+              if f.endswith('.html') and f != 'index.html':
+                  filepath = os.path.join(root, f)
+                  article_id = None
+            
+                  # (A) 파일명에서 숫자 찾기
+                  nums = re.findall(r'\d{7,10}', f)
+                  if nums: article_id = nums[0]
+            
+                  # (B) 파일명에 없으면 파일 안(상단 2000자)에서 URL 찾기
+                  if not article_id:
+                      try:
+                          with open(filepath, 'r', encoding='utf-8') as tmp:
+                              head = tmp.read(2000)
+                              match = re.search(r'https://arca\.live/b/[^/]+/(\d+)', head)
+                              if match: article_id = match.group(1)
+                      except: pass
+
+                  if article_id:
+                      # 툴붕이가 말한 '상대 경로' 구조를 자동으로 생성
+                      rel = os.path.relpath(filepath, '.')
+                      link_map[article_id] = rel.replace('\\', '/')
+                      print(f"✅ 발견 및 매핑: {article_id} -> {link_map[article_id]}")
 
           def inject_width_style(filepath, link_map_data):
               """개별 HTML 파일의 텍스트를 직접 수정하는 핵심 함수"""
