@@ -30,30 +30,31 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data):
+              # 백업 3번 시절의 그 가벼운 스타일 코드 (100% 대신 가독성 위해 1000px만 제한)
+              style_code = '<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
+                  # 1. 닉네임 삭제 (백업 3번 방식)
+                  for nick in ["Ryl3", "ryl3", "RYL3"]:
+                      content = content.replace(nick, "")
+
+                  # 2. 링크 매핑 (백업 17의 핵심 기능)
                   def link_replacer(match):
                       aid = match.group(1)
                       if aid in link_map_data:
                           target = urllib.parse.quote(link_map_data[aid])
                           return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
                       return match.group(0)
-
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
-                  for nick in ["Ryl3", "ryl3", "RYL3"]:
-                      content = content.replace(nick, "")
-                  
-                  style_tag = '<style>body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 15px !important; box-sizing: border-box !important; } img, video { max-width: 100% !important; height: auto !important; display: block; margin: 10px auto; }</style>'
 
-                  # 기존 head의 가장 앞부분에 주입하여 우선순위를 높임
-                  if '<head>' in content.lower():
-                      content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                  # 3. 레이아웃 주입 (백업 3번의 head 치환 방식)
+                  if '<head>' in content:
+                      content = content.replace('<head>', '<head>' + style_code)
                   else:
-                      content = style_tag + content
-                  
-                  # 불필요한 보안 정책 제거
+                      content = style_code + content
+
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
