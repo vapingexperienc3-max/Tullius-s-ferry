@@ -30,17 +30,24 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data=None):
-              # 1. 백업 3의 그 전설적인 스타일 (더 가볍게 수정)
-              style_code = '<style>body, .fr-view, #content, .article-content { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
+              # 백업 2 스타일 기반 + 최소한의 레이아웃 고정
+              style_code = """
+              <style id="recovery-style">
+                body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
+                  max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; 
+                }
+                img { max-width: 100% !important; height: auto !important; }
+              </style>
+              """
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 2. 닉네임 삭제
+                  # 1. 닉네임 삭제 (백업 2/3 공통)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 3. 링크 매핑 (link_map_data가 있을 때만 작동)
+                  # 2. 링크 매핑 (백업 17 로직을 안전하게 실행)
                   if link_map_data:
                       try:
                           def link_replacer(match):
@@ -53,13 +60,16 @@ jobs:
                       except:
                           pass
 
-                  # 4. 스타일 주입 (백업 3의 단순 교체 방식)
-                  if '<head>' in content:
-                      content = content.replace('<head>', '<head>' + style_code)
-                  else:
-                      content = style_code + content
+                  # 3. 레이아웃 주입 (백업 2의 안전 검사 로직 채용)
+                  # 중복 주입을 방지하고 <head> 태그가 있을 때만 그 뒤에 바로 붙입니다.
+                  if 'id="recovery-style"' not in content:
+                      if '<head>' in content:
+                          content = content.replace('<head>', '<head>' + style_code)
+                      else:
+                          # head가 없으면 맨 앞에 강제 주입
+                          content = style_code + content
                   
-                  # 5. CSP 제거
+                  # 4. CSP 제거 (이미지 차단 방지용)
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
