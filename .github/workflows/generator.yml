@@ -63,7 +63,6 @@ jobs:
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     let targetPath = backupLinkMap[articleId].split('\\\\').join('/');
-                    // 깃허브 페이지 루트 경로를 찾기 위한 계산
                     const repoName = "Tullius-ferry";
                     const currentUrl = window.location.href;
                     const rootPath = currentUrl.split(repoName)[0] + repoName + "/";
