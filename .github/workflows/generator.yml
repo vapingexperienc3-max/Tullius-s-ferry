@@ -30,79 +30,82 @@ jobs:
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
-                      # 파일명 전체에서 숫자 7~10자리를 모두 찾아봅니다.
-                      # (게시글 번호는 보통 8자리 내외이므로 범위를 넓힘)
+                      # 파일명에서 7~10자리 숫자(게시글 번호)를 모두 찾음
                       all_numbers = re.findall(r'\d{7,10}', f)
-                      
-                      # 만약 파일명에 번호가 없다면, 파일 내부를 슥 훑어서 meta 태그의 og:url 등을 확인 (선택 사항)
-                      # 일단 파일명에서 가장 유력한 번호를 게시글 ID로 채택합니다.
                       if all_numbers:
-                          # 여러 숫자 중 가장 게시글 번호 같은 것(보통 첫 번째나 긴 것)을 선택
-                          article_id = all_numbers[0] 
+                          # 가장 게시글 번호 같은 것(보통 첫 번째)을 ID로 채택
+                          article_id = all_numbers[0]
                           rel_path = os.path.relpath(os.path.join(root, f), '.')
                           link_map[article_id] = rel_path
-                          # 확인용 로그 (GitHub Actions 빌드 로그에서 볼 수 있음)
+                          # 빌드 로그 확인용
                           print(f"Mapped: {article_id} -> {rel_path}")
-                          
+
           def inject_width_style(filepath, link_map_data):
-              """개별 게시글 내부 가공: 닉네임 삭제, 스타일 주입, 리졸버 삽입"""
+              """개별 게시물 가공: 닉네임 삭제, 스타일 주입, 리졸버 삽입"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
                   
-                  # 1. 닉네임 제거
+                  # 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 중복 주입 방지
                   if 'backupLinkMap' in content:
                       with open(filepath, 'w', encoding='utf-8') as f:
                           f.write(content)
                       return
 
                   link_map_json = json.dumps(link_map_data)
-                  code_lines = [
+                  
+                  # 자바스크립트 주입 (에러 방지를 위해 리스트 결합 방식 사용)
+                  js_lines = [
+                      '<style>',
+                      'body, .fr-view, #content, .main-container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; }',
+                      'img { max-width: 100% !important; height: auto !important; }',
+                      '</style>',
                       '<script>',
                       '(function() {',
-                      '    const backupLinkMap = ' + link_map_json + ';',
-                      '    console.log("🚀 Resolver Ready. Mapped IDs:", Object.keys(backupLinkMap).length);',
+                      '    console.log("🚀 Resolver Ready");',
+                      f'    const backupLinkMap = {link_map_json};',
                       '    window.addEventListener("mousedown", function(e) {',
                       '        const a = e.target.closest("a");',
                       '        if (!a || !a.href || !a.href.includes("arca.live")) return;',
-                      '',
-                      '        // 링크 주소에서 숫자 7~10자리만 추출',
                       '        const match = a.href.match(/\\d{7,10}/);',
                       '        const articleId = match ? match[0] : null;',
-                      '',
                       '        if (articleId && backupLinkMap[articleId]) {',
                       '            e.preventDefault(); e.stopImmediatePropagation();',
                       '            const targetPath = backupLinkMap[articleId].replace(/\\\\/g, "/");',
                       '            const repoName = "Tullius-ferry";',
-                      '            const repoIdx = window.location.pathname.toLowerCase().indexOf(repoName.toLowerCase());',
-                      '            const repoBase = window.location.pathname.substring(0, repoIdx + repoName.length);',
+                      '            const path = window.location.pathname;',
+                      '            const repoIdx = path.toLowerCase().indexOf(repoName.toLowerCase());',
+                      '            const repoBase = path.substring(0, repoIdx + repoName.length);',
                       '            const finalUrl = window.location.origin + repoBase + "/" + encodeURI(targetPath);',
-                      '            console.log("✅ Match found! Redirecting to:", finalUrl);',
+                      '            console.log("✅ Match found! Redirecting:", finalUrl);',
                       '            window.location.href = finalUrl;',
-                      '        } else {',
-                      '            console.log("❌ No match for ID:", articleId);',
                       '        }',
                       '    }, true);',
                       '})();',
                       '</script>'
                   ]
-                  combined_code = "\\n".join(code_lines)
+                  combined_code = "\\n".join(js_lines)
 
-                  # 3. HTML 헤더에 코드 주입
+                  # 헤더에 주입
                   if '<head>' in content.lower():
                       content = content.replace('<head>', '<head>' + combined_code) if '<head>' in content else content.replace('<HEAD>', '<HEAD>' + combined_code)
                   else:
                       content = combined_code + content
 
-                  # 4. 최종 결과 저장 및 에러 처리
-                  with open(filepath, "w", encoding="utf-8") as f:
+                  with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
               except Exception as e:
                   print("❌ Error in {0}: {1}".format(filepath, e))
+
+                  # 2. 모든 파일에 주입 실행 (이 루프의 들여쓰기가 중요합니다)
+          for root, dirs, files in os.walk('.'):
+              for f in files:
+                  if f.endswith('.html') and f != 'index.html':
+                      f_path = os.path.join(root, f)
+                      inject_width_style(f_path, link_map)
                   
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
