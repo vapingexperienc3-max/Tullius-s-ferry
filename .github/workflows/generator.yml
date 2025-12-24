@@ -46,16 +46,11 @@ jobs:
                       content = content.replace(nick, "")
                   
                   style_rules = [
-                      "body, html { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #1a1a1a !important; color: #eee !important; }",
-                      /* 본문 컨테이너: 최대 너비를 1000px로 제한하고 중앙 정렬 */
+                      "body, html { margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #1a1a1a !important; color: #eee !important; }", 
                       ".fr-view, .article-content, #article_content, .article-wrapper, .post-wrapper { max-width: 1000px !important; width: 95% !important; margin: 20px auto !important; padding: 30px !important; box-sizing: border-box !important; background: #222 !important; border-radius: 8px; line-height: 1.6; }",
-                      /* 이미지/영상: 본문 너비를 넘지 않게 조절 */
                       "img, video, iframe { max-width: 100% !important; height: auto !important; display: block; margin: 15px auto; border-radius: 4px; }",
-                      /* 테이블 처리 */
                       "table { width: 100% !important; table-layout: fixed; word-break: break-all; border-collapse: collapse; }",
-                      /* 댓글 영역: 본문과 동일한 너비 유지 */
                       ".comment-wrapper, .reply-form, #comment { max-width: 1000px !important; width: 95% !important; margin: 20px auto !important; padding: 10px !important; }",
-                      /* 인라인 스타일로 박힌 너비 강제 해제 */
                       "div[style*='width'] { max-width: 100% !important; width: auto !important; }"
                   ]
                   style_tag = '\n<style>' + ' '.join(style_rules) + '</style>\n'
