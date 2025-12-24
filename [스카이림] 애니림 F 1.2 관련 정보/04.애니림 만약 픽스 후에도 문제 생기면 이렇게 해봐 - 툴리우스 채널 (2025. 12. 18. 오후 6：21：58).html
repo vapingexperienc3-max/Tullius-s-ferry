@@ -1,12 +1,30 @@
 
-    <style id="final-v2-style">
-      body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
-        max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
+    <style id="original-recovery">
+      /* 전체 배경과 기본 폰트 설정 유지 */
+      body { background-color: #f8f9fa !important; margin: 0 !important; }
+      
+      /* 본문 영역만 중앙 정렬 및 너비 확보 */
+      .fr-view, .article-content, #content, .main-container { 
+        max-width: 1100px !important; 
+        width: 95% !important; 
+        margin: 0 auto !important; 
+        padding: 20px !important;
+        background: #fff !important; /* 문서 같은 느낌을 위해 배경 흰색 */
+        box-shadow: 0 0 10px rgba(0,0,0,0.1) !important; /* 종이 같은 느낌 */
       }
+
+      /* 이미지/표는 본문 안에서만 놀게 함 */
       img { max-width: 100% !important; height: auto !important; }
-      svg, .icon { max-width: 32px !important; height: auto !important; }
-      .navbar-wrapper .user-info, .navbar-wrapper .nav-item.member { display: none !important; }
+      table { width: 100% !important; table-layout: auto !important; border-collapse: collapse !important; }
+      
+      /* 거대 아이콘 방지 */
+      svg, .icon { max-width: 24px !important; height: auto !important; }
+      
+      /* 불필요한 웹 레이아웃 요소(로그인창 등) 제거 */
+      .navbar-wrapper, .user-info, .bottom-container, .side-menu { display: none !important; }
     </style>
+    
+    
     
     
     
