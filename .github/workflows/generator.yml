@@ -37,23 +37,28 @@ jobs:
                           print(f"Mapped: {article_id} -> {link_map[article_id]}")
 
           def inject_width_style(filepath, link_map_data):
-              """본문 내 링크 치환 및 스타일 주입"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
 
-                  # (1) 닉네임 삭제
+                  # 1. 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # (2) 아카라이브 링크를 깃허브 내부 링크로 강제 치환
+                  # 2. 강화된 링크 치환 (정규식 사용)
+                  # 아카라이브 주소 패턴: https://arca.live/b/tullius/숫자...
                   for aid, path in link_map_data.items():
-                      old_url = f"https://arca.live/b/tullius/{aid}"
-                      # 저장소 주소에 맞춰 경로 생성
-                      new_url = f"https://vapingexperienc3-max.github.io/Tullius-ferry/{path}"
-                      content = content.replace(old_url, new_url)
+                      # 깃허브 최종 주소 조립
+                      new_url = f"https://vapingexperienc3-max.github.io/Tullius-ferry/{path.replace('\\', '/')}"
+                      
+                      # 패턴 1: 주소 끝이 숫자로 끝날 때
+                      content = content.replace(f"https://arca.live/b/tullius/{aid}", new_url)
+                      # 패턴 2: 주소 끝에 /가 붙어있을 때
+                      content = content.replace(f"https://arca.live/b/tullius/{aid}/", new_url)
+                      # 패턴 3: 주소 뒤에 쿼리문(?p=1 등)이 붙어있을 때 (정규식으로 더 넓게 치환 가능하지만 일단 텍스트 위주)
+                      content = re.sub(f'https://arca\.live/b/tullius/{aid}(\?|#)[^"\'\\s>]*', new_url, content)
 
-                  # (3) 스타일 주입
+                  # 3. 스타일 주입
                   style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
                   if '<head>' in content.lower():
                       marker = '<head>' if '<head>' in content else '<HEAD>'
