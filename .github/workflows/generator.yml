@@ -46,8 +46,10 @@ jobs:
                       content = content.replace(nick, "")
                   
                   style_rules = [
-                      "body, html, .fr-view, .article-content, .content, .container, .main, div[style*='width'] { max-width: 100% !important; width: 100% !important; margin: 0 auto !important; padding: 10px !important; box-sizing: border-box !important; float: none !important; }",
-                      "img, video, iframe { max-width: 100% !important; height: auto !important; }",
+                      "* { max-width: 100% !important; box-sizing: border-box !important; }",
+                      "body, html, .fr-view, .article-content, .content, .container, .main { width: 100% !important; margin: 0 auto !important; padding: 10px !important; background-color: transparent !important; }",
+                      "div, table, section, article { width: auto !important; min-width: 0 !important; display: block !important; }",
+                      "img, video, iframe { max-width: 100% !important; height: auto !important; display: block; margin: 10px auto; }",
                       ".article-wrapper, .post-wrapper { width: 100% !important; min-width: unset !important; }"
                   ]
                   style_tag = '\n<style>' + ' '.join(style_rules) + '</style>\n'
@@ -57,6 +59,7 @@ jobs:
                   else:
                       content = style_tag + content
                   
+                  # CSP 메타 태그 제거
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
