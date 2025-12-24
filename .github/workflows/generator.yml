@@ -24,23 +24,69 @@ jobs:
           import re    # 추가: 게시글 번호를 찾기 위한 도구
           import json  # 추가: 찾은 번호들을 리스트로 저장하기 위한 도구
           
-          link_map = {}
-          def inject_width_style(filepath):
-              style_code = """<style>
-              body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
-                  max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
-              } 
-              img { max-width: 100% !important; height: auto !important; }
-              </style>"""
-              try:
-                  with open(filepath, 'r', encoding='utf-8') as f:
-                      content = f.read()
-                  
-                  # 게시글 번호 추출 (전체 내용에서)
-                  url_match = re.search(r'arca\.live/b/[^/]+/(\d+)', content)
-                  if url_match:
-                      article_id = url_match.group(1)
-                      link_map[article_id] = filepath.replace("\\", "/").replace("./", "")
+          def inject_width_style(filepath, link_map):
+    # 1. 주입할 스타일과 리졸버 스크립트 정의
+    # json.dumps를 통해 link_map 데이터를 자바스크립트 변수로 직접 박아넣습니다.
+    combined_code = f"""
+    <style>
+        body, .fr-view, #content, .main-container, .article-content, div[class*="content"] {{ 
+            max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
+        }} 
+        img {{ max-width: 100% !important; height: auto !important; }}
+    </style>
+    <script>
+        (function() {{
+            const backupLinkMap = {json.dumps(link_map)};
+            
+            function resolveLink(e) {{
+                const a = e.target.closest('a');
+                if (!a || !a.href || !a.href.includes('arca.live')) return;
+
+                const parts = a.href.split('/');
+                const lastPart = parts[parts.length - 1].split('?')[0];
+                let articleId = lastPart.replace(/[^0-9]/g, '');
+
+                const textNum = a.innerText.replace(/[^0-9]/g, '');
+                if (textNum.length >= 8) {{ articleId = textNum; }}
+
+                if (articleId && backupLinkMap[articleId]) {{
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    
+                    let targetPath = backupLinkMap[articleId].split('\\\\').join('/');
+                    // 개별 게시글은 보통 하위 폴더에 있으므로, 루트(index.html 위치)를 찾아가야 합니다.
+                    // 간단하게 전체 경로를 조합하거나 상대 경로로 계산합니다.
+                    const currentUrl = window.location.href;
+                    const repoName = "Tullius-ferry"; // 저장소 이름에 맞춰 수정 필요할 수 있음
+                    const rootPath = currentUrl.split(repoName)[0] + repoName + "/";
+                    
+                    window.location.href = rootPath + encodeURI(targetPath);
+                    return false;
+                }}
+            }}
+            document.addEventListener('click', resolveLink, true);
+            document.addEventListener('mousedown', resolveLink, true);
+        }})();
+    </script>
+    """
+
+    try:
+        # 파일 읽기
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # 헤더가 있는지 확인하고 주입
+        if '<head>' in content.lower():
+            # 대소문자 구분 없이 <head> 태그 바로 뒤에 삽입
+            import re
+            new_content = re.sub(r'(<head> )', r'\1' + combined_code, content, flags=re.IGNORECASE)
+            
+            # 파일 쓰기 (수정된 내용 저장)
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+            # print(f"✅ 스타일/스크립트 주입 완료: {filepath}") # 확인용
+    except Exception as e:
+        print(f"❌ 파일 수정 오류 ({filepath}): {e}")
                   
                   # 닉네임 제거 및 스타일 삽입
                   for nick in ["Ryl3", "ryl3", "RYL3"]: content = content.replace(nick, "")
