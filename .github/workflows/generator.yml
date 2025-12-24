@@ -39,64 +39,49 @@ jobs:
                           print(f"Mapped: {article_id} -> {rel_path}")
 
           def inject_width_style(filepath, link_map_data):
-              """개별 게시글 가공 로직"""
+              """JS 리졸버 대신, HTML 내의 모든 아카라이브 링크를 직접 수정"""
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
 
+                  # 1. 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  if 'backupLinkMap' in content:
-                      return
+                  # 2. 본문 내 아카라이브 링크를 로컬 링크로 강제 치환
+                  # 아카라이브 게시글 주소 패턴을 찾습니다.
+                  arca_pattern = r'https://arca\.live/b/[^/]+/(\d+)'
+                  
+                  def replace_url(match):
+                      aid = match.group(1)
+                      if aid in link_map_data:
+                          # 깃허브 내부 경로로 변환 (상대 경로 계산)
+                          target = link_map_data[aid].replace('\\', '/')
+                          # 파일이 위치한 깊이에 따라 상대 경로 조절 (단순화 위해 절대경로 활용 권장)
+                          return f"/{aid}.html" # 이 부분은 실제 파일 구조에 맞춰 조정 필요
+                      return match.group(0) # 매칭 안되면 유지
 
-                  link_map_json = json.dumps(link_map_data)
-                  js_lines = [
-                      '<style>',
-                      'body, .fr-view, #content, .main-container { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; }',
-                      'img { max-width: 100% !important; height: auto !important; }',
-                      '</style>',
-                      '<script>',
-                      '(function() {',
-                      '    console.log("🚀 Resolver Ready");',
-                      f'    const backupLinkMap = {link_map_json};',
-                      '    window.addEventListener("mousedown", function(e) {',
-                      '        const a = e.target.closest("a");',
-                      '        if (!a || !a.href || !a.href.includes("arca.live")) return;',
-                      '        const match = a.href.match(/\\d{{7,10}}/);', # 중괄호 이중 처리
-                      '        const articleId = match ? match[0] : null;',
-                      '        if (articleId && backupLinkMap[articleId]) {',
-                      '            e.preventDefault(); e.stopImmediatePropagation();',
-                      '            const targetPath = backupLinkMap[articleId].replace(/\\\\/g, "/");',
-                      '            const repoName = "Tullius-ferry";',
-                      '            const path = window.location.pathname;',
-                      '            const repoIdx = path.toLowerCase().indexOf(repoName.toLowerCase());',
-                      '            const repoBase = path.substring(0, repoIdx + repoName.length);',
-                      '            const finalUrl = window.location.origin + repoBase + "/" + encodeURI(targetPath);',
-                      '            console.log("✅ Match found! Redirecting:", finalUrl);',
-                      '            window.location.href = finalUrl;',
-                      '        }',
-                      '    }, true);',
-                      '})();',
-                      '</script>'
-                  ]
-                  combined_code = "\\n".join(js_lines)
+                  # 정규식으로 링크 자체를 텍스트 단계에서 교체
+                  for aid, path in link_map_data.items():
+                      old_url = f"https://arca.live/b/tullius/{aid}"
+                      # 깃허브 저장소 이름(Tullius-ferry) 기반 경로 생성
+                      new_url = f"https://vapingexperienc3-max.github.io/Tullius-ferry/{path.replace('\\', '/')}"
+                      content = content.replace(old_url, new_url)
 
-                  if '<head>' in content.lower():
-                      marker = '<head>' if '<head>' in content else '<HEAD>'
-                      content = content.replace(marker, marker + combined_code)
-                  else:
-                      content = combined_code + content
+                  # 3. 스타일만 깔끔하게 주입
+                  style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; }</style>'
+                  if '<head>' in content:
+                      content = content.replace('<head>', '<head>' + style_tag)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
               except Exception as e:
-                  print("❌ Error in {0}: {1}".format(filepath, e))
+                  print("❌ Error: {0}".format(e))
 
-          # 3. 모든 파일에 주입 실행
-          for root, dirs, files in os.walk('.'):
-              for f in files:
-                  if f.endswith('.html') and f != 'index.html':
+                  # 3. 모든 파일에 주입 실행
+                  for root, dirs, files in os.walk('.'):
+                      for f in files:
+                      if f.endswith('.html') and f != 'index.html':
                       f_path = os.path.join(root, f)
                       inject_width_style(f_path, link_map)
                   
@@ -260,25 +245,7 @@ jobs:
               f.write("    cat.style.display = catHasMatch ? 'block' : 'none'; ")
               f.write("  }); ")
               f.write("} \n") # globalSearch 함수 끝
-
-              # 메인 index.html용 리졸버
-              f.write("const backupLinkMap = " + json.dumps(link_map) + ";\n")
-              f.write("function resolveLink(e) {\n")
-              f.write("    const a = e.target.closest('a');\n")
-              f.write("    if (a && a.href && a.href.includes('arca.live')) {\n")
-              f.write("        const parts = a.href.split('/');\n")
-              f.write("        const lastPart = parts[parts.length - 1].split('?')[0];\n")
-              f.write("        let articleId = lastPart.replace(/[^0-9]/g, '');\n")
-              f.write("        if (articleId && backupLinkMap[articleId]) {\n")
-              f.write("            e.preventDefault();\n")
-              f.write("            let targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');\n")
-              f.write("            window.location.href = window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + encodeURI(targetPath);\n")
-              f.write("        }\n")
-              f.write("    }\n")
-              f.write("}\n")
-              f.write("document.addEventListener('mousedown', resolveLink, true);\n")
-              f.write("document.addEventListener('click', resolveLink, true);\n")
-              f.write("</script></body></html>")
+              f.write("</body></html>")
           EOF
 
       - name: Commit and Push
