@@ -30,21 +30,14 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data=None):
-              # 백업 2에서 검증된 '순정형' 스타일
+              # 백업 2의 순정 스타일 (100% 너비로 시원하게 보기)
               style_code = """
-              <style id="recovery-v2">
-                /* 본문 컨테이너 너비만 제한 (백업 2 로직) */
+              <style id="final-v2-style">
                 body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
-                  max-width: 1000px !important; 
-                  width: 95% !important; 
-                  margin: 0 auto !important; 
-                  padding: 10px !important; 
+                  max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
                 }
-                /* 이미지가 본문을 뚫고 나가는 것만 방지 */
                 img { max-width: 100% !important; height: auto !important; }
-                /* 아이콘 크기만 정상화 */
                 svg, .icon { max-width: 32px !important; height: auto !important; }
-                /* 상단 불필요 UI 제거 */
                 .navbar-wrapper .user-info, .navbar-wrapper .nav-item.member { display: none !important; }
               </style>
               """
@@ -56,7 +49,7 @@ jobs:
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 링크 매핑 (백업 17 핵심 기능)
+                  # 2. 링크 매핑 (백업 17의 핵심 기능)
                   if link_map_data:
                       try:
                           def link_replacer(match):
@@ -68,16 +61,19 @@ jobs:
                           content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
                       except: pass
 
-                  # 3. 레이아웃 주입 (백업 2의 단순 replace 방식)
-                  # 중복 주입 방지를 위해 ID 체크 포함
-                  if 'id="recovery-v2"' not in content:
-                      if '<head>' in content:
-                          content = content.replace('<head>', '<head>' + style_code)
-                      else:
-                          content = style_code + content
+                  # 3. 레이아웃 주입 (조건문 없이 강제 교체)
+                  # 기존에 박혀있을지 모르는 모든 구형 스타일 태그를 먼저 제거합니다.
+                  content = re.sub(r'<style.*?>.*?</style>', '', content, flags=re.DOTALL | re.IGNORECASE)
                   
-                  # 4. CSP 제거 (이미지 엑박 방지)
+                  # 그리고 가장 깨끗한 백업 2 스타일을 삽입합니다.
+                  if '<head>' in content:
+                      content = content.replace('<head>', '<head>' + style_code)
+                  else:
+                      content = style_code + content
+                  
+                  # 4. CSP 제거 및 인라인 너비 초기화
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
+                  content = content.replace('width: 1200px', 'width: 100%')
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
