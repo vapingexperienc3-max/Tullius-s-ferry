@@ -29,7 +29,7 @@ jobs:
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
-         def inject_width_style(filepath, link_map_data):
+          def inject_width_style(filepath, link_map_data):
               # 백업 3의 핵심: 원본 스타일은 그대로 두고, 본문 너비만 딱 1000px로 가두기
               # !important를 최소화하여 원본 레이아웃과의 충돌을 방지합니다.
               style_code = '<style>body, .fr-view, #content, .article-content { max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
