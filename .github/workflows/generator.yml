@@ -30,24 +30,26 @@ jobs:
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
           def inject_width_style(filepath, link_map_data=None):
-              # 백업 2 스타일 기반 + 최소한의 레이아웃 고정
+              # 백업 2 스타일 + 파란 아이콘(svg) 강제 억제 코드 추가
               style_code = """
-              <style id="recovery-style">
+              <style>
                 body, .fr-view, #content, .main-container, .article-content, div[class*="content"] { 
                   max-width: 1000px !important; width: 95% !important; margin: 0 auto !important; padding: 10px !important; 
                 }
                 img { max-width: 100% !important; height: auto !important; }
+                svg, .icon, [class*="icon"] { max-width: 24px !important; height: auto !important; } 
+                .navbar-wrapper .user-info, .navbar-wrapper .nav-item.member { display: none !important; }
               </style>
               """
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
-                  # 1. 닉네임 삭제 (백업 2/3 공통)
+                  # 1. 닉네임 삭제 (백업 2 방식)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 2. 링크 매핑 (백업 17 로직을 안전하게 실행)
+                  # 2. 링크 매핑 (가장 단순한 정규식만 사용)
                   if link_map_data:
                       try:
                           def link_replacer(match):
@@ -57,19 +59,16 @@ jobs:
                                   return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
                               return match.group(0)
                           content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
-                      except:
-                          pass
+                      except: pass
 
-                  # 3. 레이아웃 주입 (백업 2의 안전 검사 로직 채용)
-                  # 중복 주입을 방지하고 <head> 태그가 있을 때만 그 뒤에 바로 붙입니다.
-                  if 'id="recovery-style"' not in content:
-                      if '<head>' in content:
-                          content = content.replace('<head>', '<head>' + style_code)
-                      else:
-                          # head가 없으면 맨 앞에 강제 주입
-                          content = style_code + content
+                  # 3. 레이아웃 주입 (백업 2의 '무식하지만 확실한' replace 방식)
+                  # 복잡하게 체크하지 않고 <head>를 찾아 그 자리에 우리 스타일을 강제로 박습니다.
+                  if '<head>' in content:
+                      content = content.replace('<head>', '<head>' + style_code)
+                  else:
+                      content = style_code + content
                   
-                  # 4. CSP 제거 (이미지 차단 방지용)
+                  # 4. CSP 제거
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
