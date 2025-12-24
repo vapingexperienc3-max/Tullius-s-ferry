@@ -30,7 +30,6 @@ jobs:
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f != 'index.html':
-                      # 파일명에서 8자리 이상의 숫자(게시글 번호) 추출
                       match = re.search(r'(\d{8,})', f)
                       if match:
                           article_id = match.group(1)
@@ -38,9 +37,22 @@ jobs:
                           link_map[article_id] = rel_path
 
           def inject_width_style(filepath, link_map_data):
-              link_map_json = json.dumps(link_map_data)
-              
-              combined_code = f"""
+              """개별 게시글 내부 가공: 닉네임 삭제, 스타일 주입, 리졸버 삽입"""
+              try:
+                  with open(filepath, 'r', encoding='utf-8') as f:
+                      content = f.read()
+                  
+                  # 닉네임 제거
+                  for nick in ["Ryl3", "ryl3", "RYL3"]:
+                      content = content.replace(nick, "")
+
+                  if 'backupLinkMap' in content:
+                      with open(filepath, 'w', encoding='utf-8') as f:
+                          f.write(content)
+                      return
+
+                  link_map_json = json.dumps(link_map_data)
+                  combined_code = f"""
               <style>
                   body, .fr-view, #content, .main-container, .article-content, div[class*="content"] {{ 
                       max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; 
@@ -50,69 +62,46 @@ jobs:
               <script>
                   (function() {{
                       const backupLinkMap = {link_map_json};
-                      
-                      function resolveLink(e) {{
+                      document.addEventListener('click', function(e) {{
                           const a = e.target.closest('a');
                           if (!a || !a.href || !a.href.includes('arca.live')) return;
 
-                          // 1. 게시글 ID 추출 로직 강화
-                          const urlParts = a.href.split('/');
-                          const lastPart = urlParts[urlParts.length - 1].split('?')[0].split('#')[0];
+                          const parts = a.href.split('/');
+                          const lastPart = parts[parts.length - 1].split('?')[0];
                           let articleId = lastPart.replace(/[^0-9]/g, '');
                           
-                          // 텍스트에 8자리 이상의 숫자가 있다면 그걸 우선시 (낚시 링크 방지)
-                          const textNumMatch = a.innerText.match(/\\d{{8,}}/);
-                          if (textNumMatch) {{ articleId = textNumMatch[0]; }}
-
                           if (articleId && backupLinkMap[articleId]) {{
                               e.preventDefault();
-                              e.stopImmediatePropagation();
+                              e.stopPropagation();
                               
-                              let targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');
+                              const repoName = "Tullius-ferry";
+                              const path = window.location.pathname;
+                              const repoBase = path.substring(0, path.toLowerCase().indexOf(repoName.toLowerCase()) + repoName.length);
                               
-                              // 2. 경로 계산 방식 변경: 도메인 루트로부터의 절대 경로 사용
-                              // 주소의 /Tullius-ferry/ 부분을 기준으로 경로를 재구성합니다.
-                              const pathSegments = window.location.pathname.split('/');
-                              const repoIdx = pathSegments.findIndex(s => s.toLowerCase() === 'tullius-ferry');
+                              const targetPath = backupLinkMap[articleId].replace(/\\\\/g, '/');
+                              const finalUrl = window.location.origin + repoBase + "/" + encodeURI(targetPath);
                               
-                              let finalUrl;
-                              if (repoIdx !== -1) {{
-                                  const rootPrefix = pathSegments.slice(0, repoIdx + 1).join('/');
-                                  finalUrl = window.location.origin + rootPrefix + '/' + encodeURI(targetPath);
-                              }} else {{
-                                  // 예상치 못한 경로일 경우 현재 위치 기준 상대 경로 시도
-                                  finalUrl = window.location.origin + '/' + encodeURI(targetPath);
-                              }}
-
-                              console.log('✅ 로컬 리다이렉트 실행:', articleId, '->', finalUrl);
+                              console.log("Redirecting to:", finalUrl);
                               window.location.href = finalUrl;
-                              return false;
                           }}
-                      }}
-                      
-                      // 캡처링 단계에서 이벤트를 낚아챔 (가장 강력한 가로채기 방식)
-                      document.addEventListener('click', resolveLink, true);
-                      document.addEventListener('mousedown', resolveLink, true);
+                      }}, true);
                   }})();
               </script>
               """
-    
-              try:
-                  with open(filepath, 'r', encoding='utf-8') as f:
-                      content = f.read()
-                  
-                  # 닉네임 제거 (선택 사항)
-                  for nick in ["Ryl3", "ryl3", "RYL3"]: content = content.replace(nick, "")
-                  
+                  # HTML 헤더에 코드 주입
                   if '<head>' in content.lower():
-                      # 중복 주입 방지 및 대소문자 대응
-                      if 'backupLinkMap' not in content:
-                          content = re.sub(r'(<head>)', r'\1' + combined_code, content, flags=re.IGNORECASE)
-                          with open(filepath, 'w', encoding='utf-8') as f:
-                              f.write(content)
+                      if '<head>' in content:
+                          content = content.replace('<head>', '<head>' + combined_code)
+                      else:
+                          content = content.replace('<HEAD>', '<HEAD>' + combined_code)
+                  
+                  with open(filepath, 'w', encoding='utf-8') as f:
+                      f.write(content)
+                      
               except Exception as e:
-                  print(f"Error processing {filepath}: {e}")
-
+                  # f-string 출력 형식 수정
+                  print(f"❌ Error processing {{filepath}}: {{e}}")
+                  
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
