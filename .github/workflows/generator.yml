@@ -26,64 +26,74 @@ jobs:
 
           # 1. 변수 초기화 (에러 방지를 위해 반드시 먼저 선언)
           link_map = {}
+          print("--- 매핑 작업 시작 ---")
           for root, dirs, files in os.walk('.'):
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       filepath = os.path.join(root, f)
                       article_id = None
+                      
+                      # 파일명에서 숫자 추출
                       nums = re.findall(r'\d{7,11}', f)
-                      if nums: article_id = nums[0]
+                      if nums:
+                          article_id = nums[0]
+                      
+                      # 파일 내용에서 추출 (파일명에 숫자 없을 때)
                       if not article_id:
                           try:
                               with open(filepath, 'r', encoding='utf-8') as tmp:
-                                  head = tmp.read(5000)
-                                  match = re.search(r'arca\.live/b/[^/]+/(\d+)', head)
+                                  sample = tmp.read(5000)
+                                  match = re.search(r'arca\.live/b/[^/]+/(\d+)', sample)
                                   if match: article_id = match.group(1)
                           except: pass
+                      
                       if article_id:
-                          rel = os.path.relpath(filepath, '.')
-                          link_map[article_id] = rel.replace('\\', '/')
+                          rel_path = os.path.relpath(filepath, '.').replace('\\', '/')
+                          link_map[article_id] = rel_path
+                          print(f"✅ 매핑 완료: {article_id} -> {rel_path}")
 
-          # 2. 치환 함수 (urllib 에러 해결 및 무적 정규식 적용)
-          def inject_width_style(filepath, link_map_data):
+          # 2. 치환 및 스타일 주입 함수
+          def process_file(filepath):
               try:
                   with open(filepath, 'r', encoding='utf-8') as f:
                       content = f.read()
 
+                  # 링크 치환 로직
                   def link_replacer(match):
                       aid = match.group(1)
-                      if aid in link_map_data:
-                          target = link_map_data[aid].replace('\\', '/')
-                          # 2. 내부에서 안전하게 urllib.parse 사용
-                          encoded_path = urllib.parse.quote(target)
-                          return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{encoded_path}"'
+                      if aid in link_map:
+                          target_path = urllib.parse.quote(link_map[aid])
+                          return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target_path}"'
                       return match.group(0)
 
-                  # [무적 정규식] 따옴표 있든 없든 다 낚아챔
+                  # 아카라이브 링크를 깃허브 링크로 강제 치환 (따옴표 대응)
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
 
                   # 닉네임 삭제
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
 
-                  # 스타일 주입
-                  style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
-                  if '<head>' in content.lower() and style_tag not in content:
-                      marker = '<head>' if '<head>' in content else '<HEAD>'
-                      content = content.replace(marker, marker + style_tag)
+                  # 모바일 최적화 스타일 주입
+                  style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
+                  if '<head>' in content.lower():
+                      content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                  elif '<html>' in content.lower():
+                      content = re.sub(r'(<html.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
-                  print(f"✅ 수정 완료: {filepath}")
+                  print(f"✔️ 수정 완료: {filepath}")
               except Exception as e:
-                  print(f"❌ 수정 실패 ({filepath}): {e}")
+                  print(f"❌ 수정 실패 ({filepath}): {str(e)}")
 
-          # 3. 모든 파일 실행
+          # 3. 모든 HTML 파일에 대해 실행
+          print("--- 본문 수정 시작 ---")
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
-                      inject_width_style(os.path.join(root, f), link_map)
+                      process_file(os.path.join(root, f))
+          print("--- 모든 작업 종료 ---")
                   
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
