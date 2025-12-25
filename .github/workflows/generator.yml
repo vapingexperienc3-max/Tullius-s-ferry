@@ -67,15 +67,19 @@ jobs:
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       path = os.path.join(root, f)
+                      print(f"🔍 파일 감지: {f}")  # 일단 파일을 찾으면 무조건 출력
+                      
                       aid = None
-                      # 파일명에서 숫자 추출 (게시글 번호)
+                      # 파일명에서 숫자 추출 (7~11자리)
                       nums = re.findall(r'\d{7,11}', f)
-                      if nums: aid = nums[0]
+                      if nums: 
+                          aid = nums[0]
                       
                       # 파일명에 숫자가 없으면 본문 앞부분에서 추출
                       if not aid:
                           try:
                               with open(path, 'r', encoding='utf-8', errors='ignore') as tmp:
+                                  # 처음 5000자만 읽어서 아카 링크 탐색
                                   m = re.search(r'arca\.live/b/[^/]+/(\d+)', tmp.read(5000))
                                   if m: aid = m.group(1)
                           except: pass
@@ -83,8 +87,10 @@ jobs:
                       if aid:
                           rel_p = os.path.relpath(path, '.').replace('\\', '/')
                           link_map[aid] = rel_p
-                          # 매핑된 파일 로그 찍기
-                          print(f"🔗 매핑 발견: {aid} -> {rel_p}")
+                          print(f"🔗 매핑 성공: {aid} -> {rel_p}")
+                      else:
+                          # 매핑에 실패했다면 이유 출력
+                          print(f"⚠️ 매핑 실패: {f} 에서 게시글 번호(AID)를 찾을 수 없음")
 
           # 3. 실제 수정 작업 실행 (2차 순회)
           print(f"\n--- 2단계: 본문 수정 시작 (총 {len(link_map)}개 대상) ---")
