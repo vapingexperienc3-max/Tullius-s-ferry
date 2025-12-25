@@ -45,10 +45,14 @@ jobs:
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
-                 # 줄바꿈 없이 한 줄로 정리된 스타일 태그 (가장 안전함)
-                  style_tag = '\n<style>html, body { background-color: #1b1b1b !important; } .fr-view, .article-body, .content, .article-wrapper { max-width: 1200px !important; width: 100% !important; margin: 0 auto !important; padding: 20px !important; display: block !important; } @media (min-width: 1200px) { .article-body, .fr-view { width: 1200px !important; } }</style>\n'
-
                   content = content.replace('window.innerWidth', '1200')
+                  content = content.replace('document.documentElement.clientWidth', '1200')
+                  content = content.replace('screen.width', '1200')
+
+                  content = content.replace('max-width: 728px', 'max-width: 1200px')
+                  content = content.replace('max-width: 800px', 'max-width: 1200px')
+
+                  style_tag = '\n<style>html, body { background-color: #1b1b1b !important; } .fr-view, .article-body, .content, .article-wrapper { max-width: 1200px !important; width: 100% !important; margin: 0 auto !important; padding: 20px !important; display: block !important; } @media (min-width: 1200px) { .article-body, .fr-view { width: 1200px !important; } }</style>\n'
                   
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
