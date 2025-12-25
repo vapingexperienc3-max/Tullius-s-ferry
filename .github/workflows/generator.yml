@@ -46,7 +46,7 @@ jobs:
                       content = content.replace(nick, "")
                   
                  # 줄바꿈 없이 한 줄로 정리된 스타일 태그 (가장 안전함)
-                  style_tag = '\n<style>body, .fr-view, .article-body, .content { max-width: 1200px !important; width: 100% !important; margin: 0 auto !important; padding: 20px !important; box-sizing: border-box !important; background-color: #1b1b1b !important; color: #eee !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
+                  style_tag = '\n<style>html, body { background-color: #1b1b1b !important; margin: 0 !important; padding: 0 !important; width: 100% !important; } .fr-view, .article-body, .content, .article-wrapper { max-width: 1200px !important; width: 95% !important; margin: 0 auto !important; padding: 20px !important; box-sizing: border-box !important; background-color: #1b1b1b !important; color: #eee !important; display: block !important; } img { max-width: 100% !important; height: auto !important; display: block; margin: 10px auto; } .article-head, .article-info { max-width: 1200px !important; margin: 0 auto !important; }</style>\n'
                   
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
