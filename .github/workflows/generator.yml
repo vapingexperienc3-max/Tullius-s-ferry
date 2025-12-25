@@ -45,55 +45,15 @@ jobs:
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
-                  # window.innerWidth, clientWidth, screen.width 세 개를 한 번에 돌면서 '9999'로 바꿉니다.
-                  for target in ['window.innerWidth', 'document.documentElement.clientWidth', 'screen.width']:
-                      content = content.replace(target, '9999')
-
-                  content = re.sub(r'<link[^>]*layout\.css[^>]*>', '', content)
-                  content = re.sub(r'<link[^>]*board\.css[^>]*>', '', content)    
-                      
-                  content = content.replace('<script', '')
-                  content = re.sub(r'style="[^"]*width:[^"]*"', '', content)
-
-                  content = content.replace('max-width: 728px', 'max-width: 1200px')
-                  content = content.replace('max-width: 800px', 'max-width: 1200px')
-
-                  style_tag = """
-                  <style>
-                     html, body { 
-                          background-color: #ffffff !important; 
-                          color: #000000 !important; 
-                          margin: 0 !important; 
-                          padding: 0 !important; 
-                      }
-                      .article-body, .fr-view, .article-wrapper {
-                          max-width: 1100px !important;
-                          width: 100% !important;
-                          margin: 0 auto !important;
-                          display: block !important;
-                          padding: 20px !important;
-                          box-sizing: border-box !important;
-                      }
-
-                      p, span, div, li {
-                          line-height: 1.8 !important;
-                          font-size: 16px !important;
-                      }
-                      .sidebar, .nav, .header, .footer, .navbar, .top-header { 
-                          display: none !important; 
-                      }
-                      img { max-width: 100% !important; height: auto !important; }                 
-                  </style>
-                  """
-
-                  if '</head>' in content.lower():
-                      content = content.replace('</head>', style_tag + '\n</head>')
+                  style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
+                  if '<head>' in content.lower():
+                      content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                  
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
-                  
               except:
                   return False
 
@@ -107,19 +67,15 @@ jobs:
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       path = os.path.join(root, f)
-                      print(f"🔍 파일 감지: {f}")  # 일단 파일을 찾으면 무조건 출력
-                      
                       aid = None
-                      # 파일명에서 숫자 추출 (7~11자리)
+                      # 파일명에서 숫자 추출 (게시글 번호)
                       nums = re.findall(r'\d{7,11}', f)
-                      if nums: 
-                          aid = nums[0]
+                      if nums: aid = nums[0]
                       
                       # 파일명에 숫자가 없으면 본문 앞부분에서 추출
                       if not aid:
                           try:
                               with open(path, 'r', encoding='utf-8', errors='ignore') as tmp:
-                                  # 처음 5000자만 읽어서 아카 링크 탐색
                                   m = re.search(r'arca\.live/b/[^/]+/(\d+)', tmp.read(5000))
                                   if m: aid = m.group(1)
                           except: pass
@@ -127,10 +83,8 @@ jobs:
                       if aid:
                           rel_p = os.path.relpath(path, '.').replace('\\', '/')
                           link_map[aid] = rel_p
-                          print(f"🔗 매핑 성공: {aid} -> {rel_p}")
-                      else:
-                          # 매핑에 실패했다면 이유 출력
-                          print(f"⚠️ 매핑 실패: {f} 에서 게시글 번호(AID)를 찾을 수 없음")
+                          # 매핑된 파일 로그 찍기
+                          print(f"🔗 매핑 발견: {aid} -> {rel_p}")
 
           # 3. 실제 수정 작업 실행 (2차 순회)
           print(f"\n--- 2단계: 본문 수정 시작 (총 {len(link_map)}개 대상) ---")
