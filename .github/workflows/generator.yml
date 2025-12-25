@@ -85,6 +85,9 @@ jobs:
                           link_map[aid] = rel_p
                           # 매핑된 파일 로그 찍기
                           print(f"🔗 매핑 발견: {aid} -> {rel_p}")
+                      
+                      if f.endswith('.html'):
+                          print(f"DEBUG: Found file -> {f} in {root}")   
 
           # 3. 실제 수정 작업 실행 (2차 순회)
           print(f"\n--- 2단계: 본문 수정 시작 (총 {len(link_map)}개 대상) ---")
