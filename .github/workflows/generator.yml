@@ -121,13 +121,13 @@ jobs:
               curr_node[parts[-1]]['_files'] = sorted(html_files)
 
           def render_tree(node_name, node_data, depth, is_rr, full_path):
-              icon = "railroad.png" if is_rr else "ElderScroll.webp"
+              icon = "pipboy.png" if is_rr else "ElderScroll.webp"
               text_color = "#FFB000" if is_rr else "#fff"
               bg_color = "rgba(0,0,0,0.6)"
               border_color = "rgba(255,176,0,0.3)" if is_rr else "rgba(255,255,255,0.1)"
-              img_w = "35px" if is_rr else "55px"
+              img_w = "45px" if is_rr else "55px"
               img_style = f"width:{img_w}; aspect-ratio:1/1; object-fit:contain; margin-right:12px; vertical-align:middle;"
-              if is_rr: img_style += " filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg) brightness(1.1); margin-top:-2px;"
+              if is_rr: img_style += " margin-top:-2px;" # 원본 색상 유지를 위해 필터 제외
               
               margin = f"margin-left:{depth * 15}px;"
               html = f"<div style='{margin} margin-bottom:12px; width:100%;' class='tree-node'>"
@@ -140,7 +140,7 @@ jobs:
                   f_path = os.path.join(full_path, f)
                   url = f_path.replace(os.sep, '/')
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
-                  f_icon = f"<span style='color:#FFB000; margin-right:10px; font-size:12px;'>●</span>" if is_rr else f"<img src='ElderScroll.webp' style='width:30px; margin-right:10px; vertical-align:middle;'>"
+                  f_icon = f"<img src='pipboy.png' style='width:25px; margin-right:10px; vertical-align:middle;'>" if is_rr else f"<img src='ElderScroll.webp' style='width:30px; margin-right:10px; vertical-align:middle;'>"
                   link_class = "file-link-v" if is_rr else "file-link-f"
                   html += f'<li style="margin:12px 0;"><a href="{url}" target="_blank" class="{link_class}">{f_icon}{disp}</a></li>'
               
@@ -205,7 +205,7 @@ jobs:
               f.write("<a href='https://github.com/vapingexperienc3-max/Tullius-s-ferry/issues' target='_blank' class='header-btn' style='border-color:#58a6ff; color:#58a6ff;'>📢 피드백 제보</a></div></div></header>")
 
               sf_final = f"<details open style='margin-bottom:15px;'><summary style='color:#fff; font-weight:bold; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.2); display:flex; align-items:center;'><img src='ElderScroll.webp' style='width:55px; margin-right:12px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['ferry']['modpack']}</div></details>{sidebar_data['ferry']['normal']}"
-              srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; padding:5px 0; border-bottom:1px solid rgba(255,176,0,0.3); display:flex; align-items:center;'><img src='railroad.png' style='width:35px; margin-right:12px; filter: invert(1) sepia(1) saturate(5) hue-rotate(-10deg);'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
+              srr_final = f"<details open style='margin-bottom:15px;'><summary style='color:#FFB000; font-weight:bold; padding:5px 0; border-bottom:1px solid rgba(255,176,0,0.3); display:flex; align-items:center;'><img src='pipboy.png' style='width:40px; margin-right:12px;'>모드팩 아카이브</summary><div style='padding-left:10px;'>{sidebar_data['railroad']['modpack']}</div></details>{sidebar_data['railroad']['normal']}"
 
               f.write("<div id='main-wrapper' style='display:none;'><div class='sidebar-nav' id='main-lnb'><h3 id='idx-t' style='border-bottom:2px solid; padding-bottom:10px;'>INDEX</h3><div id='l-ferry'>" + sf_final + "</div><div id='l-vault' style='display:none;'>" + srr_final + "</div></div>")
               f.write("<div class='main-area'><h1 id='t-f' style='display:none; color:#fff; font-size:4.5em; margin:0;'>Tullius' Ferry</h1><h1 id='t-v' style='display:none; color:#FFB000; font-size:4.5em; margin:0;'>The Sole Survivor's Railroad</h1><input type='text' id='search-bar' placeholder='파일 검색...' onkeyup='globalSearch()'><div id='a-ferry'>" + main_contents['ferry'] + "</div><div id='a-vault' style='display:none;'>" + main_contents['railroad'] + "</div></div></div>")
