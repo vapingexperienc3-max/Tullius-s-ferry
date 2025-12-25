@@ -45,23 +45,24 @@ jobs:
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
-                  content = content.replace('window.innerWidth', '1200')
-                  content = content.replace('document.documentElement.clientWidth', '1200')
-                  content = content.replace('screen.width', '1200')
+                  # window.innerWidth, clientWidth, screen.width 세 개를 한 번에 돌면서 '9999'로 바꿉니다.
+                  for target in ['window.innerWidth', 'document.documentElement.clientWidth', 'screen.width']:
+                  content = content.replace(target, '9999')
 
+                  # 기존 728, 800으로 고정된 스타일 수치는 그대로 1200으로 바꿉니다.
                   content = content.replace('max-width: 728px', 'max-width: 1200px')
                   content = content.replace('max-width: 800px', 'max-width: 1200px')
 
-                  style_tag = '\n<style>html, body { background-color: #1b1b1b !important; } .fr-view, .article-body, .content, .article-wrapper { max-width: 1200px !important; width: 100% !important; margin: 0 auto !important; padding: 20px !important; display: block !important; } @media (min-width: 1200px) { .article-body, .fr-view { width: 1200px !important; } }</style>\n'
+                  style_tag = '\n<style>html, body, .fr-view, .article-body, .content, .article-wrapper, .root-container, .main-layout, #content, .container { max-width: 1200px !important; width: 100% !important; min-width: 1200px !important; margin: 0 auto !important; padding: 20px !important; box-sizing: border-box !important; display: block !important; } img, video { max-width: 100% !important; height: auto !important; } body { background-color: #1b1b1b !important; color: #eee !important; }</style>\n'
                   
                   if '<head>' in content.lower():
                       content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
-                  
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
+                  
               except:
                   return False
 
