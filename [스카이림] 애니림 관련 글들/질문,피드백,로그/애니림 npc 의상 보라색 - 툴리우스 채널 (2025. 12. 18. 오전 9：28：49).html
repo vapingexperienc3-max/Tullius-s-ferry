@@ -117,6 +117,31 @@
             .sidebar, .nav, .footer, .header { display: none !important; }
         </style>
         
+
+        <style>
+            html, body { 
+                background-color: #1b1b1b !important; 
+                color: #eee !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                overflow-x: hidden !important; /* 가로 스크롤 방지 */
+            }
+            .article-body, .fr-view, .article-wrapper, .content, .root-container {
+                max-width: 1200px !important;
+                width: 100% !important; /* 고정값 대신 100%로 유연하게 */
+                margin: 0 auto !important;
+                display: block !important;
+                padding: 10px !important; /* 여백 최소화 */
+                box-sizing: border-box !important; /* 패딩이 너비에 포함되게 함 (매우 중요) */
+            }
+            
+            * { box-sizing: border-box !important; word-break: break-all !important; }
+
+            img, video { max-width: 100% !important; height: auto !important; }
+
+            .sidebar, .nav, .footer, .header { display: none !important; }
+        </style>
+        
 </head>
 <body class=body>
  <div id=top></div>
