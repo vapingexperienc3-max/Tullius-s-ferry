@@ -324,11 +324,21 @@ jobs:
               f.write("  audio.volume = vSld.value;\n")
               f.write("}\n")
 
-              # 2. togglePlay 함수 (독립 - window 전역 선언)
+              # 2. togglePlay 함수 수정
               f.write("window.togglePlay = function() {\n")
               f.write("  if(audio.paused) {\n")
-              f.write("    audio.play();\n")
-              f.write("    pBtn.innerText = '⏸';\n")
+              # 만약 src가 비어있거나 초기 상태라면 다시 한번 로드 시도
+              f.write("    if(!audio.src || audio.currentTime === 0) {\n")
+              f.write("       loadTrack(currentMode, currIdx);\n")
+              f.write("    }\n")
+              f.write("    const playPromise = audio.play();\n")
+              f.write("    if (playPromise !== undefined) {\n")
+              f.write("      playPromise.then(_ => {\n")
+              f.write("        pBtn.innerText = '\u23f8';\n") # 일시정지 아이콘
+              f.write("      }).catch(e => {\n")
+              f.write("        console.log('재생 실패:', e);\n")
+              f.write("      });\n")
+              f.write("    }\n")
               f.write("  } else {\n")
               f.write("    audio.pause();\n")
               f.write("    pBtn.innerText = '▶';\n")
