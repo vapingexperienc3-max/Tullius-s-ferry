@@ -252,6 +252,7 @@ jobs:
               f.write("  document.getElementById('main-wrapper').style.display='flex';")
               f.write("  switchTheme(m); document.getElementById('main-lnb').classList.add('active');")
               f.write("  if(particles.length === 0) { setupCanvas(); initSmoke(); animate(); }")
+              f.write("  if(window.syncMusicWithTheme) window.syncMusicWithTheme(m);")
               f.write("}")
               
               f.write("function switchTheme(m){ const b=document.body; if(m==='ferry'){ b.style.setProperty('background-image', \"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('skyrim.png')\", 'important'); b.style.setProperty('background-position', 'center 10%', 'important'); document.getElementById('l-ferry').style.display='block'; document.getElementById('l-vault').style.display='none'; document.getElementById('t-f').style.display='block'; document.getElementById('t-v').style.display='none'; document.getElementById('a-ferry').style.display='block'; document.getElementById('a-vault').style.display='none'; } else { b.style.setProperty('background-image', \"linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4)), url('fallout.png')\", 'important'); b.style.setProperty('background-position', 'center top 70px', 'important'); document.getElementById('l-ferry').style.display='none'; document.getElementById('l-vault').style.display='block'; document.getElementById('t-f').style.display='none'; document.getElementById('t-v').style.display='block'; document.getElementById('a-ferry').style.display='none'; document.getElementById('a-vault').style.display='block'; } }")
@@ -280,44 +281,72 @@ jobs:
               f.write("  }); ")
               f.write("} \n") # globalSearch 함수 끝
 
-              # --- BGM 로직 시작 ---
-              f.write("const playlist = [")
-              f.write("{name:'1. Adventure', file:'1.Adventure(remaster).mp3'},")
-              f.write("{name:'2. Marked', file:'2.Marked.mp3'},")
-              f.write("{name:'3. Forest Walk', file:'3.Forest_Walk.mp3'},")
-              f.write("{name:'4. The Lone Wolf', file:'4.The_Lone_Wolf.mp3'},")
-              f.write("{name:'5. Dragonquest', file:'5.Dragonquest.mp3'},")
-              f.write("{name:'6. Daudir', file:'6.Daudir.mp3'},")
-              f.write("{name:'7. Hymn to the Gods', file:'7.Hymn_to_the_Gods.mp3'},")
-              f.write("{name:'8. The Road Home', file:'8.The_Road_Home_2023.mp3'},")
-              f.write("{name:'9. Mjolnir', file:'9.Mjolnir.mp3'},")
-              f.write("{name:'10. Adventure(Metal)', file:'10.Adventure(Metal_Version).mp3'}")
-              f.write("];\n")
-              
-              f.write("let currIdx = 0; const audio = document.getElementById('main-audio');\n")
-              f.write("const tInfo = document.getElementById('track-info'); const pBtn = document.getElementById('play-btn'); const vSld = document.getElementById('volume-slider');\n")
-              
-              f.write("function loadTrack(idx){ const t = playlist[idx]; audio.src = t.file; tInfo.innerText = t.name; audio.volume = vSld.value; }\n")
-              f.write("function togglePlay(){ if(audio.paused){ audio.play(); pBtn.innerText='⏸'; } else { audio.pause(); pBtn.innerText='▶'; } }\n")
-              
-              # 다음/이전 곡 기능 (독립된 함수로 정의)
+              # --- 통합 BGM 로직 시작 ---
+              f.write("const playlists = {\n")
+              f.write("  skyrim: [\n")
+              f.write("    {name:'1. Adventure', file:'1.Adventure(remaster).mp3'},\n")
+              f.write("    {name:'2. Marked', file:'2.Marked.mp3'},\n")
+              f.write("    {name:'3. Forest Walk', file:'3.Forest_Walk.mp3'},\n")
+              f.write("    {name:'4. The Lone Wolf', file:'4.The_Lone_Wolf.mp3'},\n")
+              f.write("    {name:'5. Dragonquest', file:'5.Dragonquest.mp3'},\n")
+              f.write("    {name:'6. Daudir', file:'6.Daudir.mp3'},\n")
+              f.write("    {name:'7. Hymn to the Gods', file:'7.Hymn_to_the_Gods.mp3'},\n")
+              f.write("    {name:'8. The Road Home', file:'8.The_Road_Home_2023.mp3'},\n")
+              f.write("    {name:'9. Mjolnir', file:'9.Mjolnir.mp3'},\n")
+              f.write("    {name:'10. Adventure(Metal)', file:'10.Adventure(Metal_Version).mp3'}\n")
+              f.write("  ],\n")
+              f.write("  fallout: [\n")
+              f.write("    {name:'1. Happy', file:'1.Happy.mp3'},\n")
+              f.write("    {name:'2. Degenerate Blues', file:'2.Degenerate_Blues.mp3'},\n")
+              f.write("    {name:'3. Stoned', file:'3.Stoned(no_guitar_solo).mp3'},\n")
+              f.write("    {name:'4. Be Chillin', file:'4.Be_Chillin.mp3'},\n")
+              f.write("    {name:'5. Nightfall', file:'5.Nightfall.mp3'},\n")
+              f.write("    {name:'6. Apocalypse Blues', file:'6.Apocalypse_Blues.mp3'},\n")
+              f.write("    {name:'7. Through the Mist', file:'7.Through_the_Mist.mp3'},\n")
+              f.write("    {name:'8. The Collapse', file:'8.The_Collapse.mp3'},\n")
+              f.write("    {name:'9. Lullaby', file:'9.Lullaby.mp3'}\n")
+              f.write("  ]\n")
+              f.write("};\n")
+
+              f.write("let currentMode = 'skyrim'; let currIdx = 0;\n")
+              f.write("const audio = document.getElementById('main-audio');\n")
+              f.write("const tInfo = document.getElementById('track-info');\n")
+              f.write("const pBtn = document.getElementById('play-btn');\n")
+              f.write("const vSld = document.getElementById('volume-slider');\n")
+
+              f.write("function loadTrack(mode, idx) {\n")
+              f.write("  currentMode = mode;\n")
+              f.write("  currIdx = idx;\n")
+              f.write("  const track = playlists[mode][idx];\n")
+              f.write("  audio.src = track.file;\n")
+              f.write("  tInfo.innerText = track.name;\n")
+              f.write("  audio.volume = vSld.value;\n")
+              f.write("}\n")
+
+              # 테마 전환 시 호출할 외부 함수
+              f.write("window.syncMusicWithTheme = function(theme) {\n")
+              f.write("  const newMode = (theme === 'vault') ? 'fallout' : 'skyrim';\n")
+              f.write("  if(currentMode !== newMode) {\n")
+              f.write("    const wasPlaying = !audio.paused;\n")
+              f.write("    loadTrack(newMode, 0);\n")
+              f.write("    if(wasPlaying) audio.play();\n")
+              f.write("  }\n")
+              f.write("};\n")
+
+              # 다음/이전 곡 버튼 함수
               f.write("window.changeTrack = function(dir) {\n")
-              f.write("  currIdx = (currIdx + dir + playlist.length) % playlist.length;\n")
+              f.write("  const list = playlists[currentMode];\n")
+              f.write("  currIdx = (currIdx + dir + list.length) % list.length;\n")
               f.write("  const wasPlaying = !audio.paused;\n")
-              f.write("  loadTrack(currIdx);\n")
+              f.write("  loadTrack(currentMode, currIdx);\n")
               f.write("  if(wasPlaying) audio.play();\n")
               f.write("};\n")
-              
-              # 곡 종료 시 자동 재생 로직 (닫는 중괄호 '};' 추가됨)
-              f.write("audio.onended = () => { \n")
-              f.write("  currIdx = (currIdx + 1) % playlist.length; \n")
-              f.write("  loadTrack(currIdx); \n")
-              f.write("  audio.play(); \n")
-              f.write("  if(!audio.paused) pBtn.innerText='⏸'; \n")
-              f.write("};\n")
+
+              # 곡 종료 시 자동 재생
+              f.write("audio.onended = () => { window.changeTrack(1); };\n")
               
               f.write("vSld.oninput = () => { audio.volume = vSld.value; };\n")
-              f.write("loadTrack(0);\n")
+              f.write("loadTrack('skyrim', 0);\n")
               # --- BGM 로직 끝 ---
               f.write("</script></body></html>")
           EOF
