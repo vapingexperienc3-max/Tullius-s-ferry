@@ -67,11 +67,15 @@ window.changeTrack = function(dir) {
   }
 };
 audio.onended = () => { 
-  currIdx = (currIdx + 1) % playlists[currentMode].length; 
-  loadTrack(currentMode, currIdx); 
-  const playPromise = audio.play();
-  if (playPromise !== undefined) {
-    playPromise.then(_ => { pBtn.innerText='⏸'; }).catch(e => { audio.load(); audio.play(); });
-  }
+  const list = playlists[currentMode];
+  currIdx = (currIdx + 1) % list.length;
+  loadTrack(currentMode, currIdx);
+  audio.play().catch(e => console.log('자동재생 대기'));
 };
+vSld.oninput = () => { audio.volume = vSld.value; };
+loadTrack('skyrim', 0);
+document.addEventListener('click', () => {
+  if (audio.src && audio.paused && currIdx === 0 && audio.currentTime === 0) {
+  }
+}, {once: true});
 </script></body></html>
