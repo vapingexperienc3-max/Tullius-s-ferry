@@ -59,9 +59,19 @@ window.changeTrack = function(dir) {
   currIdx = (currIdx + dir + list.length) % list.length;
   const wasPlaying = !audio.paused;
   loadTrack(currentMode, currIdx);
-  if(wasPlaying) audio.play();
+  if(wasPlaying) {
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(_ => { pBtn.innerText='⏸'; }).catch(error => { console.log('재생 차단됨'); });
+    }
+  }
 };
-audio.onended = () => { window.changeTrack(1); };
-vSld.oninput = () => { audio.volume = vSld.value; };
-loadTrack('skyrim', 0);
+audio.onended = () => { 
+  currIdx = (currIdx + 1) % playlists[currentMode].length; 
+  loadTrack(currentMode, currIdx); 
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(_ => { pBtn.innerText='⏸'; }).catch(e => { audio.load(); audio.play(); });
+  }
+};
 </script></body></html>
