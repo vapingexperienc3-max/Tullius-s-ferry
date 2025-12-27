@@ -292,6 +292,12 @@ jobs:
               f.write("{name:'8. The Road Home', file:'8.The_Road_Home_2023.mp3'},")
               f.write("{name:'9. Mjolnir', file:'9.Mjolnir.mp3'},")
               f.write("{name:'10. Adventure(Metal)', file:'10.Adventure(Metal Version).mp3'}")
+              f.write("window.changeTrack = function(dir) {\n")
+              f.write("  const list = playlists[currentMode];\n")
+              f.write("  currIdx = (currIdx + dir + list.length) % list.length;\n") # 음수 방지 루프 계산
+              f.write("  const wasPlaying = !audio.paused;\n")
+              f.write("  loadTrack((currentMode==='fallout'?'vault':'ferry'), currIdx);\n")
+              f.write("  if(wasPlaying) audio.play();\n")
               f.write("];")
               
               f.write("let currIdx = 0; const audio = document.getElementById('main-audio');")
