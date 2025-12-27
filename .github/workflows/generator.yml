@@ -280,7 +280,7 @@ jobs:
               f.write("  }); ")
               f.write("} \n") # globalSearch 함수 끝
 
-              # 2. BGM 로직 (script 태그 마지막 부분에 삽입)
+              # --- BGM 로직 시작 ---
               f.write("const playlist = [")
               f.write("{name:'1. Adventure', file:'1.Adventure(remaster).mp3'},")
               f.write("{name:'2. Marked', file:'2.Marked.mp3'},")
@@ -292,26 +292,30 @@ jobs:
               f.write("{name:'8. The Road Home', file:'8.The_Road_Home_2023.mp3'},")
               f.write("{name:'9. Mjolnir', file:'9.Mjolnir.mp3'},")
               f.write("{name:'10. Adventure(Metal)', file:'10.Adventure(Metal Version).mp3'}")
-              f.write("];")
+              f.write("];\n")
               
-              f.write("let currIdx = 0; const audio = document.getElementById('main-audio');")
-              f.write("const tInfo = document.getElementById('track-info'); const pBtn = document.getElementById('play-btn'); const vSld = document.getElementById('volume-slider');")
+              f.write("let currIdx = 0; const audio = document.getElementById('main-audio');\n")
+              f.write("const tInfo = document.getElementById('track-info'); const pBtn = document.getElementById('play-btn'); const vSld = document.getElementById('volume-slider');\n")
               
-              f.write("function loadTrack(idx){ const t = playlist[idx]; audio.src = t.file; tInfo.innerText = t.name; audio.volume = vSld.value; }")
-              f.write("function togglePlay(){ if(audio.paused){ audio.play(); pBtn.innerText='⏸'; } else { audio.pause(); pBtn.innerText='▶'; } }")
+              f.write("function loadTrack(idx){ const t = playlist[idx]; audio.src = t.file; tInfo.innerText = t.name; audio.volume = vSld.value; }\n")
+              f.write("function togglePlay(){ if(audio.paused){ audio.play(); pBtn.innerText='⏸'; } else { audio.pause(); pBtn.innerText='▶'; } }\n")
               
-              f.write("audio.onended = () => { \n")
-              f.write("  currIdx = (currIdx + 1) % playlist.length; \n") # 다음 곡 번호 계산 (10번 다음은 1번)
-              f.write("  loadTrack(currIdx); \n")                       # 지연 없이 즉시 파일 로드
-              f.write("  audio.play(); \n")                            # 즉시 재생 시작
-              f.write("  if(!audio.paused) pBtn.innerText='⏸'; \n")      # UI 버튼 상태 갱신
+              # 다음/이전 곡 기능 (독립된 함수로 정의)
               f.write("window.changeTrack = function(dir) {\n")
-              f.write("  const list = playlists[currentMode];\n")
-              f.write("  currIdx = (currIdx + dir + list.length) % list.length;\n") # 음수 방지 루프 계산
+              f.write("  currIdx = (currIdx + dir + playlist.length) % playlist.length;\n")
               f.write("  const wasPlaying = !audio.paused;\n")
-              f.write("  loadTrack((currentMode==='fallout'?'vault':'ferry'), currIdx);\n")
+              f.write("  loadTrack(currIdx);\n")
               f.write("  if(wasPlaying) audio.play();\n")
               f.write("};\n")
+              
+              # 곡 종료 시 자동 재생 로직 (닫는 중괄호 '};' 추가됨)
+              f.write("audio.onended = () => { \n")
+              f.write("  currIdx = (currIdx + 1) % playlist.length; \n")
+              f.write("  loadTrack(currIdx); \n")
+              f.write("  audio.play(); \n")
+              f.write("  if(!audio.paused) pBtn.innerText='⏸'; \n")
+              f.write("};\n")
+              
               f.write("vSld.oninput = () => { audio.volume = vSld.value; };\n")
               f.write("loadTrack(0);\n")
               # --- BGM 로직 끝 ---
