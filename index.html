@@ -39,8 +39,17 @@ function loadTrack(mode, idx) {
 }
 window.togglePlay = function() {
   if(audio.paused) {
-    audio.play();
-    pBtn.innerText = '⏸';
+    if(!audio.src || audio.currentTime === 0) {
+       loadTrack(currentMode, currIdx);
+    }
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(_ => {
+        pBtn.innerText = '⏸';
+      }).catch(e => {
+        console.log('재생 실패:', e);
+      });
+    }
   } else {
     audio.pause();
     pBtn.innerText = '▶';
