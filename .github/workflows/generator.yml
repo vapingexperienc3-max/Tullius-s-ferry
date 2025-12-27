@@ -314,6 +314,7 @@ jobs:
               f.write("const pBtn = document.getElementById('play-btn');\n")
               f.write("const vSld = document.getElementById('volume-slider');\n")
 
+              # 1. loadTrack 함수 (독립)
               f.write("function loadTrack(mode, idx) {\n")
               f.write("  currentMode = mode;\n")
               f.write("  currIdx = idx;\n")
@@ -322,6 +323,17 @@ jobs:
               f.write("  tInfo.innerText = track.name;\n")
               f.write("  audio.volume = vSld.value;\n")
               f.write("}\n")
+
+              # 2. togglePlay 함수 (독립 - window 전역 선언)
+              f.write("window.togglePlay = function() {\n")
+              f.write("  if(audio.paused) {\n")
+              f.write("    audio.play();\n")
+              f.write("    pBtn.innerText = '⏸';\n")
+              f.write("  } else {\n")
+              f.write("    audio.pause();\n")
+              f.write("    pBtn.innerText = '▶';\n")
+              f.write("  }\n")
+              f.write("};\n")
 
               # 테마 전환 시 호출할 외부 함수
               f.write("window.syncMusicWithTheme = function(theme) {\n")
