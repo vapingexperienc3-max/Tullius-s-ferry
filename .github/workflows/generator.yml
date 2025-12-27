@@ -279,7 +279,7 @@ jobs:
               f.write("{name:'1. Adventure', file:'1.Adventure(remaster).mp3'},")
               f.write("{name:'2. Marked', file:'2.Marked.mp3'},")
               f.write("{name:'3. Forest Walk', file:'3.Forest_Walk.mp3'},")
-              f.write("{name:'4. The Lone Wolf', file:'4.The Lone Wolf.mp3'},")
+              f.write("{name:'4. The Lone Wolf', file:'4.The_Lone_Wolf.mp3'},")
               f.write("{name:'5. Dragonquest', file:'5.Dragonquest.mp3'},")
               f.write("{name:'6. Daudir', file:'6.Daudir.mp3'},")
               f.write("{name:'7. Hymn to the Gods', file:'7.Hymn_to_the_Gods.mp3'},")
