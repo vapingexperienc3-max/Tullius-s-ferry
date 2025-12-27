@@ -37,6 +37,15 @@ function loadTrack(mode, idx) {
   tInfo.innerText = track.name;
   audio.volume = vSld.value;
 }
+window.togglePlay = function() {
+  if(audio.paused) {
+    audio.play();
+    pBtn.innerText = '⏸';
+  } else {
+    audio.pause();
+    pBtn.innerText = '▶';
+  }
+};
 window.syncMusicWithTheme = function(theme) {
   const newMode = (theme === 'vault') ? 'fallout' : 'skyrim';
   if(currentMode !== newMode) {
