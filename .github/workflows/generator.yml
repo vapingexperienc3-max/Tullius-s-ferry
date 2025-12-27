@@ -351,14 +351,25 @@ jobs:
               f.write("  currIdx = (currIdx + dir + list.length) % list.length;\n")
               f.write("  const wasPlaying = !audio.paused;\n")
               f.write("  loadTrack(currentMode, currIdx);\n")
-              f.write("  if(wasPlaying) audio.play();\n")
+              # 브라우저 정책 대응: play()가 리턴하는 Promise 처리
+              f.write("  if(wasPlaying) {\n")
+              f.write("    const playPromise = audio.play();\n")
+              f.write("    if (playPromise !== undefined) {\n")
+              f.write("      playPromise.then(_ => { pBtn.innerText='⏸'; }).catch(error => { console.log('재생 차단됨'); });\n")
+              f.write("    }\n")
+              f.write("  }\n")
               f.write("};\n")
 
               # 곡 종료 시 자동 재생
-              f.write("audio.onended = () => { window.changeTrack(1); };\n")
-              
-              f.write("vSld.oninput = () => { audio.volume = vSld.value; };\n")
-              f.write("loadTrack('skyrim', 0);\n")
+              f.write("audio.onended = () => { \n")
+              f.write("  currIdx = (currIdx + 1) % playlists[currentMode].length; \n")
+              f.write("  loadTrack(currentMode, currIdx); \n")
+              # 자동 재생 시에도 Promise 처리 적용
+              f.write("  const playPromise = audio.play();\n")
+              f.write("  if (playPromise !== undefined) {\n")
+              f.write("    playPromise.then(_ => { pBtn.innerText='⏸'; }).catch(e => { audio.load(); audio.play(); });\n")
+              f.write("  }\n")
+              f.write("};\n")
               # --- BGM 로직 끝 ---
               f.write("</script></body></html>")
           EOF
