@@ -291,7 +291,7 @@ jobs:
               f.write("{name:'7. Hymn to the Gods', file:'7.Hymn_to_the_Gods.mp3'},")
               f.write("{name:'8. The Road Home', file:'8.The_Road_Home_2023.mp3'},")
               f.write("{name:'9. Mjolnir', file:'9.Mjolnir.mp3'},")
-              f.write("{name:'10. Adventure(Metal)', file:'10.Adventure(Metal Version).mp3'}")
+              f.write("{name:'10. Adventure(Metal)', file:'10.Adventure(Metal_Version).mp3'}")
               f.write("];\n")
               
               f.write("let currIdx = 0; const audio = document.getElementById('main-audio');\n")
