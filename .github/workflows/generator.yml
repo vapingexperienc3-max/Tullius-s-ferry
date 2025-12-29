@@ -57,34 +57,43 @@ jobs:
               except:
                   return False
                   
-          # --- 패치 1: href="/..." 수정 ---
-          def fix_root_absolute_links(filepath):
+          def fix_all_links(filepath):
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
-                  new = re.sub(r'href="/(?!/|http|https)([^"]+)"', r'href="\1"', content)
-                  if new != content:
-                      with open(filepath, 'w', encoding='utf-8') as f:
-                          f.write(new)
-                      return True
-              except: pass
-              return False
+                  
+                  # 1단계: 한글 인코딩 정규화 (NFC로 강제 고정)
+                  # 서버가 리눅스(NFD)여도 링크는 무조건 윈도우 표준(NFC)으로 생성하게 함
+                  def normalize_match(match):
+                      url = match.group(1)
+                      # 주소의 한글 부분을 NFC로 변환
+                      normalized_url = unicodedata.normalize('NFC', url)
+                      return f'href="{normalized_url}"'
 
-          # --- 패치 2: 레포 이름 누락된 도메인 주소 수정 ---
-          def fix_github_root_links(filepath):
-              try:
-                  with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                      content = f.read()
+                  # 2단계: 도메인 및 상대경로 통합 수정
+                  # 잘못된 도메인 주소 수정
                   new = re.sub(
                       r'href="https://vapingexperienc3-max\.github\.io/(?!Tullius-ferry/)([^"]+)"',
                       r'href="https://vapingexperienc3-max.github.io/Tullius-ferry/\1"',
                       content
                   )
+                  
+                  # 앞의 슬래시(/) 제거 및 상대경로화
+                  new = re.sub(
+                      r'href="/(?!/|http|https|Tullius-ferry)([^"]+)"',
+                      r'href="\1"',
+                      new
+                  )
+
+                  # 모든 href 주소 내의 한글을 NFC로 최종 정규화
+                  new = re.sub(r'href="([^"]+)"', normalize_match, new)
+
                   if new != content:
                       with open(filepath, 'w', encoding='utf-8') as f:
                           f.write(new)
                       return True
-              except: pass
+              except:
+                  pass
               return False
 
           # 2. 파일 탐색 및 매핑 (1차 순회)
@@ -129,9 +138,7 @@ jobs:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
                       if inject_width_style(full_p, link_map):
-                          # 이중 패치 적용
-                          fix_root_absolute_links(full_p)
-                          fix_github_root_links(full_p)
+                         fix_all_links(full_p)  # 통합 패치 하나만 호출
                           # 수정 성공 로그 (이게 보여야 진짜 수정된 것임)
                           print(f"✔️ 수정 완료: {full_p}")
                       else:
