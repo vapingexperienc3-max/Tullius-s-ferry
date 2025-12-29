@@ -57,6 +57,21 @@ jobs:
               except:
                   return False
 
+                  # --- 여기에 GPT의 패치 코드를 추가합니다 ---
+          def fix_root_absolute_links(filepath):
+              try:
+                  with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                      content = f.read()
+                  # 외부 링크 제외하고 href="/..." 만 상대경로로 변경
+                  new = re.sub(r'href="/(?!/|http|https)([^"]+)"', r'href="\1"', content)
+                  if new != content:
+                      with open(filepath, 'w', encoding='utf-8') as f:
+                          f.write(new)
+                      return True
+              except:
+                  pass
+              return False
+
           # 2. 파일 탐색 및 매핑 (1차 순회)
           print("--- 1단계: 파일 탐색 및 매핑 시작 ---")
           print(f"Current Directory: {os.getcwd()}")
@@ -99,6 +114,8 @@ jobs:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
                       if inject_width_style(full_p, link_map):
+                      # --- 바로 여기에 이 한 줄을 추가합니다 ---
+                          fix_root_absolute_links(full_p)
                           # 수정 성공 로그 (이게 보여야 진짜 수정된 것임)
                           print(f"✔️ 수정 완료: {full_p}")
                       else:
