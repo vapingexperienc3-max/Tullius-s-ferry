@@ -36,13 +36,14 @@ jobs:
 
                   def link_replacer(match):
                       aid = match.group(1)
+                      # 맵에 해당 게시글 번호가 있다면 무조건 상대경로로 변환
                       if aid in link_map_data:
-                          # 도메인 주소를 빼고 상대 경로로 연결 (404 방지 핵심)
                           target = urllib.parse.quote(link_map_data[aid])
                           return f'href="./{target}"'
                       return match.group(0)
 
-                  content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
+                  # 패턴을 더 유연하게 수정 (대소문자 무시, 게시판 이름 상관없음)
+                  content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
