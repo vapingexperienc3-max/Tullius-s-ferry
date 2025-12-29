@@ -25,8 +25,7 @@ jobs:
           import os
           import re
           import urllib.parse
-          import unicodedata
-          # ...
+          import unicodedata  # <--- 이 줄이 반드시 있어야 합니다!
           safe_path = "/".join([urllib.parse.quote(unicodedata.normalize('NFC', p)) for p in f_path.replace('\\', '/').split('/')])
 
           # 1. 매핑 준비 및 함수 정의
