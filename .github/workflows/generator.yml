@@ -139,11 +139,16 @@ jobs:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
                       if inject_width_style(full_p, link_map):
-                          fix_all_links(full_p)  # 통합 패치 하나만 호출
-                          # 수정 성공 로그 (이게 보여야 진짜 수정된 것임)
-                          print(f"✔️ 수정 완료: {full_p}")
+                          # 2) 한글 인코딩 및 도메인 통합 패치 실행
+                          # 이 함수가 True를 반환하면 진짜로 파일 내용이 바뀐 것입니다.
+                          if fix_all_links(full_p):
+                              print(f"✔️ 최종 패치 완료 (수정됨): {full_p}")
+                          else:
+                              # 스타일은 바꿨는데 링크는 고칠 게 없었을 경우
+                              print(f"✔️ 스타일 적용 완료: {full_p}")
                       else:
-                          print(f"❌ 수정 실패 또는 스킵: {full_p}")
+                          # 아예 읽기 실패하거나 스킵된 경우
+                          print(f"❌ 작업 스킵: {full_p}")
 
           # 4. 트리 생성 및 인덱스 제작 로직 시작
           tree = {}
