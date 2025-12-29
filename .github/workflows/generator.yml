@@ -179,7 +179,7 @@ jobs:
               html += f"<img src='{icon}' style='{img_style}'>{node_name}</summary>"
               html += "<ul style='margin:0; padding:15px 25px 20px 45px; list-style-type:none;'>"
               
-              for for f in node_data['_files']:
+              for f in node_data['_files']:
                   f_path = os.path.join(full_path, f)
                   # [수정 핵심] 경로를 / 기준으로 쪼개서 각각 인코딩한 뒤 다시 합칩니다.
                   # 이렇게 해야 '폴더/파일.html' 구조는 깨지지 않고 한글/공백만 변환됩니다.
