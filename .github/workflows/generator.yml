@@ -34,22 +34,29 @@ jobs:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
 
+                  modified = False
                   def link_replacer(match):
-                      # match.group(1)은 주소 맨 끝의 숫자(게시글 번호)입니다.
+                      nonlocal modified
                       aid = match.group(1)
+                      # 디버깅용: 현재 찾는 번호가 맵에 있는지 확인
                       if aid in link_map_data:
                           target = urllib.parse.quote(link_map_data[aid])
-                          # 상대 경로로 강제 변환
+                          modified = True
                           return f'href="./{target}"'
                       return match.group(0)
 
-                  # [수정] 패턴을 극도로 단순화하여 매칭 확률을 높임
-                  # arca.live/b/어쩌구/숫자 형태면 무조건 잡습니다.
-                  content = re.sub(r'href="?https://arca\.live/b/[^/]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
+                  # 패턴 매칭 (더 유연하게 수정)
+                  new_content = re.sub(r'href="?https://arca\.live/b/[^/]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
                   
                   style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
-                  if '<head>' in content.lower():
-                      content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                  if '<head>' in new_content.lower() and style_tag not in new_content:
+                      new_content = re.sub(r'(<head.*?>)', r'\1' + style_tag, new_content, flags=re.IGNORECASE)
+                      modified = True
+
+                  if modified:
+                      with open(filepath, 'w', encoding='utf-8') as f:
+                          f.write(new_content)
+                      return True # 실제로 내용이 바뀌었을 때만 True 반환
                   
                   content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
 
