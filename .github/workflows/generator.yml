@@ -25,7 +25,9 @@ jobs:
           import os
           import re
           import urllib.parse
-          import unicodedata # 한글 파일명 정규화용
+          import unicodedata
+          # ...
+          safe_path = "/".join([urllib.parse.quote(unicodedata.normalize('NFC', p)) for p in f_path.replace('\\', '/').split('/')])
 
           # 1. 매핑 준비 및 함수 정의
           link_map = {}
