@@ -62,10 +62,18 @@ jobs:
                   def link_replacer(match):
                       aid = match.group(1)
                       if aid in link_map_data:
-                          # 저장소 이름을 포함한 루트 기준 경로로 생성 (Tullius-ferry 부분 확인 필수)
-                          target = urllib.parse.quote(link_map_data[aid])
-                          # 앞에 /Tullius-ferry/ 를 붙여서 어떤 폴더 깊이에서든 루트를 찾아가게 함
-                          return f'href="/Tullius-ferry/{target}"'
+                          target_path = link_map_data[aid]
+                          
+                          # [핵심] 현재 파일의 위치를 계산해서 '상위 폴더'로 가는 ../ 개수를 맞춥니다.
+                          # 예: 2단계 깊이면 ../../ 를 붙여서 루트로 강제 이동 후 다시 내려감
+                          depth = len(os.path.relpath(filepath, '.').split(os.sep)) - 1
+                          prefix = "../" * depth if depth > 0 else "./"
+                          
+                          # 경로의 각 부분(폴더명, 파일명)을 안전하게 인코딩
+                          parts = [urllib.parse.quote(p) for p in target_path.split('/')]
+                          safe_path = "/".join(parts)
+                          
+                          return f'href="{prefix}{safe_path}"'
                       return match.group(0)
 
                   # 링크 변환 실행 (중복 실행되어도 상관없음)
