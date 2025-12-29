@@ -10,7 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write   # 파일 수정 및 커밋 권한
+      pages: write      # GitHub Pages 배포 권한 (필수!)
+      id-token: write   # 배포 인증을 위한 토큰 권한 (필수!)
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -411,10 +413,25 @@ jobs:
               f.write("</script></body></html>")
           EOF
 
-      - name: Commit and Push
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "FIX: Search logic to show all matching folders within current theme" || exit 0
-          git push origin main
+      # 1. 여기서부터는 - name: Checkout repository 와 같은 세로줄에 맞춰야 합니다. (보통 공백 6칸)
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+  # 2. 여기서부터는 위쪽의 build: 와 똑같이 맨 왼쪽(공백 2칸)으로 바짝 붙어야 합니다.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+            
