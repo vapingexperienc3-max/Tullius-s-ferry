@@ -181,16 +181,14 @@ jobs:
               html += "<ul style='margin:0; padding:15px 25px 20px 45px; list-style-type:none;'>"
               
               for f in node_data['_files']:
-                  # 1. f_path를 여기서 먼저 정의합니다 (이 줄이 없으면 NameError 발생)
+                  # [필수] f_path 정의: 현재 파일의 전체 경로 생성
                   f_path = os.path.join(full_path, f)
                   
-                  # 2. NFC 정규화 적용 (한글 자모 분리 방지)
+                  # [필수] NFC 정규화 및 URL 인코딩: 404 에러 방지 핵심 로직
                   f_path_nfc = unicodedata.normalize('NFC', f_path.replace('\\', '/'))
-                  
-                  # 3. 안전한 URL 인코딩 (404 방지)
                   url = "/".join([urllib.parse.quote(p) for p in f_path_nfc.split('/')])
                   
-                  # 4. 화면 표시용 가공
+                  # 화면 표시용 가공
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
                   f_icon = f"<img src='pipboy.png' style='width:25px; margin-right:10px; vertical-align:middle;'>" if is_rr else f"<img src='ElderScroll.webp' style='width:30px; margin-right:10px; vertical-align:middle;'>"
                   link_class = "file-link-v" if is_rr else "file-link-f"
@@ -198,16 +196,13 @@ jobs:
                   html += f'<li style="margin:12px 0;"><a href="{url}" target="_blank" class="{link_class}">{f_icon}{disp}</a></li>'
               
               html += "</ul>"
+              
+              # 2. 하위 폴더 리스트 처리 (재귀 호출)
               for child_name, child_data in node_data['_dirs'].items():
-                  # 하위 폴더 탐색 시에도 경로를 올바르게 전달
+                  # 하위 폴더 탐색 시에도 os.path.join으로 경로를 정확히 합쳐서 넘깁니다.
                   html += render_tree(child_name, child_data, depth+1, is_rr, os.path.join(full_path, child_name))
-              html += "</details></div>"
-              return html
-
-              html += "</ul>"
-              for child_name, child_data in node_data['_dirs'].items():
-                  html += render_tree(child_name, child_data, depth+1, is_rr, os.path.join(full_path, child_name))
-              html += "</details></div>"
+              
+              html += f"</details></div>"
               return html
 
           main_contents = {"ferry": "", "railroad": ""}
