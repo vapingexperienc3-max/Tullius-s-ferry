@@ -138,7 +138,7 @@ jobs:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
                       if inject_width_style(full_p, link_map):
-                         fix_all_links(full_p)  # 통합 패치 하나만 호출
+                          fix_all_links(full_p)  # 통합 패치 하나만 호출
                           # 수정 성공 로그 (이게 보여야 진짜 수정된 것임)
                           print(f"✔️ 수정 완료: {full_p}")
                       else:
