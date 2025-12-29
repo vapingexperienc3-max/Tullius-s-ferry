@@ -113,20 +113,24 @@ jobs:
                           print(f"🔗 매핑 성공: {aid} -> {rel_p}")
 
           # 3. 실제 수정 작업 실행 (2차 순회)
-          print(f"\n--- 2단계: 본문 수정 시작 (총 {len(link_map)}개 대상) ---")
+          print(f"\n--- 2단계: 본문 수정 및 경로 갱신 시작 (총 {len(link_map)}개 대상) ---")
           for root, dirs, files in os.walk('.'):
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
-                      # 스타일/링크 변환 실행
+                      
+                      # 1) 스타일 및 새 경로(link_map) 주입
+                      # inject_width_style 함수가 내부적으로 무조건 파일을 저장하게 되어 있다면 성공이 뜰 겁니다.
                       if inject_width_style(full_p, link_map):
-                          # 인코딩 패치 및 최종 확인
+                          # 2) 한글 파일명 정규화(NFC) 및 최종 저장
+                          # 이 과정에서 경로 정보가 포함된 링크가 파일에 완전히 박히게 됩니다.
                           if fix_all_links(full_p):
-                              print(f"✔️ 최종 패치 완료 (수정됨): {full_p}")
+                              print(f"✔️ 경로/인코딩 패치 완료: {full_p}")
                           else:
-                              print(f"✔️ 스타일 적용 완료: {full_p}")
+                              print(f"✔️ 스타일/경로 갱신 완료: {full_p}")
                       else:
-                          print(f"❌ 작업 실패: {full_p}")
+                          # 파일이 열리지 않거나 권한 문제일 경우
+                          print(f"❌ 작업 실패 (파일 확인 필요): {full_p}")
 
           # 4. 트리 생성 및 인덱스 제작 로직 시작
           tree = {}
