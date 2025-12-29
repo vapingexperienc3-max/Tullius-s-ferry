@@ -180,7 +180,9 @@ jobs:
               
               for f in node_data['_files']:
                   f_path = os.path.join(full_path, f)
-                  url = f_path.replace(os.sep, '/')
+                  # [수정 핵심] 경로를 / 기준으로 쪼개서 각각 인코딩한 뒤 다시 합칩니다.
+                  # 이렇게 해야 '폴더/파일.html' 구조는 깨지지 않고 한글/공백만 변환됩니다.
+                  url = "/".join([urllib.parse.quote(p) for p in f_path.replace('\\', '/').split('/')])
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
                   f_icon = f"<img src='pipboy.png' style='width:25px; margin-right:10px; vertical-align:middle;'>" if is_rr else f"<img src='ElderScroll.webp' style='width:30px; margin-right:10px; vertical-align:middle;'>"
                   link_class = "file-link-v" if is_rr else "file-link-f"
