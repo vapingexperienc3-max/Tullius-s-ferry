@@ -180,16 +180,22 @@ jobs:
               html += "<ul style='margin:0; padding:15px 25px 20px 45px; list-style-type:none;'>"
               
               for f in node_data['_files']:
-                  f_path = os.path.join(full_path, f)
-                  # [수정 핵심] 경로를 / 기준으로 쪼개서 각각 인코딩한 뒤 다시 합칩니다.
-                  # 이렇게 해야 '폴더/파일.html' 구조는 깨지지 않고 한글/공백만 변환됩니다.
-                  f_path_nfc = unicodedata.normalize('NFC', f_path.replace('\\', '/'))
+                  # 1. 경로 생성 및 NFC 정규화
+                  f_raw_path = os.path.join(full_path, f)
+                  f_path_nfc = unicodedata.normalize('NFC', f_raw_path.replace('\\', '/'))
+                  
+                  # 2. 안전한 URL 인코딩 (404 방어)
                   url = "/".join([urllib.parse.quote(p) for p in f_path_nfc.split('/')])
+                  
+                  # 3. 화면 표시용 이름 정리
                   disp = f.replace('.html', '').split(' (')[0].replace(' - 툴리우스 채널', '')
                   f_icon = f"<img src='pipboy.png' style='width:25px; margin-right:10px; vertical-align:middle;'>" if is_rr else f"<img src='ElderScroll.webp' style='width:30px; margin-right:10px; vertical-align:middle;'>"
                   link_class = "file-link-v" if is_rr else "file-link-f"
+                  
+                  # 4. 리스트 아이템 추가
                   html += f'<li style="margin:12px 0;"><a href="{url}" target="_blank" class="{link_class}">{f_icon}{disp}</a></li>'
-              
+              # --- 파일 리스트 처리 끝 ---
+
               html += "</ul>"
               for child_name, child_data in node_data['_dirs'].items():
                   html += render_tree(child_name, child_data, depth+1, is_rr, os.path.join(full_path, child_name))
