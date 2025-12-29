@@ -26,9 +26,7 @@ jobs:
           import re
           import urllib.parse
           import unicodedata
-          # 여기서 f_path가 뭔지 모르는데 바로 써버림 -> 에러 발생!
-          safe_path = "/".join([urllib.parse.quote(unicodedata.normalize('NFC', p)) for p in f_path.replace('\\', '/').split('/')])
-
+         
           # 1. 매핑 준비 및 함수 정의
           link_map = {}
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
