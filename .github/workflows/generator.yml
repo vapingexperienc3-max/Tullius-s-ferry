@@ -23,111 +23,80 @@ jobs:
           import os
           import re
           import urllib.parse
+          import unicodedata # 한글 파일명 정규화용
 
           # 1. 매핑 준비 및 함수 정의
           link_map = {}
           skyrim_pack_names = ["뷰리다", "애니림", "짬뽕림", "뉴상림", "mz팩", "로어림", "Ferry"]
           fallout_pack_names = ["짬통팩", "스위트폴"]
 
+          # [추가] 통합 링크 및 인코딩 패치 함수
+          def fix_all_links(filepath):
+              try:
+                  with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                      content = f.read()
+                  
+                  # 1) 한글 파일명 정규화 (NFC) - 404 방지 핵심
+                  new_content = unicodedata.normalize('NFC', content)
+                  
+                  # 2) 혹시 남아있을 수 있는 잘못된 도메인 주소를 현재 기준으로 통합
+                  # (이미 상대경로 처리가 되었겠지만, 한 번 더 검구)
+                  changed = (content != new_content)
+                  
+                  if changed:
+                      with open(filepath, 'w', encoding='utf-8') as f:
+                          f.write(new_content)
+                      return True
+                  return False
+              except:
+                  return False
+
           def inject_width_style(filepath, link_map_data):
               try:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
-
-                  modified = False
+                  
+                  # 1. 아카라이브 링크 -> 상대 경로 변환
                   def link_replacer(match):
-                      nonlocal modified
                       aid = match.group(1)
-                      # 디버깅용: 현재 찾는 번호가 맵에 있는지 확인
                       if aid in link_map_data:
                           target = urllib.parse.quote(link_map_data[aid])
-                          modified = True
                           return f'href="./{target}"'
                       return match.group(0)
 
-                  # 패턴 매칭 (더 유연하게 수정)
-                  new_content = re.sub(r'href="?https://arca\.live/b/[^/]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
-                  
-                  style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
-                  if '<head>' in new_content.lower() and style_tag not in new_content:
-                      new_content = re.sub(r'(<head.*?>)', r'\1' + style_tag, new_content, flags=re.IGNORECASE)
-                      modified = True
+                  content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
 
-                  if modified:
-                      with open(filepath, 'w', encoding='utf-8') as f:
-                          f.write(new_content)
-                      return True # 실제로 내용이 바뀌었을 때만 True 반환
+                  # 2. 닉네임 제거
+                  for nick in ["Ryl3", "ryl3", "RYL3"]:
+                      content = content.replace(nick, "")
                   
-                  content = re.sub(r'<meta[^>]*Content-Security-Policy[^>]*>', '', content, flags=re.IGNORECASE)
+                  # 3. 모바일 최적화 스타일
+                  style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
+                  if '<head>' in content.lower():
+                      content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
 
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
               except:
                   return False
-                  
-          def fix_all_links(filepath):
-              try:
-                  with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                      content = f.read()
-                  
-                  # 1단계: 한글 인코딩 정규화 (NFC로 강제 고정)
-                  # 서버가 리눅스(NFD)여도 링크는 무조건 윈도우 표준(NFC)으로 생성하게 함
-                  def normalize_match(match):
-                      url = match.group(1)
-                      # 주소의 한글 부분을 NFC로 변환
-                      normalized_url = unicodedata.normalize('NFC', url)
-                      return f'href="{normalized_url}"'
-
-                  # 2단계: 도메인 및 상대경로 통합 수정
-                  # 잘못된 도메인 주소 수정
-                  new = re.sub(
-                      r'href="https://vapingexperienc3-max\.github\.io/(?!Tullius-ferry/)([^"]+)"',
-                      r'href="https://vapingexperienc3-max.github.io/Tullius-ferry/\1"',
-                      content
-                  )
-                  
-                  # 앞의 슬래시(/) 제거 및 상대경로화
-                  new = re.sub(
-                      r'href="/(?!/|http|https|Tullius-ferry)([^"]+)"',
-                      r'href="\1"',
-                      new
-                  )
-
-                  # 모든 href 주소 내의 한글을 NFC로 최종 정규화
-                  new = re.sub(r'href="([^"]+)"', normalize_match, new)
-
-                  if new != content:
-                      with open(filepath, 'w', encoding='utf-8') as f:
-                          f.write(new)
-                      return True
-              except:
-                  pass
-              return False
 
           # 2. 파일 탐색 및 매핑 (1차 순회)
           print("--- 1단계: 파일 탐색 및 매핑 시작 ---")
-          print(f"Current Directory: {os.getcwd()}")
-          
           for root, dirs, files in os.walk('.'):
-              # 숨김 폴더나 .git 등 제외
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       path = os.path.join(root, f)
-                      print(f"🔍 파일 감지: {f}")  # 일단 파일을 찾으면 무조건 출력
                       
                       aid = None
                       # 파일명에서 숫자 추출 (7~11자리)
                       nums = re.findall(r'\d{7,11}', f)
-                      if nums: 
-                          aid = nums[0]
+                      if nums: aid = nums[0]
                       
-                      # 파일명에 숫자가 없으면 본문 앞부분에서 추출
                       if not aid:
                           try:
                               with open(path, 'r', encoding='utf-8', errors='ignore') as tmp:
-                                  # 처음 5000자만 읽어서 아카 링크 탐색
                                   m = re.search(r'arca\.live/b/[^/]+/(\d+)', tmp.read(5000))
                                   if m: aid = m.group(1)
                           except: pass
@@ -136,9 +105,6 @@ jobs:
                           rel_p = os.path.relpath(path, '.').replace('\\', '/')
                           link_map[aid] = rel_p
                           print(f"🔗 매핑 성공: {aid} -> {rel_p}")
-                      else:
-                          # 매핑에 실패했다면 이유 출력
-                          print(f"⚠️ 매핑 실패: {f} 에서 게시글 번호(AID)를 찾을 수 없음")
 
           # 3. 실제 수정 작업 실행 (2차 순회)
           print(f"\n--- 2단계: 본문 수정 시작 (총 {len(link_map)}개 대상) ---")
@@ -146,17 +112,15 @@ jobs:
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
                       full_p = os.path.join(root, f)
+                      # 스타일/링크 변환 실행
                       if inject_width_style(full_p, link_map):
-                          # 2) 한글 인코딩 및 도메인 통합 패치 실행
-                          # 이 함수가 True를 반환하면 진짜로 파일 내용이 바뀐 것입니다.
+                          # 인코딩 패치 및 최종 확인
                           if fix_all_links(full_p):
                               print(f"✔️ 최종 패치 완료 (수정됨): {full_p}")
                           else:
-                              # 스타일은 바꿨는데 링크는 고칠 게 없었을 경우
                               print(f"✔️ 스타일 적용 완료: {full_p}")
                       else:
-                          # 아예 읽기 실패하거나 스킵된 경우
-                          print(f"❌ 작업 스킵: {full_p}")
+                          print(f"❌ 작업 실패: {full_p}")
 
           # 4. 트리 생성 및 인덱스 제작 로직 시작
           tree = {}
