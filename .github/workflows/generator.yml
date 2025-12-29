@@ -58,29 +58,34 @@ jobs:
                   with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                       content = f.read()
                   
-                  # 1. 아카라이브 링크 -> 상대 경로 변환
+                  # 1. 아카라이브 링크 -> 폴더 포함 상대 경로로 무조건 변환
                   def link_replacer(match):
                       aid = match.group(1)
                       if aid in link_map_data:
+                          # link_map_data[aid]에 이제 '[폴더명]/파일명.html'이 들어있습니다.
                           target = urllib.parse.quote(link_map_data[aid])
                           return f'href="./{target}"'
                       return match.group(0)
 
+                  # 링크 변환 실행 (중복 실행되어도 상관없음)
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
 
                   # 2. 닉네임 제거
                   for nick in ["Ryl3", "ryl3", "RYL3"]:
                       content = content.replace(nick, "")
                   
-                  # 3. 모바일 최적화 스타일
-                  style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
-                  if '<head>' in content.lower():
-                      content = re.sub(r'(<head.*?>)', r'\1' + style_tag, content, flags=re.IGNORECASE)
+                  # 3. 모바일 최적화 스타일 (중복 삽입 방지)
+                  style_tag = '<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>'
+                  if style_tag not in content:
+                      if '<head>' in content.lower():
+                          content = re.sub(r'(<head.*?>)', r'\1\n' + style_tag + '\n', content, flags=re.IGNORECASE)
 
+                  # 4. 무조건 저장 (기존 if changed 로직 제거)
                   with open(filepath, 'w', encoding='utf-8') as f:
                       f.write(content)
                   return True
-              except:
+              except Exception as e:
+                  print(f"Error in inject_width_style: {e}")
                   return False
 
           # 2. 파일 탐색 및 매핑 (1차 순회)
