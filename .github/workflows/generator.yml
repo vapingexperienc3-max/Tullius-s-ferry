@@ -35,17 +35,17 @@ jobs:
                       content = f.read()
 
                   def link_replacer(match):
+                      # match.group(1)은 주소 맨 끝의 숫자(게시글 번호)입니다.
                       aid = match.group(1)
-                      # 맵에 해당 게시글 번호가 있다면 무조건 상대경로로 변환
                       if aid in link_map_data:
                           target = urllib.parse.quote(link_map_data[aid])
+                          # 상대 경로로 강제 변환
                           return f'href="./{target}"'
                       return match.group(0)
 
-                  # 패턴을 더 유연하게 수정 (대소문자 무시, 게시판 이름 상관없음)
-                  content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
-                  for nick in ["Ryl3", "ryl3", "RYL3"]:
-                      content = content.replace(nick, "")
+                  # [수정] 패턴을 극도로 단순화하여 매칭 확률을 높임
+                  # arca.live/b/어쩌구/숫자 형태면 무조건 잡습니다.
+                  content = re.sub(r'href="?https://arca\.live/b/[^/]+/(\d+)[^"\'\s> ]*"?', link_replacer, content, flags=re.IGNORECASE)
                   
                   style_tag = '\n<style>body, .fr-view { max-width: 100% !important; width: 100% !important; margin: 0 !important; padding: 10px !important; } img { max-width: 100% !important; height: auto !important; }</style>\n'
                   if '<head>' in content.lower():
