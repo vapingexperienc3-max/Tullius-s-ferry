@@ -37,8 +37,9 @@ jobs:
                   def link_replacer(match):
                       aid = match.group(1)
                       if aid in link_map_data:
+                          # 도메인 주소를 빼고 상대 경로로 연결 (404 방지 핵심)
                           target = urllib.parse.quote(link_map_data[aid])
-                          return f'href="https://vapingexperienc3-max.github.io/Tullius-ferry/{target}"'
+                          return f'href="./{target}"'
                       return match.group(0)
 
                   content = re.sub(r'href="?https://arca\.live/b/[^/"\'\s> ]+/(\d+)[^"\'\s> ]*"?', link_replacer, content)
