@@ -84,8 +84,9 @@ jobs:
                   return False
 
           # 2. 파일 탐색 및 매핑 (1차 순회)
-          print("--- 1단계: 파일 탐색 및 매핑 시작 ---")
+          print("--- 1단계: 모든 폴더 탐색 및 매핑 시작 ---")
           for root, dirs, files in os.walk('.'):
+              # 숨김 폴더 제외
               dirs[:] = [d for d in dirs if not d.startswith('.')]
               for f in files:
                   if f.endswith('.html') and f not in ['index.html', '404.html']:
@@ -96,6 +97,7 @@ jobs:
                       nums = re.findall(r'\d{7,11}', f)
                       if nums: aid = nums[0]
                       
+                      # 파일명에 숫자가 없으면 본문 앞부분에서 추출
                       if not aid:
                           try:
                               with open(path, 'r', encoding='utf-8', errors='ignore') as tmp:
@@ -104,6 +106,8 @@ jobs:
                           except: pass
                       
                       if aid:
+                          # [핵심 수정] 파일명만 넣는 게 아니라, 폴더 경로를 포함한 상대 경로를 저장
+                          # 예: '폴더/파일.html' 형태로 저장되어 깃허브가 정확히 찾아가게 함
                           rel_p = os.path.relpath(path, '.').replace('\\', '/')
                           link_map[aid] = rel_p
                           print(f"🔗 매핑 성공: {aid} -> {rel_p}")
